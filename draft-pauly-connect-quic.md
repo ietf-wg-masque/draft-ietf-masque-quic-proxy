@@ -87,14 +87,14 @@ The "Client-Connection-Id" header is a Byte Sequence Structured Field {{!I-D.iet
 containing a client's QUIC Connection ID. The byte sequence MAY be zero-length. The ABNF is:
 
 ~~~
-	Client-Connection-Id = sf-binary
+   Client-Connection-Id = sf-binary
 ~~~
 
 The "Server-Connection-Id" header is a Byte Sequence Structured Field {{!I-D.ietf-httpbis-header-structure}}
 containing a server's QUIC Connection ID. The byte sequence MAY be zero-length. The ABNF is:
 
 ~~~
-	Server-Connection-Id = sf-binary
+   Server-Connection-Id = sf-binary
 ~~~
 
 The "Datagram-Flow-ID" header is an Integer Structured Field {{!I-D.ietf-httpbis-header-structure}}
