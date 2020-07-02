@@ -143,7 +143,7 @@ the Server-Connection-Id header, along with a Datagram-Flow-Id header.
 - Creating a mapping entry for the QUIC Connection ID in the given direction (client or server)
 associated with the client's IP address and UDP port.
 For any non-zero-length Client Connection ID, the Connection ID MUST be unique
-across all other clients. 
+across all other clients.
 - Allocating a UDP socket on which to communicate with the requested server.
 
 If these operations can be completed the proxy sends a 2xx (Successful) response.
@@ -207,7 +207,7 @@ The client sends the following request:
 HEADERS + END_HEADERS
 :method = CONNECT-QUIC
 :authority = target.example.com:443
-client-connection-id = :YWJjZA==:
+server-connection-id = :YWJjZA==:
 datagram-flow-id = 1
 ~~~
 
@@ -222,6 +222,23 @@ Destination Connection ID of 0x61626364 directly to the proxy (not tunnelled), a
 these are forwarded directly to the server by the proxy. Similarly, Short Header packets
 from the server with a Destination Connection ID of 0x31323334 are forwarded directly
 to the client.
+
+# Interactions with Load Balancers
+
+Some QUIC servers are accessed using load balancers, as described in {{?I-D.ietf-quic-load-balancers}}.
+These load balancers route packets to servers based on the server's Connection ID. These
+Connection IDs are generated in a way that can be coordinated between servers and their load
+balancers.
+
+If a proxy that supports CONNECT-QUIC is itself running behind a load balancer, extra
+complexity arises once clients start sending packets to the proxy that have Destination Connection
+IDs that belong to the end servers, not the proxy. If the load balancer is not aware of these Connection
+IDs, or the Connection IDs overlap with other Connection IDs used by the load balancer, packets
+can be routed incorrectly.
+
+CONNECT-QUIC proxies generally SHOULD NOT be run behind load balancers; and if they are,
+they MUST coordinate between the proxy and the load balancer to create mappings for proxied
+Connection IDs prior to the proxy sending 2xx (Successful) responses to clients.
 
 # Security Considerations {#security}
 
