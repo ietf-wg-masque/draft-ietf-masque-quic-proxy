@@ -58,7 +58,8 @@ is referred to as the "Server Connection ID".
 
 QUIC packets can be either tunnelled within an HTTP/3 proxy connection using
 QUIC DATAGRAM frames, or be forwarded directly alongside an HTTP/3 proxy
-connection on the same set of IP addresses and UDP ports.
+connection on the same set of IP addresses and UDP ports. CONNECT-QUIC allows
+clients to specify either form of transport.
 
 # The CONNECT-QUIC Method {#connect-quic-method}
 
@@ -77,6 +78,8 @@ CONNECT-QUIC responses are not cacheable.
 The CONNECT-QUIC method as defined in this document can only be supported
 by an HTTP/3 proxy. Use of CONNECT-QUIC with older HTTP versions is undefined and
 MUST be rejected.
+
+[[OPEN ISSUE: Some clients might be unable to connect to proxies with HTTP/3, so HTTP/2 support may be needed.]]
 
 ## CONNECT-QUIC Headers
 
@@ -133,13 +136,18 @@ frames to avoid exposing unnecessary connection metadata. QUIC Short Header
 packets, on the other hand, can send directly to the proxy (without any tunnelling
 or encapsulation) once the proxy has sent a successful response for the Server Connection ID.
 
+Clients SHOULD establish mappings for any Client Connection ID values it provides to
+the destination target. Failure to do so will prevent the target from initiating
+connection migration probes along new paths.
+
 ## Proxy Response Behavior
 
 Upon receipt of a CONNECT-QUIC request, the proxy attempts to establish a forwarding
 path, and validates that it has no overlapping mappings. This includes:
 
 - Validating that the request include one of either the Client-Connection-Id and
-the Server-Connection-Id header, along with a Datagram-Flow-Id header.
+the Server-Connection-Id header, along with a Datagram-Flow-Id header. Requests absent
+any connection ID header MUST be rejected.
 - Creating a mapping entry for the QUIC Connection ID in the given direction (client or server)
 associated with the client's IP address and UDP port.
 For any non-zero-length Client Connection ID, the Connection ID MUST be unique
@@ -151,9 +159,11 @@ This response MUST also echo any Client-Connection-Id, Server-Connection-Id, and
 Datagram-Flow-Id headers included in the request.
 
 At this point, any DATAGRAM frames sent by the client matching a known Server
-Connection ID will be forwarded on the correct UDP socket. Any packets recieved
-directly to the proxy from the client that match a known Server Connection ID
-will be forwarded similarly.
+Connection ID will be forwarded on the correct UDP socket. Specifically, the proxy
+extracts the contents of each DATAGRAM frame and writes them to the UDP socket
+created in response to the CONNECT-QUIC request. Any packets received directly
+to the proxy from the client that match a known Server Connection ID will be
+forwarded similarly.
 
 Any packets received by the proxy from a server that match a known Client Connection
 ID on a matching UDP socket need to be forwarded to the client. The proxy MUST
@@ -169,15 +179,12 @@ Connection ID lasts as long as the stream is open.
 A client that no longer wants a given Connection ID to be forwarded by the proxy, for either
 direction, MUST reset the stream.
 
-If the proxy encounters an error upon sending a forwarded packet, such as an ICMP error,
-it SHOULD send a H3_CONNECT_ERROR stream error {{!I-D.ietf-quic-http}}.
-
 # Example
 
 Consider a client that is establishing a new QUIC connection through the proxy.
 It has selected a Client Connection ID of 0x31323334. It selects the next open datagram flow ID (1).
 In order to inform a proxy of the new QUIC Client Connection ID, and bind that connection ID
-to datagram flow 1, the client sends the following CONNECT-DATAGRAM request:
+to datagram flow 1, the client sends the following CONNECT-QUIC request:
 
 ~~~
 HEADERS + END_HEADERS
@@ -215,7 +222,8 @@ The client also sends its reply to the server in a DATAGRAM frame on flow 1 afte
 request.
 
 Once the proxy sends a 200 response indicating success, packets sent by the client
-that match the Connection ID 0x61626364 will be forwarded to the server.
+that match the Connection ID 0x61626364 will be forwarded to the server, i.e.,
+without proxy decryption.
 
 Upon receiving the response, the client starts sending Short Header packets with a
 Destination Connection ID of 0x61626364 directly to the proxy (not tunnelled), and
@@ -249,6 +257,19 @@ to limit abuse or use of proxies to launch Denial-of-Service attacks.
 Sending QUIC packets by forwarding through a proxy without tunnelling exposes
 some QUIC header metadata to onlookers, and can be used to correlate packets
 flows if an attacker is able to see traffic on both sides of the proxy.
+Tunnelled packets have similar inference problems. An attacker on both sides
+of the proxy can use the size of ingress and egress packets to correlate packets
+belonging to the same connection. (Absent client-side padding, tunneled packets
+will typically have a fixed amount of overhead that is removed before their
+DATAGRAM contents are written to the target.)
+
+Since proxies that forward QUIC packets do not perform any cryptographic
+integrity check, it is possible that these packets are either malformed, replays, or
+otherwise malicious. This may result in proxy targets rate limiting or decreasing
+the reputation of a given proxy.
+
+[[OPEN ISSUE: figure out how clients and proxies interact to learn whether an
+adversary is injecting malicious forwarded packets to induce rate limiting]]
 
 # IANA Considerations {#iana}
 
