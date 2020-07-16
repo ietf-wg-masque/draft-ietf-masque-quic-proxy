@@ -177,7 +177,7 @@ it SHOULD send a H3_CONNECT_ERROR stream error {{!I-D.ietf-quic-http}}.
 Consider a client that is establishing a new QUIC connection through the proxy.
 It has selected a Client Connection ID of 0x31323334. It selects the next open datagram flow ID (1).
 In order to inform a proxy of the new QUIC Client Connection ID, and bind that connection ID
-to datagram flow 1, the client sends the following CONNECT-DATAGRAM request:
+to datagram flow 1, the client sends the following CONNECT-QUIC request:
 
 ~~~
 HEADERS + END_HEADERS
