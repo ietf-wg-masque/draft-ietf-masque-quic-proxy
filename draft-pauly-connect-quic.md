@@ -34,6 +34,24 @@ using an HTTP/3 {{!I-D.ietf-quic-http}} proxy.
 Specifically, this document defines the CONNECT-QUIC HTTP method to support QUIC
 as a proxied protocol.
 
+This document uses the term "target" to refer to the server that a client is accessing via a proxy.
+This target may be an origin hosting content, or another proxy.
+
+This approach to proxying creates two modes for QUIC packets going through a proxy:
+
+1. Tunnelled, in which client <-> target QUIC packets are encapsulated inside client <-> proxy QUIC packets.
+These packets use multiple layers of encryption and congestion control. QUIC long header packets MUST use
+this mode.
+
+2. Forwarded, in which client <-> target QUIC packets are sent directly over the client <-> UDP socket.
+These packets are only encrypted using the client-target keys, and use the client-target congestion control.
+This mode can only be used for QUIC short header packets.
+
+Forwarding is defined as an optimization to reduce CPU processing on clients and proxies, as well as overhead
+for packets on the wire. It provides equivalent properties to cleartext TCP proxies, in that targets see the proxy's
+IP address instead of the client's IP address, but packets sent client <-> proxy and proxy <-> target are easily
+correlatable to entities who can observe traffic on both sides of the proxy.
+
 ## Conventions and Definitions {#conventions}
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
@@ -49,11 +67,11 @@ identifying and routing the packets. Each QUIC Connection ID represents one dire
 of QUIC packets, with the Connection ID being owned and defined by the receiver of the packets.
 
 A Connection ID that is defined by the client of HTTP/3 proxy, and is used
-to route packets from the server to the client when it is a Destination Connection ID,
+to route packets from the target server to the client when it is a Destination Connection ID,
 is referred to as the "Client Connection ID".
 
-A Connection ID that is defined by the server accessed via an HTTP/3 proxy, and is used
-to route packets from the client to the server when it is a Destination Connection ID,
+A Connection ID that is defined by the target server accessed via an HTTP/3 proxy, and is used
+to route packets from the client to the target server when it is a Destination Connection ID,
 is referred to as the "Server Connection ID".
 
 QUIC packets can be either tunnelled within an HTTP/3 proxy connection using
@@ -68,7 +86,7 @@ a particular flow of datagrams associated with a QUIC Connection ID.
 
 CONNECT-QUIC requests follow the same header requirements as CONNECT requests,
 as defined in Section 8.3 of {{!RFC7540}}. Notably, the request MUST include the :authority
-psuedo-header field containing the host and port to which to connect.
+pseudo-header field containing the host and port to which to connect.
 
 Body payloads within CONNECT-QUIC requests are undefined, and SHOULD be treated
 as malformed.
@@ -94,7 +112,7 @@ containing a client's QUIC Connection ID. The byte sequence MAY be zero-length. 
 ~~~
 
 The "Server-Connection-Id" header is a Byte Sequence Structured Field {{!I-D.ietf-httpbis-header-structure}}
-containing a server's QUIC Connection ID. The byte sequence MAY be zero-length. The ABNF is:
+containing a target server's QUIC Connection ID. The byte sequence MAY be zero-length. The ABNF is:
 
 ~~~
    Server-Connection-Id = sf-binary
@@ -118,20 +136,26 @@ DATAGRAM frames, or sent directly to the proxy's IP address and port.
 
 Each request MUST contain exactly one connection ID header, either Client-Connection-Id
 or Server-Connection-Id. Client-Connection-Id requests define paths for receiving
-packets from the server to the client, and Server-Connection-Id requests define paths
-for sending packets from the client to server.
+packets from the target server to the client, and Server-Connection-Id requests define paths
+for sending packets from the client to target server.
 
 Packets tunnelled within DATAGRAM frames can be sent as soon as the
 CONNECT-QUIC request has been sent, even in the same QUIC packet to the proxy.
 That is, the QUIC packet sent from the client to the proxy can contain a STREAM
 frame with the CONNECT-QUIC request, as well as a DATAGRAM frame that contains
 a tunnelled QUIC packet to forward. This is particularly useful for reducing round trips.
+Note that packets sent in DATAGRAM frames before the proxy has sent its
+CONNECT-QUIC response might be dropped if the proxy rejects the request.
+Any DATAGRAM frames that are sent in a separate QUIC packet from the STREAM
+frame that contains the CONNECT-QUIC request might also be dropped in
+the case that the packet arrives at the proxy before the packet containing the
+STREAM frame.
 
 Packets forwarded by sending directly to the proxy's IP address and port MUST
 wait for a successful response to the CONNECT-QUIC request. This ensures
 that the proxy knows how to forward a given packet.
 
-Clients sending QUIC Long Header packets SHOULD tunnel them within DATAGRAM
+Clients sending QUIC Long Header packets MUST tunnel them within DATAGRAM
 frames to avoid exposing unnecessary connection metadata. QUIC Short Header
 packets, on the other hand, can send directly to the proxy (without any tunnelling
 or encapsulation) once the proxy has sent a successful response for the Server Connection ID.
@@ -148,11 +172,11 @@ path, and validates that it has no overlapping mappings. This includes:
 - Validating that the request include one of either the Client-Connection-Id and
 the Server-Connection-Id header, along with a Datagram-Flow-Id header. Requests absent
 any connection ID header MUST be rejected.
-- Creating a mapping entry for the QUIC Connection ID in the given direction (client or server)
+- Creating a mapping entry for the QUIC Connection ID in the given direction (client or target server)
 associated with the client's IP address and UDP port.
 For any non-zero-length Client Connection ID, the Connection ID MUST be unique
 across all other clients.
-- Allocating a UDP socket on which to communicate with the requested server.
+- Allocating a UDP socket on which to communicate with the requested target server.
 
 If these operations can be completed the proxy sends a 2xx (Successful) response.
 This response MUST also echo any Client-Connection-Id, Server-Connection-Id, and
@@ -165,7 +189,7 @@ created in response to the CONNECT-QUIC request. Any packets received directly
 to the proxy from the client that match a known Server Connection ID will be
 forwarded similarly.
 
-Any packets received by the proxy from a server that match a known Client Connection
+Any packets received by the proxy from a target server that match a known Client Connection
 ID on a matching UDP socket need to be forwarded to the client. The proxy MUST
 use DATAGRAM frames on the associated flow ID for any Long Header packets. The proxy
 SHOULD forward directly to the client for any matching Short Header packets.
@@ -206,7 +230,7 @@ When the proxy receives a response from target.example.com:443 that has 0x313233
 as the Destination Connection ID, the proxy will forward that packet to the client on
 DATAGRAM flow 1.
 
-Once the client learns which Connection ID has been selected by the server, it can send
+Once the client learns which Connection ID has been selected by the target server, it can send
 a new request to the proxy to establish a mapping. In this case, that ID is 0x61626364.
 The client sends the following request:
 
@@ -218,17 +242,17 @@ server-connection-id = :YWJjZA==:
 datagram-flow-id = 1
 ~~~
 
-The client also sends its reply to the server in a DATAGRAM frame on flow 1 after sending the new
+The client also sends its reply to the target server in a DATAGRAM frame on flow 1 after sending the new
 request.
 
 Once the proxy sends a 200 response indicating success, packets sent by the client
-that match the Connection ID 0x61626364 will be forwarded to the server, i.e.,
+that match the Connection ID 0x61626364 will be forwarded to the target server, i.e.,
 without proxy decryption.
 
 Upon receiving the response, the client starts sending Short Header packets with a
 Destination Connection ID of 0x61626364 directly to the proxy (not tunnelled), and
-these are forwarded directly to the server by the proxy. Similarly, Short Header packets
-from the server with a Destination Connection ID of 0x31323334 are forwarded directly
+these are forwarded directly to the target by the proxy. Similarly, Short Header packets
+from the target with a Destination Connection ID of 0x31323334 are forwarded directly
 to the client.
 
 # Interactions with Load Balancers
@@ -293,15 +317,15 @@ This document registers the "Client-Connection-Id", "Server-Connection-Id", and
 <[](https://www.iana.org/assignments/message-headers)>.
 
 ~~~
-  +----------------------+----------+--------+---------------+
-  | Header Field Name    | Protocol | Status |   Reference   |
-  +----------------------+----------+--------+---------------+
-  | Client-Connection-Id |   http   |  exp   | This document |
-  +----------------------+----------+--------+---------------+
-  | Server-Connection-Id |   http   |  exp   | This document |
-  +----------------------+----------+--------+---------------+
-  | Datagram-Flow-Id     |   http   |  exp   | This document |
-  +----------------------+----------+--------+---------------+
+  +----------------------+----------+--------+--------------------------------------+
+  | Header Field Name    | Protocol | Status |              Reference               |
+  +----------------------+----------+--------+--------------------------------------+
+  | Client-Connection-Id |   http   |  exp   |            This document             |
+  +----------------------+----------+--------+--------------------------------------+
+  | Server-Connection-Id |   http   |  exp   |            This document             |
+  +----------------------+----------+--------+--------------------------------------+
+  | Datagram-Flow-Id     |   http   |  exp   | {{!I-D.schinazi-masque-connect-udp}} |
+  +----------------------+----------+--------+--------------------------------------+
 ~~~
 
 --- back
