@@ -43,7 +43,7 @@ This approach to proxying creates two modes for QUIC packets going through a pro
 These packets use multiple layers of encryption and congestion control. QUIC long header packets MUST use
 this mode.
 
-2. Forwarded, in which client <-> target QUIC packets are sent directly over the client <-> UDP socket.
+2. Forwarded, in which client <-> target QUIC packets are sent directly over the client <-> proxy UDP socket.
 These packets are only encrypted using the client-target keys, and use the client-target congestion control.
 This mode can only be used for QUIC short header packets.
 
