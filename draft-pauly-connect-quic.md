@@ -211,7 +211,7 @@ In order to inform a proxy of the new QUIC Client Connection ID, and bind that c
 to datagram flow 1, the client sends the following CONNECT-QUIC request:
 
 ~~~
-HEADERS + END_HEADERS
+HEADERS
 :method = CONNECT-QUIC
 :authority = target.example.com:443
 client-connection-id = :MTIzNA==:
