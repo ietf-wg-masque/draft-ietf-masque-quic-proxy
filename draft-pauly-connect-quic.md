@@ -102,23 +102,25 @@ with the 501 (Not Implemented) status code {{!I-D.ietf-httpbis-semantics}}.
 CONNECT-QUIC requests and responses include headers that describe how the proxy routes
 QUIC packets matching a given Connection ID.
 
-The "Client-Connection-Id" header is a Byte Sequence Structured Field {{!I-D.ietf-httpbis-header-structure}}
-containing a client's QUIC Connection ID. The byte sequence MAY be zero-length. The ABNF is:
+"Client-Connection-Id" is an Item Structured Header {{!I-D.ietf-httpbis-header-structure}}, containing a
+client's QUIC Connection ID. Its value MUST be a Byte Sequence. The byte sequence MAY
+be zero-length. Its ABNF is:
 
 ~~~
    Client-Connection-Id = sf-binary
 ~~~
 
-The "Server-Connection-Id" header is a Byte Sequence Structured Field {{!I-D.ietf-httpbis-header-structure}}
-containing a target server's QUIC Connection ID. The byte sequence MAY be zero-length. The ABNF is:
+"Server-Connection-Id" is an Item Structured Header {{!I-D.ietf-httpbis-header-structure}}, containing a
+target server's QUIC Connection ID. Its value MUST be a Byte Sequence. The byte sequence MAY
+be zero-length. Its ABNF is:
 
 ~~~
    Server-Connection-Id = sf-binary
 ~~~
 
-The "Datagram-Flow-ID" header is an Integer Structured Field {{!I-D.ietf-httpbis-header-structure}}
-containing the QUIC datagram flow ID to use for tunnelling packets {{!I-D.schinazi-quic-h3-datagram}}
-{{!I-D.ietf-quic-datagram}}. The ABNF is:
+"Datagram-Flow-ID" is an Item Structured Header {{!I-D.ietf-httpbis-header-structure}}, containing the QUIC
+datagram flow ID to use for tunnelling packets {{!I-D.schinazi-quic-h3-datagram}}. Its value MUST be
+an Integer. Its ABNF is:
 
 ~~~
   Datagram-Flow-Id = sf-integer
