@@ -41,11 +41,11 @@ This approach to proxying creates two modes for QUIC packets going through a pro
 
 1. Tunnelled, in which client <-> target QUIC packets are encapsulated inside client <-> proxy QUIC packets.
 These packets use multiple layers of encryption and congestion control. QUIC long header packets MUST use
-this mode.
+this mode. QUIC short header packets MAY use this mode.
 
 2. Forwarded, in which client <-> target QUIC packets are sent directly over the client <-> proxy UDP socket.
 These packets are only encrypted using the client-target keys, and use the client-target congestion control.
-This mode can only be used for QUIC short header packets.
+This mode MUST only be used for QUIC short header packets.
 
 Forwarding is defined as an optimization to reduce CPU processing on clients and proxies, as well as overhead
 for packets on the wire. It provides equivalent properties to cleartext TCP proxies, in that targets see the proxy's
@@ -88,16 +88,14 @@ CONNECT-QUIC requests follow the same header requirements as CONNECT requests,
 as defined in Section 8.3 of {{!RFC7540}}. Notably, the request MUST include the :authority
 pseudo-header field containing the host and port to which to connect.
 
-Body payloads within CONNECT-QUIC requests are undefined, and SHOULD be treated
-as malformed.
+CONNECT-QUIC requests do not include bodies, and SHOULD include
+a Content-Length header field with a value of "0" {{!I-D.ietf-httpbis-semantics}}.
 
 CONNECT-QUIC responses are not cacheable.
 
 The CONNECT-QUIC method as defined in this document can only be supported
-by an HTTP/3 proxy. Use of CONNECT-QUIC with older HTTP versions is undefined and
-MUST be rejected.
-
-[[OPEN ISSUE: Some clients might be unable to connect to proxies with HTTP/3, so HTTP/2 support may be needed.]]
+by an HTTP/3 proxy. Servers that do not support CONNECT-QUIC SHOULD respond
+with the 501 (Not Implemented) status code {{!I-D.ietf-httpbis-semantics}}.
 
 ## CONNECT-QUIC Headers
 
@@ -155,10 +153,14 @@ Packets forwarded by sending directly to the proxy's IP address and port MUST
 wait for a successful response to the CONNECT-QUIC request. This ensures
 that the proxy knows how to forward a given packet.
 
-Clients sending QUIC Long Header packets MUST tunnel them within DATAGRAM
-frames to avoid exposing unnecessary connection metadata. QUIC Short Header
-packets, on the other hand, can send directly to the proxy (without any tunnelling
-or encapsulation) once the proxy has sent a successful response for the Server Connection ID.
+Clients sending QUIC long header packets MUST tunnel them within DATAGRAM
+frames to avoid exposing unnecessary connection metadata.
+
+QUIC short header packets, on the other hand, can be forwarded directly to the proxy
+(without any tunnelling or encapsulation) once the proxy has sent a successful response
+for the Server Connection ID. Prior to receiving the server response, the client MUST send
+short header packets tunnelled in DATAGRAM frames. The client MAY also choose to tunnel
+some short header packets even after receiving the successful response.
 
 Clients SHOULD establish mappings for any Client Connection ID values it provides to
 the destination target. Failure to do so will prevent the target from initiating
@@ -183,7 +185,7 @@ This response MUST also echo any Client-Connection-Id, Server-Connection-Id, and
 Datagram-Flow-Id headers included in the request.
 
 At this point, any DATAGRAM frames sent by the client matching a known Server
-Connection ID will be forwarded on the correct UDP socket. Specifically, the proxy
+Connection ID will be sent on the correct UDP socket. Specifically, the proxy
 extracts the contents of each DATAGRAM frame and writes them to the UDP socket
 created in response to the CONNECT-QUIC request. Any packets received directly
 to the proxy from the client that match a known Server Connection ID will be
@@ -191,8 +193,14 @@ forwarded similarly.
 
 Any packets received by the proxy from a target server that match a known Client Connection
 ID on a matching UDP socket need to be forwarded to the client. The proxy MUST
-use DATAGRAM frames on the associated flow ID for any Long Header packets. The proxy
-SHOULD forward directly to the client for any matching Short Header packets.
+use DATAGRAM frames on the associated flow ID for any long header packets. The proxy
+SHOULD forward directly to the client for any matching short header packets, but MAY tunnel
+them in DATAGRAM frames.
+
+The proxy MUST only forward non-tunnelled packets from the client that are QUIC short header
+packets (based on the Header Form bit) and have known Client Connection IDs. Packets sent by
+the client that are forwarded SHOULD be considered as activity for restarting QUIC's Idle
+Timeout {{!I-D.ietf-quic-transport}}.
 
 ## Connection ID Mapping Lifetime
 
@@ -201,7 +209,7 @@ on which the proxy has sent a response indicating success, the mapping for forwa
 Connection ID lasts as long as the stream is open.
 
 A client that no longer wants a given Connection ID to be forwarded by the proxy, for either
-direction, MUST reset the stream.
+direction, MUST cancel its CONNECT-QUIC HTTP/3 request {{!I-D.ietf-quic-http}}.
 
 # Example
 
@@ -215,7 +223,7 @@ HEADERS
 :method = CONNECT-QUIC
 :authority = target.example.com:443
 client-connection-id = :MTIzNA==:
-datagram-flow-id = 1
+datagram-flow-id = 2
 ~~~
 
 The client will also send the initial QUIC packet with the Long Header form in a DATAGRAM frame
@@ -239,7 +247,7 @@ HEADERS + END_HEADERS
 :method = CONNECT-QUIC
 :authority = target.example.com:443
 server-connection-id = :YWJjZA==:
-datagram-flow-id = 1
+datagram-flow-id = 2
 ~~~
 
 The client also sends its reply to the target server in a DATAGRAM frame on flow 1 after sending the new
