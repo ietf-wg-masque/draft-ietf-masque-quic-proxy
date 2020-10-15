@@ -62,7 +62,7 @@ when, and only when, they appear in all capitals, as shown here.
 # Required Proxy State {#mappings}
 
 In the methods defined in this document, the proxy is aware of the QUIC Connection IDs
-being used by proxied connections, along with the UDP sockets (IP addresses and ports)
+being used by proxied connections, along with the UDP 4-tuples (local and remote IP addresses and ports)
 used to communicate with the client and the target. Tracking Connection IDs in this way
 allows the proxy to reuse server-facing sockets for multiple connections and support the forwarding
 mode of proxying.
@@ -85,21 +85,24 @@ clients to specify either form of transport.
 In order to correctly route QUIC packets in both tunnelled and forwarded modes, the proxy
 needs to maintain mappings between several items:
 
-- Datagram flow ID, which represents a flow of HTTP/3 DATAGRAMs specific to a single client QUIC connection to the proxy.
-- Client-facing socket, which is the 4-tuple of UDP addresses and ports used to communicate between the client and the proxy.
-- Server-facing socket, which is the 4-tuple of UDP addresses and ports used to communicate between the proxy and the target.
+- Client <-> Proxy QUIC connection, which is a single QUIC connection established from the client to the proxy.
+- Datagram flow ID, which represents a flow of HTTP/3 DATAGRAMs specific to a single client <-> proxy QUIC connection.
+- Client-facing socket, which is the UDP 4-tuple of addresses and ports used to communicate between the client and the proxy.
+- Server-facing socket, which is the UDP 4-tuple of addresses and ports used to communicate between the proxy and the target.
 - Client Connection ID, which is a QUIC Connection ID used to route traffic to a client.
 - Server Connection ID, which is a QUIC Connection ID used to route traffic to a target.
 
+Note that this document refers to UDP 4-tuples (local address, local port, remote address, remote port) as "sockets".
+This is equivalent to a "connected" UDP socket. Implementations will often use UDP socket APIs that only define the local port.
+
 There are three required unidirectional mappings, described below.
 
-## Datagram Flow Mapping
+## Datagram Flow ID Mapping
 
-Each datagram flow MUST be mapped to a single server-facing socket. This datagram flow can be identified by datagram flow ID
-within a unique QUIC connection between the client and the proxy.
+Each pair of client <-> proxy QUIC connection and datagram flow ID MUST be mapped to a single server-facing socket.
 
 ~~~
-Datagram flow => Server-facing socket
+(Client <-> Proxy QUIC connection + Datagram flow ID) => Server-facing socket
 ~~~
 
 Multiple datagram flows can map to the same server-facing socket, but a single datagram flow cannot be mapped to multiple
@@ -118,25 +121,39 @@ Each pair of Server Connection ID and client-facing socket MUST map to a single 
 
 Multiple pairs of Connection IDs and sockets can map to the same server-facing socket.
 
-This mapping guarantees that any QUIC packet sent from the client to the proxy in forwarded mode can be sent to the correct
-target.
+This mapping guarantees that any QUIC packet containing the Server Connection ID sent from the
+client to the proxy in forwarded mode can be sent to the correct target.
 
 ## Client Connection ID Mappings
 
-Each pair of Client Connection ID and server-facing socket MUST map to a single client-facing socket.
-Additionally, that same pair MUST map to a single datagram flow.
+Each pair of Client Connection ID and server-facing socket MUST map to a single datagram flow ID on a single
+client <-> proxy QUIC connection. Additionally, the pair of Client Connection ID and server-facing socket
+MUST map to a single client-facing socket.
 
 ~~~
+(Server-facing socket + Client Connection ID) => (Client <-> Proxy QUIC connection + Datagram flow ID)
 (Server-facing socket + Client Connection ID) => Client-facing socket
-(Server-facing socket + Client Connection ID) => Datagram flow
 ~~~
 
-Multiple pairs of Connection IDs and sockets can map to the same client-facing socket or datagram flow.
+Multiple pairs of Connection IDs and sockets can map to the same datagram flow ID or client-facing socket.
 
 These mappings guarantee that any QUIC packet sent from a target to the proxy in either tunnelled or forwarded
 mode can be sent to the correct client. Note that this mapping becomes trivial if the proxy always opens a new
-server-facing socket for every proxied QUIC connection. The mapping is critical for any case where server-facing
-sockets are shared or reused.
+server-facing socket for every client request with a unique datagram flow ID. The mapping is critical for any case where
+server-facing sockets are shared or reused.
+
+## Detecting Connection ID Conflicts {#conflicts}
+
+In order to be able to route packets correctly in both tunnelled and forwarded mode, proxies MUST check for conflicts
+before creating a new mapping. If a conflict is detected, the proxy will reject a client request, as described in {{response}}.
+
+Two sockets conflict only when the entire 4-tupe (local address, local port, remote address, and remote port) all are identical.
+
+Two Connection IDs conflict when one Connection ID is equal to or a prefix of another. For example, a zero-length Connection
+ID conflicts with all other connection IDs.
+
+The proxy treats two mappings as being in conflict when a confict is detected for all elements on the left side of the
+mapping diagrams above.
 
 # The CONNECT-QUIC Method {#connect-quic-method}
 
@@ -185,7 +202,7 @@ an Integer. Its ABNF is:
   Datagram-Flow-Id = sf-integer
 ~~~
 
-# Client Behavior
+# Client Request Behavior {#request}
 
 A clients sends new CONNECT-QUIC requests when it wants to start
 a new QUIC connection to a target, when it has received a new
@@ -195,8 +212,8 @@ Connection ID to the target.
 Each request MUST contain a Datagram-Flow-Id header and an authority
 pseudo-header identifying the target. All requests for the same QUIC
 Connection between a client and a target SHOULD contain the same Datagram-Flow-Id
-and authority. Any mismatch in these would cause the proxy to treat the requests
-as different proxied connections, which would appear like a migration or NAT
+and authority. Any mismatch in these will cause the proxy to treat the requests
+as different proxied connections, which could appear like a migration or NAT
 rebinding event to the target.
 
 Each request MUST also contain exactly one connection ID header, either Client-Connection-Id
@@ -223,13 +240,11 @@ on connection setup.
 
 Since clients are always aware whether or not they are using a QUIC proxy, clients are
 expected to cooperate with proxies in selecting Client Connection IDs. A proxy
-detects a conflict when it is not able to create a unique mapping using the Client Connection ID. 
+detects a conflict when it is not able to create a unique mapping using the Client Connection ID ({conflicts}). 
 It can reject requests that would cause a conflict and indicate this to the client by replying with a
 409 (Conflict) status. In order to avoid conflicts, clients SHOULD select Connection IDs of at least
-8 bytes in length with unpredictable values.
-A client also MUST NOT select a Client Connection ID that matches the ID used for the QUIC
-connection to the proxy, as this inherently creates
-a conflict.
+8 bytes in length with unpredictable values. A client also MUST NOT select a Client Connection ID
+that matches the ID used for the QUIC connection to the proxy, as this inherently creates a conflict.
 
 Note that packets sent in DATAGRAM frames before the proxy has sent its
 CONNECT-QUIC response might be dropped if the proxy rejects the request.
@@ -283,7 +298,7 @@ receive forwarded short header packets on the socket between itself and the prox
 the received Connection ID to determine if this packet was sent by the proxy, or merely
 forwarded from the target.
 
-# Proxy Response Behavior
+# Proxy Response Behavior {#response}
 
 Upon receipt of a CONNECT-QUIC request, the proxy validates the request,
 tries to establish the appropriate mappings described in {{mappings}}, and
@@ -301,6 +316,10 @@ datagram flow. This UDP socket may already be open (from a previous request from
 client, or another). If the socket is not already created, the proxy creates a new one.
 Proxies can choose to reuse server-facing sockets across multiple datagram flows, or
 have a unique server-facing socket for every datagram flow.
+
+If a proxy reuses server-facing sockets, it SHOULD store which authorities (server names)
+are being accessed over a particular server-facing socket so it can avoid performing a
+new DNS query and potentially choosing a different server IP address.
 
 If the request includes a Client-Connection-Id header, the proxy is receiving a request
 to be able to route traffic back to the client using that Connection ID. If the pair of this
