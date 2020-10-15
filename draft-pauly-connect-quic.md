@@ -47,10 +47,19 @@ this mode. QUIC short header packets MAY use this mode.
 These packets are only encrypted using the client-target keys, and use the client-target congestion control.
 This mode MUST only be used for QUIC short header packets.
 
-Forwarding is defined as an optimization to reduce CPU processing on clients and proxies, as well as overhead
-for packets on the wire. It provides equivalent properties to cleartext TCP proxies, in that targets see the proxy's
-IP address instead of the client's IP address, but packets sent client <-> proxy and proxy <-> target are easily
-correlatable to entities who can observe traffic on both sides of the proxy.
+Forwarding is defined as an optimization to reduce CPU processing on clients and proxies, as well as avoiding MTU
+overhead for packets on the wire. This makes it suitable for deployment situations that otherwise relied on cleartext TCP
+proxies, which cannot support QUIC and have inferior security and privacy properties.
+
+The properties provided by the forwarding mode are as follows:
+
+- All packets sent between the client and the target traverse through the proxy device.
+- The target server cannot know the IP address of the client solely based on the proxied packets the target receives.
+- Observers of either or both of the client <-> proxy link and the proxy <-> target are not able to learn more about
+the client <-> target communication than if no proxy was used.
+
+It is not a goal of forwarding mode to prevent correlation between client <-> proxy and the proxy <-> target packets
+from an entity that can observe both links. See {{security}} for futher discussion.
 
 ## Conventions and Definitions {#conventions}
 
