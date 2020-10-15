@@ -85,7 +85,7 @@ clients to specify either form of transport.
 In order to correctly route QUIC packets in both tunnelled and forwarded modes, the proxy
 needs to maintain mappings between several items:
 
-- Datagram flow, which is a flow of QUIC DATAGRAM frames specific to a single client QUIC connection to the proxy.
+- Datagram flow, which is a flow of HTTP/3 DATAGRAMs specific to a single client QUIC connection to the proxy.
 - Client-facing socket, which is the set of UDP addresses and ports used to communicate between the client and the proxy.
 - Server-facing socket, which is the set of UDP addresses and ports used to communicate between the proxy and the target.
 - Client Connection ID, which is a QUIC Connection ID used to route traffic to a client.
@@ -135,7 +135,7 @@ Multiple pairs of Connection IDs and sockets can map to the same client-facing s
 
 These mapping guarantee that any QUIC packet sent from a target to the proxy in either tunnelled or forwarded
 mode can be sent to the correct client. Note that this mapping becomes trivial if the proxy always opens a new
-server-facing socket for ever proxied QUIC connection. The mapping is critical for any case where server-facing
+server-facing socket for every proxied QUIC connection. The mapping is critical for any case where server-facing
 sockets are shared or reused.
 
 # The CONNECT-QUIC Method {#connect-quic-method}
@@ -187,7 +187,7 @@ an Integer. Its ABNF is:
 
 # Client Behavior
 
-A clients sends new CONNECT-QUIC request when it wants to start
+A clients sends new CONNECT-QUIC requests when it wants to start
 a new QUIC connection to a target, when it has received a new
 Server Connection ID for the target, and before it advertises a new Client
 Connection ID to the target.
@@ -204,7 +204,7 @@ or Server-Connection-Id. Client-Connection-Id requests define paths for receivin
 packets from the target server to the client, and Server-Connection-Id requests define paths
 for sending packets from the client to target server.
 
-## New proxied connection setup
+## New Proxied Connection Setup
 
 The first time that a client uses a proxy for a given QUIC connection, it selects a new datagram
 flow ID with an even-numbered value {{!I-D.schinazi-quic-h3-datagram}}.
@@ -223,12 +223,12 @@ on connection setup.
 
 Since clients are always aware whether or not they are using a QUIC proxy, clients are
 expected to cooperate with proxies in selecting Client Connection IDs. A proxy
-can reject a new Client Connection ID if it is not able to create a unique mapping.
-In order to avoid this, clients SHOULD select Connection IDs at least 8 bytes in length
-with unpredictable values. A conflict in Client Connection IDs is indicated by the server
-replying with a 409 (Conflict) status to a request that contains a Client Connection ID.
-A client also MUST NOT select the a matching Client Connection ID for its QUIC
-connection to the proxy and its QUIC connection to the target, as this inherently creates
+detects a conflict when it is not able to create a unique mapping using the Client Connection ID. 
+It can reject requests that would cause a conflict and indicate this to the client by replying with a
+409 (Conflict) status. In order to avoid conflicts, clients SHOULD select Connection IDs of at least
+8 bytes in length with unpredictable values.
+A client also MUST NOT select a Client Connection ID that matches the ID used for the QUIC
+connection to the proxy, as this inherently creates
 a conflict.
 
 Note that packets sent in DATAGRAM frames before the proxy has sent its
@@ -247,16 +247,16 @@ QUIC Initial packet and chooses a Connection ID that is too short or hits a conf
 with an existing mapping to the same target server, it will need to generate a new
 QUIC Initial.
 
-## Adding new Client Connection IDs
+## Adding New Client Connection IDs
 
 A client can add new Connection IDs to a proxied QUIC connection by sending
 a NEW_CONNECTION_ID frame.
 
 Prior to sending a NEW_CONNECTION_ID frame to the target for a client Connection
 ID, the client MUST send a CONNECT-QUIC request to the proxy, and only send the
-NEW_CONNECTION_ID once a successful response is received.
+NEW_CONNECTION_ID frame once a successful response is received.
 
-## Sending with forwarded mode
+## Sending With Forwarded Mode
 
 Once the client has learned the target server's Connection ID, such as in the response
 to a QUIC Initial packet, it can send a request containing the Server-Connection-Id
@@ -275,7 +275,7 @@ When forwarding, the client sends a QUIC packet with the target server's Connect
 in the QUIC short header, using the same socket between client and proxy that was used
 for the main QUIC connection between client and proxy.
 
-## Receiving with forwarded mode
+## Receiving With Forwarded Mode
 
 Once a Client Connection ID has been accepted by the proxy, the client MUST be prepared to
 receive forwarded short header packets on the socket between itself and the proxy. It uses
