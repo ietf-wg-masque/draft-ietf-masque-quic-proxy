@@ -133,7 +133,7 @@ Additionally, that same pair MUST map to a single datagram flow.
 
 Multiple pairs of Connection IDs and sockets can map to the same client-facing socket or datagram flow.
 
-These mapping guarantee that any QUIC packet sent from a target to the proxy in either tunnelled or forwarded
+These mappings guarantee that any QUIC packet sent from a target to the proxy in either tunnelled or forwarded
 mode can be sent to the correct client. Note that this mapping becomes trivial if the proxy always opens a new
 server-facing socket for every proxied QUIC connection. The mapping is critical for any case where server-facing
 sockets are shared or reused.
@@ -265,8 +265,9 @@ mode. Prior to receiving the server response, the client MUST send short header 
 tunnelled in DATAGRAM frames. The client MAY also choose to tunnel some short header
 packets even after receiving the successful response.
 
-If the client receives an error, such as a 409 (Conflict) response, it MUST NOT forward
-packets to the requested Server Connection ID, but only use tunnelled mode.
+If the client's request that included the Server-Connection-Id is rejected, for example with
+a 409 (Conflict) response, it MUST NOT forward packets to the requested
+Server Connection ID, but only use tunnelled mode.
 
 QUIC long header packets MUST NOT be forwarded. These packets can only be tunnelled within
 DATAGRAM frames to avoid exposing unnecessary connection metadata.
