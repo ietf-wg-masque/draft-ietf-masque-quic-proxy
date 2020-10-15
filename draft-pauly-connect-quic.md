@@ -173,7 +173,7 @@ connection migration probes along new paths.
 Upon receipt of a CONNECT-QUIC request, the proxy attempts to establish a forwarding
 path, and validates that it has no overlapping mappings. This includes:
 
-- Validating that the request include one of either the Client-Connection-Id and
+- Validating that the request includes one of either the Client-Connection-Id and
 the Server-Connection-Id header, along with a Datagram-Flow-Id header. Requests absent
 any connection ID header MUST be rejected.
 - Creating a mapping entry for the QUIC Connection ID in the given direction (client or target server)
@@ -216,9 +216,9 @@ direction, MUST cancel its CONNECT-QUIC HTTP/3 request {{!I-D.ietf-quic-http}}.
 # Example
 
 Consider a client that is establishing a new QUIC connection through the proxy.
-It has selected a Client Connection ID of 0x31323334. It selects the next open datagram flow ID (1).
+It has selected a Client Connection ID of 0x31323334. It selects the next open datagram flow ID (2).
 In order to inform a proxy of the new QUIC Client Connection ID, and bind that connection ID
-to datagram flow 1, the client sends the following CONNECT-QUIC request:
+to datagram flow 2, the client sends the following CONNECT-QUIC request:
 
 ~~~
 HEADERS
@@ -229,30 +229,30 @@ datagram-flow-id = 2
 ~~~
 
 The client will also send the initial QUIC packet with the Long Header form in a DATAGRAM frame
-with flow ID 1.
+with flow ID 2.
 
 Once the proxy sends a 200 response indicating success, packets received by the proxy
 that match the Connection ID 0x31323334 will be directly forwarded to the client.
-The proxy will also forward the initial QUIC packet received on DATAGRAM flow 1 to
+The proxy will also forward the initial QUIC packet received on DATAGRAM flow 2 to
 target.example.com:443.
 
 When the proxy receives a response from target.example.com:443 that has 0x31323334
 as the Destination Connection ID, the proxy will forward that packet to the client on
-DATAGRAM flow 1.
+DATAGRAM flow 2.
 
 Once the client learns which Connection ID has been selected by the target server, it can send
 a new request to the proxy to establish a mapping. In this case, that ID is 0x61626364.
 The client sends the following request:
 
 ~~~
-HEADERS + END_HEADERS
+HEADERS
 :method = CONNECT-QUIC
 :authority = target.example.com:443
 server-connection-id = :YWJjZA==:
 datagram-flow-id = 2
 ~~~
 
-The client also sends its reply to the target server in a DATAGRAM frame on flow 1 after sending the new
+The client also sends its reply to the target server in a DATAGRAM frame on flow 2 after sending the new
 request.
 
 Once the proxy sends a 200 response indicating success, packets sent by the client
@@ -327,15 +327,15 @@ This document registers the "Client-Connection-Id", "Server-Connection-Id", and
 <[](https://www.iana.org/assignments/message-headers)>.
 
 ~~~
-  +----------------------+----------+--------+--------------------------------------+
-  | Header Field Name    | Protocol | Status |              Reference               |
-  +----------------------+----------+--------+--------------------------------------+
-  | Client-Connection-Id |   http   |  exp   |            This document             |
-  +----------------------+----------+--------+--------------------------------------+
-  | Server-Connection-Id |   http   |  exp   |            This document             |
-  +----------------------+----------+--------+--------------------------------------+
-  | Datagram-Flow-Id     |   http   |  exp   | {{!I-D.schinazi-masque-connect-udp}} |
-  +----------------------+----------+--------+--------------------------------------+
+  +----------------------+----------+--------+----------------------------------+
+  | Header Field Name    | Protocol | Status |            Reference             |
+  +----------------------+----------+--------+----------------------------------+
+  | Client-Connection-Id |   http   |  exp   |          This document           |
+  +----------------------+----------+--------+----------------------------------+
+  | Server-Connection-Id |   http   |  exp   |          This document           |
+  +----------------------+----------+--------+----------------------------------+
+  | Datagram-Flow-Id     |   http   |  exp   | {{!I-D.ietf-masque-connect-udp}} |
+  +----------------------+----------+--------+----------------------------------+
 ~~~
 
 --- back
@@ -343,5 +343,5 @@ This document registers the "Client-Connection-Id", "Server-Connection-Id", and
 # Acknowledgments {#acknowledgments}
 {:numbered="false"}
 
-This work-in-progress proposal is partly based on {{?I-D.schinazi-masque-connect-udp}},
+This work-in-progress proposal is partly based on {{?I-D.ietf-masque-connect-udp}},
 and the proposal for the MASQUE protocol more generally.
