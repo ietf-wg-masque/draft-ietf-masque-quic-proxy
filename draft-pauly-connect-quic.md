@@ -59,12 +59,15 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 document are to be interpreted as described in BCP 14 {{!RFC2119}} {{!RFC8174}}
 when, and only when, they appear in all capitals, as shown here.
 
-# Proxying using QUIC Connection IDs
+# Required Proxy State {#mappings}
 
-The method described in this document proxies flows at the granularity of QUIC
-Connection IDs, which are exposed in QUIC packets and can be used for
-identifying and routing the packets. Each QUIC Connection ID represents one direction
-of QUIC packets, with the Connection ID being owned and defined by the receiver of the packets.
+In the methods defined in this document, the proxy is aware of the QUIC Connection IDs
+being used by proxied connections, along with the sockets (UDP addresses and ports)
+used to communicate with the client and the target. Tracking Connection IDs in this way
+allows the proxy to reuse sockets for multiple connections and support the forwarding
+mode of proxying.
+
+A QUIC Connection ID identifies the receiver of a packet, and is defined by the receiver.
 
 A Connection ID that is defined by the client of HTTP/3 proxy, and is used
 to route packets from the target server to the client when it is a Destination Connection ID,
@@ -78,6 +81,62 @@ QUIC packets can be either tunnelled within an HTTP/3 proxy connection using
 QUIC DATAGRAM frames, or be forwarded directly alongside an HTTP/3 proxy
 connection on the same set of IP addresses and UDP ports. CONNECT-QUIC allows
 clients to specify either form of transport.
+
+In order to correctly route QUIC packets in both tunnelled and forwarded modes, the proxy
+needs to maintain mappings between several items:
+
+- Datagram flow, which is a flow of QUIC DATAGRAM frames specific to a single client QUIC connection to the proxy.
+- Client-facing socket, which is the set of UDP addresses and ports used to communicate between the client and the proxy.
+- Server-facing socket, which is the set of UDP addresses and ports used to communicate between the proxy and the target.
+- Client Connection ID, which is a QUIC Connection ID used to route traffic to a client.
+- Server Connection ID, which is a QUIC Connection ID used to route traffic to a target.
+
+There are three required mappings, described below.
+
+## Datagram Flow Mapping
+
+Each datagram flow MUST be mapped to a single server-facing socket. This datagram flow can be identified by datagram flow ID
+within a unique QUIC connection between the client and the proxy.
+
+~~~
+Datagram flow => Server-facing socket
+~~~
+
+Multiple datagram flows can map to the same server-facing socket, but a single datagram flow cannot be mapped to multiple
+server-facing sockets.
+
+This mapping guarantees that any QUIC packet sent from the client to the proxy in tunnelled mode can be sent to the correct
+target.
+
+## Server Connection ID Mapping
+
+Each pair of Server Connection ID and client-facing socket MUST map to a single server-facing socket.
+
+~~~
+(Client-facing socket + Server Connection ID) => Server-facing socket
+~~~
+
+Multiple pairs of Connection IDs and sockets can map to the same server-facing socket.
+
+This mapping guarantees that any QUIC packet sent from the client to the proxy in forwarded mode can be sent to the correct
+target.
+
+## Client Connection ID Mappings
+
+Each pair of Client Connection ID and server-facing socket MUST map to a single client-facing socket.
+Additionally, that same pair MUST map to a single datagram flow.
+
+~~~
+(Server-facing socket + Client Connection ID) => Client-facing socket
+(Server-facing socket + Client Connection ID) => Datagram flow
+~~~
+
+Multiple pairs of Connection IDs and sockets can map to the same client-facing socket or datagram flow.
+
+These mapping guarantee that any QUIC packet sent from a target to the proxy in either tunnelled or forwarded
+mode can be sent to the correct client. Note that this mapping becomes trivial if the proxy always opens a new
+server-facing socket for ever proxied QUIC connection. The mapping is critical for any case where server-facing
+sockets are shared or reused.
 
 # The CONNECT-QUIC Method {#connect-quic-method}
 
@@ -126,92 +185,165 @@ an Integer. Its ABNF is:
   Datagram-Flow-Id = sf-integer
 ~~~
 
-## Client Request Behavior
+# Client Behavior
 
-Whenever a client wants to send QUIC packets through the proxy, or receive
-QUIC packets via the proxy, it sends a new CONNECT-QUIC request.
+A clients sends new CONNECT-QUIC request when it wants to start
+a new QUIC connection to a target, when it has received a new
+Server Connection ID for the target, and before it advertises a new Client
+Connection ID to the target.
 
-Clients can choose to send QUIC packets to the proxy either tunnelled within
-DATAGRAM frames, or sent directly to the proxy's IP address and port.
+Each request MUST contain a Datagram-Flow-Id header and an authority
+psuedo-header identifying the target. All requests for the same QUIC
+Connection between a client and a target SHOULD contain the same Datagram-Flow-Id
+and authority. Any mismatch in these would cause the proxy to treat the requests
+as different proxied connections, which would appear like a migration or NAT
+rebinding event to the target.
 
-Each request MUST contain exactly one connection ID header, either Client-Connection-Id
+Each request MUST also contain exactly one connection ID header, either Client-Connection-Id
 or Server-Connection-Id. Client-Connection-Id requests define paths for receiving
 packets from the target server to the client, and Server-Connection-Id requests define paths
 for sending packets from the client to target server.
 
-Packets tunnelled within DATAGRAM frames can be sent as soon as the
-CONNECT-QUIC request has been sent, even in the same QUIC packet to the proxy.
-That is, the QUIC packet sent from the client to the proxy can contain a STREAM
-frame with the CONNECT-QUIC request, as well as a DATAGRAM frame that contains
-a tunnelled QUIC packet to forward. This is particularly useful for reducing round trips.
+## New proxied connection setup
+
+The first time that a client uses a proxy for a given QUIC connection, it selects a new datagram
+flow ID with an even-numbered value {{!I-D.schinazi-quic-h3-datagram}}.
+
+The first request the clients makes MUST contain the authority psuedo-header and the
+Datagram-Flow-Id and Client-Connection-Id headers, containing the selected datagram
+flow ID and the Client Connection ID that will be used in the initial QUIC packets sent through
+the proxy.
+
+The client can start sending packets tunnelled within DATAGRAM frames as soon as this
+first CONNECT-QUIC request for the datagram flow ID has been sent, even in the same QUIC
+packet to the proxy. That is, the QUIC packet sent from the client to the proxy can contain a
+STREAM frame containing the CONNECT-QUIC request, as well as a DATAGRAM frame that contains
+a tunnelled QUIC packet to send to the target. This is particularly useful for reducing round trips
+on connection setup.
+
+Since clients are always aware whether or not they are using a QUIC proxy, clients are
+expected to cooperate with proxies in selecting Client Connection IDs. A proxy
+can reject a new Client Connection ID if it is not able to create a unique mapping.
+In order to avoid this, clients SHOULD select Connection IDs at least 8 bytes in length
+with unpredictable values. A conflict in Client Connection IDs is indicated by the server
+replying with a 409 (Conflict) status to a request that contains a Client Connection ID.
+A client also MUST NOT select the a matching Client Connection ID for its QUIC
+connection to the proxy and its QUIC connection to the target, as this inherently creates
+a conflict.
+
 Note that packets sent in DATAGRAM frames before the proxy has sent its
 CONNECT-QUIC response might be dropped if the proxy rejects the request.
-Any DATAGRAM frames that are sent in a separate QUIC packet from the STREAM
-frame that contains the CONNECT-QUIC request might also be dropped in
-the case that the packet arrives at the proxy before the packet containing the
-STREAM frame.
+Specifically, this can occur if the Client Connection ID hits a conflict and the proxy
+returns a 409 (Conflict) error. Any DATAGRAM frames that are sent in a separate
+QUIC packet from the STREAM frame that contains the CONNECT-QUIC request might
+also be dropped in the case that the packet arrives at the proxy before the packet
+containing the STREAM frame.
 
-Packets forwarded by sending directly to the proxy's IP address and port MUST
-wait for a successful response to the CONNECT-QUIC request. This ensures
-that the proxy knows how to forward a given packet.
+If the server rejects the first request that uses a specific datagram flow ID, the client
+MUST retire that datagram flow ID. If the rejection indicated a conflict due to the
+Client Connection ID, the client MUST select a new Connection ID before sending
+a new request, and generate a new packet. For example, if a client is sending a
+QUIC Initial packet and chooses a Connection ID that is too short or hits a conflict
+with an existing mapping to the same target server, it will need to generate a new
+QUIC Initial.
 
-Clients sending QUIC long header packets MUST tunnel them within DATAGRAM
-frames to avoid exposing unnecessary connection metadata.
+## Adding new Client Connection IDs
 
-QUIC short header packets, on the other hand, can be forwarded directly to the proxy
-(without any tunnelling or encapsulation) once the proxy has sent a successful response
-for the Server Connection ID. Prior to receiving the server response, the client MUST send
-short header packets tunnelled in DATAGRAM frames. The client MAY also choose to tunnel
-some short header packets even after receiving the successful response.
+A client can add new Connection IDs to a proxied QUIC connection by sending
+a NEW_CONNECTION_ID frame.
 
-Clients SHOULD establish mappings for any Client Connection ID values it provides to
-the destination target. Failure to do so will prevent the target from initiating
-connection migration probes along new paths.
+Prior to sending a NEW_CONNECTION_ID frame to the target for a client Connection
+ID, the client MUST send a CONNECT-QUIC request to the proxy, and only send the
+NEW_CONNECTION_ID once a successful response is received.
 
-## Proxy Response Behavior
+## Sending with forwarded mode
 
-Upon receipt of a CONNECT-QUIC request, the proxy attempts to establish a forwarding
-path, and validates that it has no overlapping mappings. This includes:
+Once the client has learned the target server's Connection ID, such as in the response
+to a QUIC Initial packet, it can send a request containing the Server-Connection-Id
+header. The client MUST wait for a successful 200 (OK) response before using forwarded
+mode. Prior to receiving the server response, the client MUST send short header packets
+tunnelled in DATAGRAM frames. The client MAY also choose to tunnel some short header
+packets even after receiving the successful response.
 
-- Validating that the request includes one of either the Client-Connection-Id and
-the Server-Connection-Id header, along with a Datagram-Flow-Id header. Requests absent
-any connection ID header MUST be rejected.
-- Creating a mapping entry for the QUIC Connection ID in the given direction (client or target server)
-associated with the client's IP address and UDP port.
-For any non-zero-length Client Connection ID, the Connection ID MUST be unique
-across all other clients.
-- Allocating a UDP socket on which to communicate with the requested target server.
+If the client receives an error, such as a 409 (Conflict) response, it MUST NOT forward
+packets to the requested Server Connection ID, but only use tunnelled mode.
 
-If these operations can be completed the proxy sends a 2xx (Successful) response.
-This response MUST also echo any Client-Connection-Id, Server-Connection-Id, and
+QUIC long header packets MUST NOT be forwarded. These packets can only be tunnelled within
+DATAGRAM frames to avoid exposing unnecessary connection metadata.
+
+When forwarding, the client sends a QUIC packet with the target server's Connection ID
+in the QUIC short header, using the same socket between client and proxy that was used
+for the main QUIC connection between client and proxy.
+
+## Receiving with forwarded mode
+
+Once a Client Connection ID has been accepted by the proxy, the client MUST be prepared to
+receive forwarded short header packets on the socket between itself and the proxy. It uses
+the received Connection ID to determine if this packet was sent by the proxy, or merely
+forwarded from the target.
+
+# Proxy Response Behavior
+
+Upon receipt of a CONNECT-QUIC request, the proxy validates the request,
+tries to establish the appropriate mappings described in {{mappings}}, and
+establish a new server-facing socket if necessary.
+
+The proxy MUST validate that the request includes either the Client-Connection-Id or
+the Server-Connection-Id header, along with a Datagram-Flow-Id header and an
+authority pseudo-header. If any of these is missing, the proxy MUST reject the
+request with a 400 (Bad Request) reponse. The proxy also MUST reject the request
+if the requested datagram flow ID has already been used on that client QUIC connection
+with a different requested authority.
+
+The proxy then determines the server-facing socket to associate with the client's
+datagram flow. This UDP socket may already be open (from a previous request from this
+client, or another). If the socket is not already created, the proxy creates a new one.
+Proxies can choose to reuse server-facing sockets across multiple datagram flows, or
+have a unique server-facing socket for every datagram flow.
+
+If the request includes a Client-Connection-Id header, the proxy is receiving a request
+to be able to route traffic back to the client using that Connection ID. If the pair of this
+Client Connection ID and the selected server-facing socket is unique, the proxy creates
+the mapping and responds with a 200 (OK) response. After this point, any packets received
+by the proxy from the server-facing socket that match the Client Connection
+ID can to be sent to the client. The proxy MUST use tunnelled mode (DATAGRAM frames) on
+the correct datagram flow for any long header packets. The proxy SHOULD forward directly to
+the client for any matching short header packets, but MAY tunnel them in DATAGRAM frames.
+If the pair is not unique, or the proxy chooses not to support zero-length Client Connection IDs,
+the proxy responds with a 409 (Conflict) response. If this occurs on the first request for a given datagram flow,
+the proxy removes any mapping for that datagram flow.
+
+If the request includes a Server-Connection-Id header, the proxy is receiving a request
+to allow the client to forward packets to the target. If the pair of this Server Connection ID
+and the client-facing socket on which the request was received is unique, the proxy
+creates the mapping and responds with a 200 (OK) response. Once the successful response
+is sent, the proxy will forward any short header packets received on the client-facing socket that use
+the Server Connection ID using the correct server-facing socket. If the pair is not unique,
+the server responds with a 409 (Conflict) response. If this occurs, traffic for that Server
+Connection ID can only use tunnelled mode, not forwarded.
+
+Any successful (2xx) response MUST also echo any Client-Connection-Id, Server-Connection-Id, and
 Datagram-Flow-Id headers included in the request.
 
-At this point, any DATAGRAM frames sent by the client matching a known Server
-Connection ID will be sent on the correct UDP socket. Specifically, the proxy
-extracts the contents of each DATAGRAM frame and writes them to the UDP socket
-created in response to the CONNECT-QUIC request. Any packets received directly
-to the proxy from the client that match a known Server Connection ID will be
-forwarded similarly.
-
-Any packets received by the proxy from a target server that match a known Client Connection
-ID on a matching UDP socket need to be forwarded to the client. The proxy MUST
-use DATAGRAM frames on the associated flow ID for any long header packets. The proxy
-SHOULD forward directly to the client for any matching short header packets, but MAY tunnel
-them in DATAGRAM frames.
-
 The proxy MUST only forward non-tunnelled packets from the client that are QUIC short header
-packets (based on the Header Form bit) and have known Client Connection IDs. Packets sent by
+packets (based on the Header Form bit) and have mapped Server Connection IDs. Packets sent by
 the client that are forwarded SHOULD be considered as activity for restarting QUIC's Idle
 Timeout {{!I-D.ietf-quic-transport}}.
 
-## Connection ID Mapping Lifetime
+## Removing Mapping State
 
 Each CONNECT-QUIC request consumes one bidirectional HTTP/3 stream. For any stream
-on which the proxy has sent a response indicating success, the mapping for forwarding a
-Connection ID lasts as long as the stream is open.
+on which the proxy has sent a response indicating success, any mappings for the request
+last as long as the stream is open.
 
 A client that no longer wants a given Connection ID to be forwarded by the proxy, for either
 direction, MUST cancel its CONNECT-QUIC HTTP/3 request {{!I-D.ietf-quic-http}}.
+
+If a client's connection to the proxy is terminated for any reason, all mappings associated with
+all requests are removed.
+
+A proxy can close its server-facing socket once all datagram flows mapped to that socket have been
+removed.
 
 # Example
 
