@@ -193,7 +193,7 @@ Server Connection ID for the target, and before it advertises a new Client
 Connection ID to the target.
 
 Each request MUST contain a Datagram-Flow-Id header and an authority
-psuedo-header identifying the target. All requests for the same QUIC
+pseudo-header identifying the target. All requests for the same QUIC
 Connection between a client and a target SHOULD contain the same Datagram-Flow-Id
 and authority. Any mismatch in these would cause the proxy to treat the requests
 as different proxied connections, which would appear like a migration or NAT
