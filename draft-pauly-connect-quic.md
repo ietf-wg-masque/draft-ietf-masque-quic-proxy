@@ -105,11 +105,11 @@ Each pair of client <-> proxy QUIC connection and datagram flow ID MUST be mappe
 (Client <-> Proxy QUIC connection + Datagram flow ID) => Server-facing socket
 ~~~
 
-Multiple datagram flows can map to the same server-facing socket, but a single datagram flow cannot be mapped to multiple
+Multiple datagram flow IDs can map to the same server-facing socket, but a single datagram flow ID cannot be mapped to multiple
 server-facing sockets.
 
-This mapping guarantees that any QUIC packet sent from the client to the proxy in tunnelled mode can be sent to the correct
-target.
+This mapping guarantees that any QUIC packet using the datagram flow ID sent from the client to the proxy in
+tunnelled mode can be sent to the correct target.
 
 ## Server Connection ID Mapping
 
