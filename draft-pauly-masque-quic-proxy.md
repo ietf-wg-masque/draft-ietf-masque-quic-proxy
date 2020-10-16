@@ -20,6 +20,15 @@ author:
     country: United States of America
     email: tpauly@apple.com
 
+ -
+    ins: "D. Schinazi"
+    name: "David Schinazi"
+    organization: "Google LLC"
+    street: "1600 Amphitheatre Parkway"
+    city: "Mountain View, California 94043"
+    country: "United States of America"
+    email: dschinazi.ietf@gmail.com
+
 --- abstract
 
 This document defines an extension to the CONNECT-UDP HTTP method that adds
@@ -32,9 +41,9 @@ rather than being re-encapsulated and re-encrypted.
 
 # Introduction {#introduction}
 
-The CONNECT-UDP HTTP method {{!I-D.ietf-masque-connect-udp}} defines a way to send
+The CONNECT-UDP HTTP method {{!CONNECT-UDP=I-D.ietf-masque-connect-udp}} defines a way to send
 datagrams through an HTTP proxy, where UDP is used to communicate between the proxy
-and a target server. This can be used to proxy QUIC connections {{!I-D.ietf-quic-transport}},
+and a target server. This can be used to proxy QUIC connections {{!QUIC=I-D.ietf-quic-transport}},
 since QUIC runs over UDP datagrams.
 
 This document uses the term "target" to refer to the server that a client is accessing via a proxy.
@@ -181,7 +190,7 @@ mapping diagrams above.
 # Connection ID Headers for CONNECT-UDP
 
 This document defines two headers that can be used in CONNECT-UDP requests
-and responses. All other requirements defined for CONNECT-UDP {{!I-D.ietf-masque-connect-udp}}
+and responses. All other requirements defined for CONNECT-UDP {{CONNECT-UDP}}
 still apply.
 
 "Client-Connection-Id" is an Item Structured Header {{!I-D.ietf-httpbis-header-structure}}, containing a
@@ -200,10 +209,10 @@ be zero-length. Its ABNF is:
    Server-Connection-Id = sf-binary
 ~~~
 
-Like the Datagram-Flow-Id header {{!I-D.ietf-masque-connect-udp}}, the Client-Connection-Id and
+Like the Datagram-Flow-Id header {{CONNECT-UDP}}, the Client-Connection-Id and
 Server-Connection-Id headers can only be supported by an HTTP/3 proxy. If a proxy does not
-support HTTP/3 datagrams {{!I-D.schinazi-quic-h3-datagram}}, or it does not support the extension defined
-in this document, it MUST remove the Client-Connection-Id and Server-Connection-Id headers from any
+support HTTP/3 datagrams {{!H3DGRAM=I-D.schinazi-quic-h3-datagram}}, or it does not support the extension defined
+in this document, it MUST NOT send the Client-Connection-Id and Server-Connection-Id headers on any
 responses. If a proxy does support this extension, it MUST echo the Client-Connection-Id and
 Server-Connection-Id headers on any 2xx (Successful) responses. Clients that do not receive an
 echoed Client-Connection-Id or Server-Connection-Id header MUST fall back to using CONNECT-UDP
@@ -508,5 +517,5 @@ headers in the "Permanent Message Header Field Names"
 # Acknowledgments {#acknowledgments}
 {:numbered="false"}
 
-Thanks to David Schinazi, Lucas Pardue, Ryan Hamilton, and Mirja Kühlewind for their inputs
+Thanks to Lucas Pardue, Ryan Hamilton, and Mirja Kühlewind for their inputs
 on this document.
