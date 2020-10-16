@@ -571,8 +571,9 @@ integrity check, it is possible that these packets are either malformed,
 replays, or otherwise malicious. This may result in proxy targets rate limiting
 or decreasing the reputation of a given proxy.
 
-OPEN ISSUE: Figure out how clients and proxies could interact to learn whether
-an adversary is injecting malicious forwarded packets to induce rate limiting.
+[comment1]: # OPEN ISSUE: Figure out how clients and proxies could interact to
+[comment2]: # learn whether an adversary is injecting malicious forwarded
+[comment3]: # packets to induce rate limiting.
 
 # IANA Considerations {#iana}
 
