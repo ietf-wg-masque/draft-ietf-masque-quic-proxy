@@ -61,7 +61,7 @@ the client <-> target communication than if no proxy was used.
 It is not a goal of forwarding mode to prevent correlation between client <-> proxy and the proxy <-> target packets
 from an entity that can observe both links. See {{security}} for futher discussion.
 
-Both clients and proxies can choose not to use forwarded mode for any client <-> target connection.
+Both clients and proxies can unilaterally choose to disable forwarded mode for any client <-> target connection.
 
 ## Conventions and Definitions {#conventions}
 
@@ -149,8 +149,8 @@ MUST map to a single client-facing socket.
 
 Multiple pairs of Connection IDs and sockets can map to the same datagram flow ID or client-facing socket.
 
-These mappings guarantee that any QUIC packet sent from a target to the proxy in either tunnelled or forwarded
-mode can be sent to the correct client. Note that this mapping becomes trivial if the proxy always opens a new
+These mappings guarantee that any QUIC packet sent from a target to the proxy can be sent to the correct client,
+in either tunelled or forwarded mode. Note that this mapping becomes trivial if the proxy always opens a new
 server-facing socket for every client request with a unique datagram flow ID. The mapping is critical for any case where
 server-facing sockets are shared or reused.
 
@@ -254,13 +254,13 @@ Since clients are always aware whether or not they are using a QUIC proxy, clien
 expected to cooperate with proxies in selecting Client Connection IDs. A proxy
 detects a conflict when it is not able to create a unique mapping using the Client Connection ID ({conflicts}). 
 It can reject requests that would cause a conflict and indicate this to the client by replying with a
-409 (Conflict) status. In order to avoid conflicts, clients SHOULD select Connection IDs of at least
+409 (Conflict) status. In order to avoid conflicts, clients SHOULD select Client Connection IDs of at least
 8 bytes in length with unpredictable values. A client also MUST NOT select a Client Connection ID
 that matches the ID used for the QUIC connection to the proxy, as this inherently creates a conflict.
 
 Note that packets sent in DATAGRAM frames before the proxy has sent its
 CONNECT-QUIC response might be dropped if the proxy rejects the request.
-Specifically, this can occur if the Client Connection ID hits a conflict and the proxy
+Specifically, this can occur if the Client Connection ID causes a conflict and the proxy
 returns a 409 (Conflict) error. Any DATAGRAM frames that are sent in a separate
 QUIC packet from the STREAM frame that contains the CONNECT-QUIC request might
 also be dropped in the case that the packet arrives at the proxy before the packet
@@ -279,14 +279,14 @@ A client can add new Connection IDs to a proxied QUIC connection by sending
 a NEW_CONNECTION_ID frame to the target.
 
 Prior to sending a NEW_CONNECTION_ID frame to the target for a client Connection
-ID, the client MUST send a CONNECT-QUIC request to the proxy, and only send the
+ID, the client MUST send a CONNECT-QUIC request with the Client-Connection-Id header to the proxy, and only send the
 NEW_CONNECTION_ID frame once a successful response is received.
 
 ## Sending With Forwarded Mode
 
 Once the client has learned the target server's Connection ID, such as in the response
 to a QUIC Initial packet, it can send a request containing the Server-Connection-Id
-header to request the ability to forward packets. The client MUST wait for a successful 200 (OK)
+header to request the ability to forward packets. The client MUST wait for a successful (2xx)
 response before using forwarded mode. Prior to receiving the server response, the client MUST
 send short header packets tunnelled in DATAGRAM frames. The client MAY also choose to tunnel
 some short header packets even after receiving the successful response.
@@ -308,7 +308,7 @@ for the main QUIC connection between client and proxy.
 
 ## Receiving With Forwarded Mode
 
-A proxy can only start forwarding packets from the target to the client only after the client has
+A proxy MUST NOT forward packets from the target to the client until after the client has
 sent at least one packet in forwarded mode. Once this occurs, the proxy MAY use forwarded
 mode for any Client Connection ID for which it has a valid mapping.
 
