@@ -317,9 +317,9 @@ client, or another). If the socket is not already created, the proxy creates a n
 Proxies can choose to reuse server-facing sockets across multiple datagram flows, or
 have a unique server-facing socket for every datagram flow.
 
-If a proxy reuses server-facing sockets, it SHOULD store which authorities (server names)
+If a proxy reuses server-facing sockets, it SHOULD store which authorities (which could be a domain name or IP address literal)
 are being accessed over a particular server-facing socket so it can avoid performing a
-new DNS query and potentially choosing a different server IP address.
+new DNS query and potentially choosing a different server IP address which could map to a different server.
 
 If the request includes a Client-Connection-Id header, the proxy is receiving a request
 to be able to route traffic back to the client using that Connection ID. If the pair of this
