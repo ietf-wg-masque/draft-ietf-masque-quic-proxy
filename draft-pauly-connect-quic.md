@@ -122,7 +122,8 @@ Each pair of Server Connection ID and client-facing socket MUST map to a single 
 Multiple pairs of Connection IDs and sockets can map to the same server-facing socket.
 
 This mapping guarantees that any QUIC packet containing the Server Connection ID sent from the
-client to the proxy in forwarded mode can be sent to the correct target.
+client to the proxy in forwarded mode can be sent to the correct target. Thus, a proxy that does not allow
+forwarded mode does not need to maintain this mapping.
 
 ## Client Connection ID Mappings
 
@@ -274,14 +275,18 @@ NEW_CONNECTION_ID frame once a successful response is received.
 
 Once the client has learned the target server's Connection ID, such as in the response
 to a QUIC Initial packet, it can send a request containing the Server-Connection-Id
-header. The client MUST wait for a successful 200 (OK) response before using forwarded
-mode. Prior to receiving the server response, the client MUST send short header packets
-tunnelled in DATAGRAM frames. The client MAY also choose to tunnel some short header
-packets even after receiving the successful response.
+header to request the ability to forward packets. The client MUST wait for a successful 200 (OK)
+response before using forwarded mode. Prior to receiving the server response, the client MUST
+send short header packets tunnelled in DATAGRAM frames. The client MAY also choose to tunnel
+some short header packets even after receiving the successful response.
 
 If the client's request that included the Server-Connection-Id is rejected, for example with
 a 409 (Conflict) response, it MUST NOT forward packets to the requested
-Server Connection ID, but only use tunnelled mode.
+Server Connection ID, but only use tunnelled mode. The request might also be rejected
+if the proxy does not support forwarded mode or has it disabled by policy. For any
+response code other than a 2xx success, the client MUST NOT retry a request
+for the same Server Connection ID. For errors other than 409 (Conflict), clients
+SHOULD stop sending requests for other Server Connection IDs in the future.
 
 QUIC long header packets MUST NOT be forwarded. These packets can only be tunnelled within
 DATAGRAM frames to avoid exposing unnecessary connection metadata.
@@ -292,10 +297,21 @@ for the main QUIC connection between client and proxy.
 
 ## Receiving With Forwarded Mode
 
-Once a Client Connection ID has been accepted by the proxy, the client MUST be prepared to
-receive forwarded short header packets on the socket between itself and the proxy. It uses
-the received Connection ID to determine if this packet was sent by the proxy, or merely
-forwarded from the target.
+A proxy can only start forwarding packets from the target to the client only after the client has
+sent at least one packet in forwarded mode. Once this occurs, the proxy MAY use forwarded
+mode for any Client Connection ID for which it has a valid mapping.
+
+If a client has started using forwarding mode, it MUST be prepared to receive forwarded short header
+packets on the socket between itself and the proxy for any Client Connection ID that has been accepted
+by the proxy. The client uses the received Connection ID to determine if a packet was originated by the
+proxy, or merely forwarded from the target.
+
+## Opting Out of Forwarded Mode
+
+The use of forwarded mode is initiated by the client sending a request with the
+Server-Connection-Id header and sending at least one forwarded packet to the proxy.
+A client that does not wish to accept forwarded packets from the proxy when communicating
+with a specific target can simply not start forwarding packets to the proxy.
 
 # Proxy Response Behavior {#response}
 
@@ -342,6 +358,10 @@ is sent, the proxy will forward any short header packets received on the client-
 the Server Connection ID using the correct server-facing socket. If the pair is not unique,
 the server responds with a 409 (Conflict) response. If this occurs, traffic for that Server
 Connection ID can only use tunnelled mode, not forwarded.
+
+If the proxy does not support forwarded mode, or does not allow forwarded mode for a particular
+client or authority by policy, it can reject requests that include the Server-Connection-Id header
+with a response to indicate the error, such as 403 (Forbidden).
 
 Any successful (2xx) response MUST also echo any Client-Connection-Id, Server-Connection-Id, and
 Datagram-Flow-Id headers included in the request.
