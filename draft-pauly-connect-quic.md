@@ -211,10 +211,10 @@ Connection ID to the target.
 
 Each request MUST contain a Datagram-Flow-Id header and an authority
 pseudo-header identifying the target. All requests for the same QUIC
-Connection between a client and a target SHOULD contain the same Datagram-Flow-Id
-and authority. Any mismatch in these will cause the proxy to treat the requests
-as different proxied connections, which could appear like a migration or NAT
-rebinding event to the target.
+Connection between a client and a target MUST contain the same authority,
+and SHOULD contain the same Datagram-Flow-Id. If there is Datagram-Flow-Id
+mismatch, the proxy will treat the requests as different proxied connections,
+which could appear as a migration or NAT rebinding event to the target.
 
 Each request MUST also contain exactly one connection ID header, either Client-Connection-Id
 or Server-Connection-Id. Client-Connection-Id requests define paths for receiving
@@ -258,9 +258,8 @@ If the server rejects the first request that uses a specific datagram flow ID, t
 MUST retire that datagram flow ID. If the rejection indicated a conflict due to the
 Client Connection ID, the client MUST select a new Connection ID before sending
 a new request, and generate a new packet. For example, if a client is sending a
-QUIC Initial packet and chooses a Connection ID that is too short or hits a conflict
-with an existing mapping to the same target server, it will need to generate a new
-QUIC Initial.
+QUIC Initial packet and chooses a Connection ID that conflicts with an existing mapping
+to the same target server, it will need to generate a new QUIC Initial.
 
 ## Adding New Client Connection IDs
 
@@ -312,8 +311,10 @@ if the requested datagram flow ID has already been used on that client <-> proxy
 with a different requested authority.
 
 The proxy then determines the server-facing socket to associate with the client's
-datagram flow. This UDP socket may already be open (from a previous request from this
-client, or another). If the socket is not already created, the proxy creates a new one.
+datagram flow. This will generally involve performing a DNS lookup for the hostname in the
+request authority, or finding an existing server-facing socket to the authority.
+The server-facing socket might already be open due to a previous request from this
+client, or another. If the socket is not already created, the proxy creates a new one.
 Proxies can choose to reuse server-facing sockets across multiple datagram flows, or
 have a unique server-facing socket for every datagram flow.
 
