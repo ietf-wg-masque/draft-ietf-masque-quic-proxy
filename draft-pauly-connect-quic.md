@@ -61,6 +61,8 @@ the client <-> target communication than if no proxy was used.
 It is not a goal of forwarding mode to prevent correlation between client <-> proxy and the proxy <-> target packets
 from an entity that can observe both links. See {{security}} for futher discussion.
 
+Both clients and proxies can choose not to use forwarded mode for any client <-> target connection.
+
 ## Conventions and Definitions {#conventions}
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
