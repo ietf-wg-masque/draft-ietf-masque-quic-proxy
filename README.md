@@ -1,6 +1,6 @@
-# Proxying QUIC using CONNECT-UDP
+# QUIC-Aware Proxying Using CONNECT-UDP
 
-This is the working area for the individual Internet-Draft, "Proxying QUIC using CONNECT-UDP".
+This is the working area for the individual Internet-Draft, "QUIC-Aware Proxying Using CONNECT-UDP".
 
 * [Editor's Copy](https://tfpauly.github.io/quic-proxy/#go.draft-pauly-masque-quic-proxy.html)
 * [Individual Draft](https://tools.ietf.org/html/draft-pauly-masque-quic-proxy)

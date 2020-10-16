@@ -1,5 +1,5 @@
 ---
-title: Proxying QUIC using CONNECT-UDP
+title: QUIC-Aware Proxying Using CONNECT-UDP
 abbrev: QUIC Proxy
 docname: draft-pauly-masque-quic-proxy-latest
 category: exp
