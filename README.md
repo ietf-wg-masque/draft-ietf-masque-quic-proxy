@@ -1,10 +1,10 @@
-# Proxying QUIC using HTTP/3
+# Proxying QUIC using CONNECT-UDP
 
-This is the working area for the individual Internet-Draft, "Proxying QUIC using HTTP/3".
+This is the working area for the individual Internet-Draft, "Proxying QUIC using CONNECT-UDP".
 
-* [Editor's Copy](https://tfpauly.github.io/quic-proxy/#go.draft-pauly-connect-quic.html)
-* [Individual Draft](https://tools.ietf.org/html/draft-pauly-connect-quic)
-* [Compare Editor's Copy to Individual Draft](https://tfpauly.github.io/quic-proxy/#go.draft-pauly-connect-quic.diff)
+* [Editor's Copy](https://tfpauly.github.io/quic-proxy/#go.draft-pauly-masque-quic-proxy.html)
+* [Individual Draft](https://tools.ietf.org/html/draft-pauly-masque-quic-proxy)
+* [Compare Editor's Copy to Individual Draft](https://tfpauly.github.io/quic-proxy/#go.draft-pauly-masque-quic-proxy.diff)
 
 ## Building the Draft
 
