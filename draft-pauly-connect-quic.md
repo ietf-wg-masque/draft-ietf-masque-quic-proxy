@@ -216,7 +216,7 @@ an Integer. Its ABNF is:
 
 # Client Request Behavior {#request}
 
-A clients sends new CONNECT-QUIC requests when it wants to start
+A client sends new CONNECT-QUIC requests when it wants to start
 a new QUIC connection to a target, when it has received a new
 Server Connection ID for the target, and before it advertises a new Client
 Connection ID to the target.
