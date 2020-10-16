@@ -235,9 +235,10 @@ the receiver from identifying which mapping this corresponds to.
 The proxy treats two mappings as being in conflict when a conflict is detected
 for all elements on the left side of the mapping diagrams above.
 
-Since very short Connection IDs are more likely to lead to conflicts, particularly zero-length
-Connection IDs, a proxy MAY choose to reject all requests for very short Connection IDs as
-conflicts, in anticipation of future conflicts.
+Since very short Connection IDs are more likely to lead to conflicts,
+particularly zero-length Connection IDs, a proxy MAY choose to reject all
+requests for very short Connection IDs as conflicts, in anticipation of future
+conflicts.
 
 # Connection ID Headers for CONNECT-UDP
 
