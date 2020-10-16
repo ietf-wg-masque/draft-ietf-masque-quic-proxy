@@ -99,11 +99,10 @@ links. See {{security}} for further discussion.
 Both clients and proxies can unilaterally choose to disable forwarded mode for
 any client <-> target connection.
 
-QUIC proxies only need to understand the following fields from packets in client
-<-> target QUIC connections: the Header Form bit, and the connection ID fields.
-Since these fields are all in the QUIC invariants header
-{{!INVARIANTS=I-D.ietf-quic-invariants}}, QUIC proxies can proxy all versions of
-QUIC.
+QUIC proxies only need to understand the Header Form bit, and the connection ID
+fields from packets in client <-> target QUIC connections. Since these fields
+are all in the QUIC invariants header {{!INVARIANTS=I-D.ietf-quic-invariants}},
+QUIC proxies can proxy all versions of QUIC.
 
 ## Conventions and Definitions {#conventions}
 
