@@ -298,6 +298,7 @@ the Datagram-Flow-Id header, and the Client-Connection-Id header. These
 respectively contain the authority of the target, the selected datagram
 flow ID and the Client Connection ID that will be used in the initial QUIC
 packets sent through the proxy.
+{::options req-id="connect-udp-quic-client-cid" req-type="must" req="Client sends `Client-Connection-Id` in first `CONNECT-UDP` request" /}
 
 The client can start sending packets tunnelled within DATAGRAM frames as soon as
 this first CONNECT-UDP request for the datagram flow ID has been sent, even in
