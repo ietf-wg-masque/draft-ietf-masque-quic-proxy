@@ -281,12 +281,16 @@ Connection between a client and a target MUST contain the same authority,
 and SHOULD contain the same Datagram-Flow-Id. If there is Datagram-Flow-Id
 mismatch, the proxy will treat the requests as different proxied connections,
 which could appear as a migration or NAT rebinding event to the target.
+{::options req-id="connect-udp-datagram-flow-id" req-type="must" req="Client sends `Datagram-Flow-Id` in all `CONNECT-UDP` requests" /}
+{::options req-id="connect-udp-authority" req-type="must" req="Client sends the same `:authority` in all requests for the same connection" /}
+{::options req-id="connect-udp-datagram-flow-id-match" req-type="should" req="Client sends the same `Datagram-Flow-Id` in all requests for the same connecion" /}
 
 Each request MUST also contain exactly one connection ID header, either
 Client-Connection-Id or Server-Connection-Id. Client-Connection-Id requests
 define paths for receiving packets from the target server to the client, and
 Server-Connection-Id requests define paths for sending packets from the client
 to target server.
+{::options req-id="connect-udp-quic-cids" req-type="must" req="Client sends exactly on  `*-Connection-Id ` in each request" /}
 
 ## New Proxied Connection Setup
 
@@ -307,6 +311,7 @@ to the proxy MAY contain a STREAM frame containing the CONNECT-UDP request, as
 well as a DATAGRAM frame that contains a tunnelled QUIC packet to send to the
 target. This is particularly useful for reducing round trips on connection
 setup.
+{::options req-id="connect-udp-early-data" req-type="supported" req="Client sends `DATAGRAM` frames in the same flight as the `CONNECT-UDP` request" /}
 
 Since clients are always aware whether or not they are using a QUIC proxy,
 clients are expected to cooperate with proxies in selecting Client Connection
@@ -333,6 +338,8 @@ Connection ID before sending a new request, and generate a new packet. For
 example, if a client is sending a QUIC Initial packet and chooses a Connection
 ID that conflicts with an existing mapping to the same target server, it will
 need to generate a new QUIC Initial.
+{::options req-id="connect-udp-rejected-flow-id" req-type="must" req="Client does not reuse a `Datagram-Flow-Id` that has been rejected" /}
+{::options req-id="connect-udp-rejected-conn-id" req-type="must" req="Client does not reuse a `Client-Connection-Id` that has been rejected" /}
 
 ## Adding New Client Connection IDs
 
@@ -344,6 +351,7 @@ Prior to informing the target of a new chosen client connection ID, the client
 MUST send a CONNECT-UDP request with the Client-Connection-Id header to the
 proxy, and only inform the target of the new client connection ID once a 2xx
 (Successful) response is received.
+{::options req-id="connect-udp-new-client-cid" req-type="must" req="Client sends a new request prior to sending `NEW_CONNECTION_ID` frames" /}
 
 ## Sending With Forwarded Mode
 
@@ -354,6 +362,9 @@ client MUST wait for a successful (2xx) response before using forwarded mode.
 Prior to receiving the server response, the client MUST send short header
 packets tunnelled in DATAGRAM frames. The client MAY also choose to tunnel some
 short header packets even after receiving the successful response.
+{::options req-id="connect-udp-forwarded-mode" req-type="supported" req="Client supports forwarded mode" /}
+{::options req-id="connect-udp-forwarded-sh" req-type="must" req="Client only uses forwarded mode with short header packets" /}
+{::options req-id="connect-udp-forwarded-sh-wait" req-type="must" req="Client does not use forwarded mode prior to receiving a `2xx (OK)`" /}
 
 If the client's request that included the Server-Connection-Id is rejected, for
 example with a 409 (Conflict) response, it MUST NOT forward packets to the
@@ -363,6 +374,8 @@ by policy. For any response code other than a 2xx success, the client MUST NOT
 retry a request for the same Server Connection ID. For errors other than 409
 (Conflict), clients SHOULD stop sending requests for other Server Connection IDs
 in the future.
+{::options req-id="connect-udp-forwarded-rejected" req-type="must" req="Client does not use forwarded mode if the server sends a `409 (Conflict)`" /}
+{::options req-id="connect-udp-forwarded-rejected" req-type="should" req="Client stops sending requests for forwarded mode if the server sends an error other than `409 (Conflict)`" /}
 
 QUIC long header packets MUST NOT be forwarded. These packets can only be
 tunnelled within DATAGRAM frames to avoid exposing unnecessary connection
@@ -384,6 +397,7 @@ forwarded short header packets on the socket between itself and the proxy for
 any Client Connection ID that has been accepted by the proxy. The client uses
 the received Connection ID to determine if a packet was originated by the
 proxy, or merely forwarded from the target.
+{::options req-id="connect-udp-forwarded-receive" req-type="must" req="Client supports receiving forwarded packets from proxy" /}
 
 ## Opting Out of Forwarded Mode
 
@@ -407,6 +421,7 @@ conditions is not met, the proxy MUST reject the request with a 400 (Bad
 Request) response. The proxy also MUST reject the request if the requested
 datagram flow ID has already been used on that client <-> proxy QUIC connection
 with a different requested authority.
+{::options req-id="connect-udp-headers-validate" req-type="must" req="Proxy rejects requests without correct headers with `400 (Bad Request)`" /}
 
 The proxy then determines the server-facing socket to associate with the
 client's datagram flow. This will generally involve performing a DNS lookup for
@@ -447,6 +462,7 @@ the Server Connection ID using the correct server-facing socket. If the pair is
 not unique, the server responds with a 409 (Conflict) response. If this occurs,
 traffic for that Server Connection ID can only use tunnelled mode, not
 forwarded.
+{::options req-id="connect-udp-proxy-forwarded-mode" req-type="supported" req="Proxy supports forwarded mode" /}
 
 If the proxy does not support forwarded mode, or does not allow forwarded mode
 for a particular client or authority by policy, it can reject requests that
@@ -455,11 +471,13 @@ such as 403 (Forbidden).
 
 Any successful (2xx) response MUST also echo any Client-Connection-Id,
 Server-Connection-Id, and Datagram-Flow-Id headers included in the request.
+{::options req-id="connect-udp-headers-echo" req-type="must" req="Proxy echoes `Datagram-Flow-Id` and `*-Connection-Id` headers in successful replies" /}
 
 The proxy MUST only forward non-tunnelled packets from the client that are QUIC
 short header packets (based on the Header Form bit) and have mapped Server
 Connection IDs. Packets sent by the client that are forwarded SHOULD be
 considered as activity for restarting QUIC's Idle Timeout {{QUIC}}.
+{::options req-id="connect-udp-proxy-idle" req-type="should" req="Proxy uses forwarded packets to restart its idle timeout" /}
 
 ## Removing Mapping State
 
@@ -474,6 +492,7 @@ closing the corresponding stream.
 If the proxy rejects a CONNECT-UDP request by sending a status code of 300 or
 higher, it MUST close the corresponding stream and remove any associated
 mappings.
+{::options req-id="connect-udp-close-stream" req-type="must" req="Proxy closes HTTP stream when it rejects a `CONNECT-UDP` request" /}
 
 If a client's connection to the proxy is terminated for any reason, all
 mappings associated with all requests are removed.
