@@ -3,24 +3,6 @@ import os
 import sys
 import json
 
-'''
-export default
-{
-  name: 'Connect-UDP',
-  id: 'connect-udp',
-  description: 'Specification support for draft-ietf-masque-connect-udp-00',
-  tests: [
-    {
-      name: 'The client supports CONNECT-UDP over HTTP/3',
-      id: 'connect-udp-h3-client',
-      kind: 'supported',
-    },
-    ... 
-  ]
-
-  [{'req-id': 'connect-udp-quic-client-cid', 'req': 'Client sends `Client-Connection-Id` in first `CONNECT-UDP` request', 'req-type': 'must'}]
-}
-'''
 def options_to_tests(fname, output_path, options):
     tests = []
     for option in options:
@@ -32,7 +14,7 @@ def options_to_tests(fname, output_path, options):
     data = {
         "name": draft_title(fname),
         "id": draft_to_test_name(fname),
-        "description": "TBD",
+        "description": "Interoperability test results for " + draft_title(fname),
         "tests": tests
     }
 
