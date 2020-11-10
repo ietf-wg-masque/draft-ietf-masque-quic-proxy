@@ -9,3 +9,9 @@ else
 	git clone -q --depth 10 $(CLONE_ARGS) \
 	    -b main https://github.com/martinthomson/i-d-template $(LIBDIR)
 endif
+
+.PHONY: interop
+interop:
+	@err=0; for f in $(drafts_source); do \
+		python interop/parse_interop_tags.py $$f interop/tests/; \
+	done
