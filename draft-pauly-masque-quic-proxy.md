@@ -283,14 +283,14 @@ mismatch, the proxy will treat the requests as different proxied connections,
 which could appear as a migration or NAT rebinding event to the target.
 {::options req-id="connect-udp-datagram-flow-id" req-type="must" req="Client sends `Datagram-Flow-Id` in all `CONNECT-UDP` requests" /}
 {::options req-id="connect-udp-authority" req-type="must" req="Client sends the same `:authority` in all requests for the same connection" /}
-{::options req-id="connect-udp-datagram-flow-id-match" req-type="should" req="Client sends the same `Datagram-Flow-Id` in all requests for the same connecion" /}
+{::options req-id="connect-udp-datagram-flow-id-match" req-type="should" req="Client sends the same `Datagram-Flow-Id` in all requests for the same connection" /}
 
 Each request MUST also contain exactly one connection ID header, either
 Client-Connection-Id or Server-Connection-Id. Client-Connection-Id requests
 define paths for receiving packets from the target server to the client, and
 Server-Connection-Id requests define paths for sending packets from the client
 to target server.
-{::options req-id="connect-udp-quic-cids" req-type="must" req="Client sends exactly on  `*-Connection-Id ` in each request" /}
+{::options req-id="connect-udp-quic-cids" req-type="must" req="Client sends exactly one  `*-Connection-Id ` in each request" /}
 
 ## New Proxied Connection Setup
 
@@ -375,7 +375,7 @@ retry a request for the same Server Connection ID. For errors other than 409
 (Conflict), clients SHOULD stop sending requests for other Server Connection IDs
 in the future.
 {::options req-id="connect-udp-forwarded-rejected" req-type="must" req="Client does not use forwarded mode if the server sends a `409 (Conflict)`" /}
-{::options req-id="connect-udp-forwarded-rejected" req-type="should" req="Client stops sending requests for forwarded mode if the server sends an error other than `409 (Conflict)`" /}
+{::options req-id="connect-udp-forwarded-stop" req-type="should" req="Client stops sending requests for forwarded mode if the server sends an error other than `409 (Conflict)`" /}
 
 QUIC long header packets MUST NOT be forwarded. These packets can only be
 tunnelled within DATAGRAM frames to avoid exposing unnecessary connection
