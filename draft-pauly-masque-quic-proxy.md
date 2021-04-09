@@ -3,6 +3,7 @@ title: QUIC-Aware Proxying Using CONNECT-UDP
 abbrev: QUIC Proxy
 docname: draft-pauly-masque-quic-proxy-latest
 category: exp
+wg: MASQUE
 
 ipr: trust200902
 keyword: Internet-Draft
