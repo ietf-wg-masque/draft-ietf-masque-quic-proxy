@@ -238,7 +238,9 @@ for all elements on the left side of the mapping diagrams above.
 Since very short Connection IDs are more likely to lead to conflicts,
 particularly zero-length Connection IDs, a proxy MAY choose to reject all
 requests for very short Connection IDs as conflicts, in anticipation of future
-conflicts.
+conflicts. Note that a request that doesn't contain any Connection ID is
+equivalent to a request for a zero-length Connection ID, and similarly would
+cause conflicts when forwarding.
 
 # Connection ID Headers for CONNECT-UDP
 
