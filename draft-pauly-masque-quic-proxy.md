@@ -603,9 +603,10 @@ at least 1200 bytes.
 Additionally, clients that connect to a proxy for purpose of proxying QUIC
 SHOULD start their connection with a larger packet size than 1200 bytes, to
 account for the overhead of tunnelling an Initial QUIC packet within a
-DATAGRAM frame. If the client does not begin with a larger packet size than 1200 bytes, it
-will need to perform Path MTU (Maximum Transmission Unit) discovery to
-discover a larger path size prior to sending any tunnelled Initial QUIC packets.
+DATAGRAM frame. If the client does not begin with a larger packet size than
+1200 bytes, it will need to perform Path MTU (Maximum Transmission Unit)
+discovery to discover a larger path size prior to sending any tunnelled Initial
+QUIC packets.
 
 Once a proxied QUIC connections moves into forwarded mode, the client SHOULD
 initiate Path MTU discovery to increase its end-to-end MTU.
