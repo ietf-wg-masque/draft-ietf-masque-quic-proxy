@@ -576,6 +576,22 @@ to the proxy sending 2xx (Successful) responses to clients.
 QUIC-aware CONNECT-UDP proxies that do not allow forwarding mode can function
 unmodified behind QUIC load balancers.
 
+# Packet Size Considerations
+
+Since Initial QUIC packets must be at least 1200 bytes in length, the DATAGRAM
+frames that are used for a QUIC-aware CONNECT-UDP proxy MUST be able to carry
+at least 1200 bytes.
+
+Additionally, clients that connect to a proxy for purpose of proxying QUIC
+SHOULD start their connection with a larger packet size than 1200 bytes, to
+account for the overhead of tunnelling an Initial QUIC packet within a
+DATAGRAM frame. If the client does not being with a larger packet size, it
+will need to perform Path MTU (Maximum Transmission Unit) discovery to
+discover a larger path size prior to sending any tunnelled Initial QUIC packets.
+
+Once a proxied QUIC connections moves into forwarded mode, the client SHOULD
+initiate Path MTU discovery to increase its end-to-end MTU.
+
 # Security Considerations {#security}
 
 Proxies that support this extension SHOULD provide protections to rate-limit
