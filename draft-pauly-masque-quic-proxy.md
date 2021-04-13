@@ -501,6 +501,17 @@ mappings associated with all requests are removed.
 A proxy can close its server-facing socket once all datagram flows mapped to
 that socket have been removed.
 
+## Handling Connection Migration
+
+If a proxy supports QUIC connection migration, it needs to ensure that a migration
+event does not end up sending too many tunnelled or proxied packets on a new
+path prior to path validation.
+
+Specifically, the proxy MUST limit the number of packets that it will proxy
+to an unvalidated client address to the size of an initial congestion window.
+Proxies additionally SHOULD pace the rate at which packets are sent over a new
+path to avoid creating unintentional congestion on the new path.
+
 # Example
 
 Consider a client that is establishing a new QUIC connection through the proxy.
