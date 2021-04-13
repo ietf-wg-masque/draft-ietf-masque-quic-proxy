@@ -439,6 +439,11 @@ particular server-facing socket so it can avoid performing a new DNS query and
 potentially choosing a different server IP address which could map to a
 different server.
 
+Server-facing sockets MUST NOT be reused across QUIC and non-QUIC CONNECT-UDP
+requests, since it might not be possible to correctly demultiplex or direct
+the traffic. Any packets received on a server-facing socket used for proxying
+QUIC that does not correspond to a known Connection ID MUST be dropped.
+
 If the request includes a Client-Connection-Id header, the proxy is receiving a
 request to be able to route traffic back to the client using that Connection ID.
 If the pair of this Client Connection ID and the selected server-facing socket
