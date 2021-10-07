@@ -120,9 +120,6 @@ This document uses the following terms:
 - Target: the server that a client is accessing via a proxy.
 - Client <-> Proxy QUIC connection: a single QUIC connection established from
 the client to the proxy.
-- Quarter stream ID: represents a set of HTTP/3 DATAGRAMs
-{{!H3DGRAM=I-D.schinazi-quic-h3-datagram}} specific to a single client <-> proxy
-QUIC connection.
 - Socket: a UDP 4-tuple (local IP address, local UDP port, remote IP address,
 remote UDP port). In some implementations, this is referred to as a "connected"
 socket.
@@ -145,9 +142,9 @@ used to communicate with the client and the target. Tracking Connection IDs in
 this way allows the proxy to reuse server-facing sockets for multiple
 connections and support the forwarding mode of proxying.
 
-QUIC packets can be either tunnelled within an HTTP/3 proxy connection using
-QUIC DATAGRAM frames {{!DGRAM=I-D.ietf-quic-datagram}}, or be forwarded directly
-alongside an HTTP/3 proxy connection on the same set of IP addresses and UDP
+QUIC packets can be either tunnelled within an HTTP proxy connection using
+HTTP Datagram frames {{!HTTP-DGRAM=I-D.schinazi-quic-h3-datagram}}, or be forwarded
+directly alongside an HTTP/3 proxy connection on the same set of IP addresses and UDP
 ports. The use of forwarded mode requires the consent of both the client and the
 proxy.
 
@@ -155,20 +152,20 @@ In order to correctly route QUIC packets in both tunnelled and forwarded modes,
 the proxy needs to maintain mappings between several items. There are three
 required unidirectional mappings, described below.
 
-## Quarter Stream ID Mapping
+## Stream Mapping
 
-Each pair of client <-> proxy QUIC connection and quarter stream ID
+Each pair of client <-> proxy QUIC connection and an HTTP stream
 MUST be mapped to a single server-facing socket.
 
 ~~~
-(Client <-> Proxy QUIC connection + Quarter stream ID)
+(Client <-> Proxy QUIC connection + Stream)
     => Server-facing socket
 ~~~
 
-Multiple quarter stream IDs can map to the same server-facing socket, but a
-single quarter stream ID cannot be mapped to multiple server-facing sockets.
+Multiple streams can map to the same server-facing socket, but a
+single stream cannot be mapped to multiple server-facing sockets.
 
-This mapping guarantees that any datagram using a quarter stream ID sent
+This mapping guarantees that any HTTP Datagram using a stream sent
 from the client to the proxy in tunnelled mode can be sent to the correct
 target.
 
@@ -193,24 +190,24 @@ maintain this mapping.
 ## Client Connection ID Mappings
 
 Each pair of Client Connection ID and server-facing socket MUST map to a single
-quarter stream ID on a single client <-> proxy QUIC connection. Additionally, the
+stream on a single client <-> proxy QUIC connection. Additionally, the
 pair of Client Connection ID and server-facing socket MUST map to a single
 client-facing socket.
 
 ~~~
 (Server-facing socket + Client Connection ID)
-    => (Client <-> Proxy QUIC connection + Quarter stream ID)
+    => (Client <-> Proxy QUIC connection + Stream)
 (Server-facing socket + Client Connection ID)
     => Client-facing socket
 ~~~
 
-Multiple pairs of Connection IDs and sockets can map to the same quarter stream
-ID or client-facing socket.
+Multiple pairs of Connection IDs and sockets can map to the same stream
+or client-facing socket.
 
 These mappings guarantee that any QUIC packet sent from a target to the proxy
 can be sent to the correct client, in either tunnelled or forwarded mode. Note
 that this mapping becomes trivial if the proxy always opens a new server-facing
-socket for every client request with a unique quarter stream ID. The mapping is
+socket for every client request with a unique stream. The mapping is
 critical for any case where server-facing sockets are shared or reused.
 
 ## Detecting Connection ID Conflicts {#conflicts}
@@ -243,7 +240,7 @@ cause conflicts when forwarding.
 
 # Connection ID Capsule Types
 
-Proxy awareness of QUIC Connection IDs relies on using capsules ({{H3DGRAM}}
+Proxy awareness of QUIC Connection IDs relies on using capsules ({{HTTP-DGRAM}}
 to signal the addition and removal of client and server connection IDs.
 
 Note that these capsules do not register contexts or define a new HTTP Datagram
@@ -254,70 +251,40 @@ The capsules used for QUIC-aware proxying allow a client to register connection
 IDs with the proxy, and for the proxy to acknowledge or reject the connection
 ID mappings.
 
-## Register and Acknowlege Connection ID Capsule Types
-
 The REGISTER_CLIENT_CID and REGISTER_SERVER_CID capsule types (see 
 {{iana-capsule-types}} for the capsule type values) allow a client to inform
 the proxy about a new Client Connection ID or a new Server Connection ID,
-respectively.
+respectively. These capsule types MUST only be sent by a client.
 
 The ACK_CLIENT_CID and ACK_SERVER_CID capsule types (see {{iana-capsule-types}}
 for the capsule type values) are sent by the proxy to the client to indicate
 that a mapping was successfully created for a registered connection ID.
+These capsule types MUST only be sent by a proxy.
 
-Register and Ack Connection ID capsule types share the same format:
+The CLOSE_CLIENT_CID and CLOSE_SERVER_CID capsule types (see 
+{{iana-capsule-types}} for the capsule type values) allow either a client
+or a proxy to remove a mapping for a connection ID. These capsule types
+MAY be sent by either a client or the proxy. If a proxy sends a
+CLOSE_CLIENT_CID without having sent an ACK_CLIENT_CID, or if a proxy
+sends a CLOSE_SERVER_CID without having sent an ACK_SERVER_CID,
+it is rejecting a Connection ID registration.
+
+All Connection ID capsule types share the same format:
 
 ~~~
 Connection ID Capsule {
   Type (i) = 0xffe100..0xffe103,
   Length (i),
-  Connection ID Length (8),
-  Connection ID (8..2040),
+  Connection ID (0..2040),
 }
 ~~~
 {: #fig-capsule-cid title="Connection ID Capsule Format"}
 
-Connection ID Length:
-: An 8-bit unsigned integer containing the length of the connection ID.
-Values less than 1 and greater than 20 are invalid.
-
 Connection ID:
-: A connection ID of the specified length.
-
-## Close Connection ID Capsule Types {#close-capsule}
-
-The CLOSE_CLIENT_CID and CLOSE_SERVER_CID capsule types (see 
-{{iana-capsule-types}} for the capsule type values) allow either a client
-or a proxy to remove a mapping for a connection ID. These capsules share
-the following format:
-
-~~~
-Connection ID Capsule {
-  Type (i) = 0xffe104..0xffe105,
-  Length (i),
-  Connection ID Length (8),
-  Connection ID (0..160),
-  Close Code (i),
-  Close Details (..),
-}
-~~~
-{: #fig-capsule-close-cid title="Close Connection ID Capsule Format"}
-
-Close Code:
-: The close code allows an endpoint to provide additional information as
-to why a connection ID mapping was closed. The codes are defined in
-{{iana-close-codes}}.
-
-Close Details:
-: This is meant for debugging purposes. It consists of a human-readable
-string encoded in UTF-8.
-
-Connection ID Length:
-: An 8-bit unsigned integer containing the length of the connection ID.
-Values less than 1 and greater than 20 are invalid.
-
-Connection ID:
-: A connection ID of the specified length.
+: A connection ID being registered or acknowledged, which is between 0 and
+255 bytes in length. The length of the connection ID is implied by the
+length of the capsule. Note that in QUICv1, the length of the Connection ID
+is limited to 20 bytes, but QUIC invariants allow up to 255 bytes.
 
 # Client Request Behavior {#request}
 
@@ -341,11 +308,10 @@ clients are expected to cooperate with proxies in selecting Client Connection
 IDs. A proxy detects a conflict when it is not able to create a unique mapping
 using the Client Connection ID ({{conflicts}}). It can reject requests that
 would cause a conflict and indicate this to the client by replying with a
-CLOSE_CLIENT_CID capsule, with the close code set to CONFLICT. In order to
-avoid conflicts, clients SHOULD select Client Connection IDs of at least 8
-bytes in length with unpredictable values. A client also SHOULD NOT select
-a Client Connection ID that matches the ID used for the QUIC connection to
-the proxy, as this inherently creates a conflict.
+CLOSE_CLIENT_CID capsule. In order to avoid conflicts, clients SHOULD select
+Client Connection IDs of at least 8 bytes in length with unpredictable values.
+A client also SHOULD NOT select a Client Connection ID that matches the ID used
+for the QUIC connection to the proxy, as this inherently creates a conflict.
 
 If the rejection indicated a conflict due to the Client Connection ID, the
 client MUST select a new Connection ID before sending a new request, and
@@ -376,18 +342,16 @@ The client MUST wait for a ACK_SERVER_CID capsule that contains the echoed
 connection ID before using forwarded mode.
 
 Prior to receiving the server response, the client MUST send short header
-packets tunnelled in DATAGRAM frames. The client MAY also choose to tunnel some
-short header packets even after receiving the successful response.
+packets tunnelled in HTTP Datagram frames. The client MAY also choose to tunnel
+some short header packets even after receiving the successful response.
 
 If the Server Connection ID registration is rejected, for example with a
-CONFLICT close code in a CLOSE_SERVER_CID capsule, it MUST NOT forward packets to
-the requested Server Connection ID, but only use tunnelled mode. The request might
-also be rejected if the proxy does not support forwarded mode or has it disabled
-by policy. For close codes other than CONFLICT, clients SHOULD stop sending requests
-for other Server Connection IDs in the future.
+CLOSE_SERVER_CID capsule, it MUST NOT forward packets to the requested Server
+Connection ID, but only use tunnelled mode. The request might also be rejected
+if the proxy does not support forwarded mode or has it disabled by policy.
 
 QUIC long header packets MUST NOT be forwarded. These packets can only be
-tunnelled within DATAGRAM frames to avoid exposing unnecessary connection
+tunnelled within HTTP Datagram frames to avoid exposing unnecessary connection
 metadata.
 
 When forwarding, the client sends a QUIC packet with the target server's
@@ -419,8 +383,15 @@ packets to the proxy.
 
 Upon receipt of a REGISTER_CLIENT_CID or REGISTER_SERVER_CID capsule,
 the proxy validates the registration, tries to establish the appropriate
-mappings as described in {{mappings}}, and establishes a new server-facing
-socket if necessary.
+mappings as described in {{mappings}}.
+
+The proxy MUST reply to each REGISTER_CLIENT_CID capsule with either
+an ACK_CLIENT_CID or CLOSE_CLIENT_CID capsule containing the
+Connection ID that was in the registration capsule.
+
+Similarly, the proxy MUST reply to each REGISTER_SERVER_CID capsule with 
+either an ACK_SERVER_CID or CLOSE_SERVER_CID capsule containing the
+Connection ID that was in the registration capsule.
 
 The proxy then determines the server-facing socket to associate with the
 client's request. This will generally involve performing a DNS lookup for
@@ -448,13 +419,13 @@ If the pair of this Client Connection ID and the selected server-facing socket
 does not create a conflict, the proxy creates the mapping and responds with a
 ACK_CLIENT_CID capsule. After this point, any packets received by the proxy from the
 server-facing socket that match the Client Connection ID can to be sent to the
-client. The proxy MUST use tunnelled mode (DATAGRAM frames) on the correct
+client. The proxy MUST use tunnelled mode (HTTP Datagram frames) on the correct
 datagram context for any long header packets. The proxy SHOULD forward directly to
 the client for any matching short header packets, but MAY tunnel them in
-DATAGRAM frames. If the pair is not unique, or the proxy chooses not to support
+HTTP Datagram frames. If the pair is not unique, or the proxy chooses not to support
 zero-length Client Connection IDs, the proxy responds with a CLOSE_CLIENT_CID
-capsule with a CONFLICT close code. If this occurs on the first request for a
-given HTTP request, the proxy removes any mapping for that HTTP request.
+capsule. If this occurs on the first request for a given HTTP request, the
+proxy removes any mapping for that HTTP request.
 
 When the proxy recieves a REGISTER_SERVER_CID capsule, it is receiving a
 request to allow the client to forward packets to the target. If the pair of
@@ -463,13 +434,12 @@ received does not create a conflict, the proxy creates the mapping and responds
 with a ACK_SERVER_CID capsule. Once the successful response is sent, the proxy will
 forward any short header packets received on the client-facing socket that use
 the Server Connection ID using the correct server-facing socket. If the pair is
-not unique, the server responds with a CLOSE_SERVER_CID capsule with a CONFLICT
-close code. If this occurs, traffic for that Server Connection ID can only use
-tunnelled mode, not forwarded.
+not unique, the server responds with a CLOSE_SERVER_CID capsule. If this occurs,
+traffic for that Server Connection ID can only use tunnelled mode, not forwarded.
 
 If the proxy does not support forwarded mode, or does not allow forwarded mode
-for a particular client or authority by policy, it can reject REGISTER_SERVER_CID
-requests with a DENIED close code.
+for a particular client or authority by policy, it can reject all REGISTER_SERVER_CID
+requests with CLOSE_SERVER_CID capsule.
 
 The proxy MUST only forward non-tunnelled packets from the client that are QUIC
 short header packets (based on the Header Form bit) and have mapped Server
@@ -480,7 +450,7 @@ considered as activity for restarting QUIC's Idle Timeout {{QUIC}}.
 
 For any connection ID for which the proxy has sent an acknowledgement, any
 mappings for the connection ID last until either endpoint sends a close capsule
-or the entire HTTP request stream closes.
+or the either side of the HTTP stream closes.
 
 A client that no longer wants a given Connection ID to be forwarded by the
 proxy sends a CLOSE_CLIENT_CID or CLOSE_SERVER_CID capsule.
@@ -594,14 +564,14 @@ behind QUIC load balancers.
 
 # Packet Size Considerations
 
-Since Initial QUIC packets must be at least 1200 bytes in length, the DATAGRAM
-frames that are used for a QUIC-aware proxy MUST be able to carry at least 1200
-bytes.
+Since Initial QUIC packets must be at least 1200 bytes in length, the HTTP
+Datagram frames that are used for a QUIC-aware proxy MUST be able to carry at least
+1200 bytes.
 
 Additionally, clients that connect to a proxy for purpose of proxying QUIC
 SHOULD start their connection with a larger packet size than 1200 bytes, to
-account for the overhead of tunnelling an Initial QUIC packet within a
-DATAGRAM frame. If the client does not begin with a larger packet size than
+account for the overhead of tunnelling an Initial QUIC packet within an
+HTTP Datagram frame. If the client does not begin with a larger packet size than
 1200 bytes, it will need to perform Path MTU (Maximum Transmission Unit)
 discovery to discover a larger path size prior to sending any tunnelled Initial
 QUIC packets.
@@ -622,7 +592,7 @@ Tunnelled packets have similar inference problems. An attacker on both sides
 of the proxy can use the size of ingress and egress packets to correlate packets
 belonging to the same connection. (Absent client-side padding, tunneled packets
 will typically have a fixed amount of overhead that is removed before their
-DATAGRAM contents are written to the target.)
+HTTP Datagram contents are written to the target.)
 
 Since proxies that forward QUIC packets do not perform any cryptographic
 integrity check, it is possible that these packets are either malformed,
@@ -638,7 +608,7 @@ or decreasing the reputation of a given proxy.
 ## Capsule Types {#iana-capsule-types}
 
 This document registers six new values in the in the "HTTP Capsule Types"
-registry established by {{H3DGRAM}}.
+registry established by {{HTTP-DGRAM}}.
 
 |     Capule Type     |   Value   | Specification |
 |:--------------------|:----------|:--------------|
@@ -649,43 +619,6 @@ registry established by {{H3DGRAM}}.
 | CLOSE_CLIENT_CID    | 0xffe104  | This Document |
 | CLOSE_SERVER_CID    | 0xffe105  | This Document |
 {: #iana-format-type-table title="Registered Capsule Type"}
-
-## CID Close Codes {#iana-close-codes}
-
-This document establishes a registry for HTTP connection ID close codes.
-The "HTTP QUIC Connection ID Close Codes" registry governs a 62-bit space.
-Registrations in this registry MUST include the following fields:
-
-Type:
-
-: A name or label for the close code.
-
-Value:
-
-: The value of the Close Code field (see {{close-capsule}}) is a 62-bit integer.
-
-Reference:
-
-: An optional reference to a specification for the parameter. This field MAY be
-empty.
-
-Registrations follow the "First Come First Served" policy (see Section 4.4 of
-{{!IANA-POLICY=RFC8126}}) where two registrations MUST NOT have the same Type
-nor Value.
-
-This registry initially contains the following entries:
-
-| Context Close Code   |   Value   | Specification |
-|:---------------------|:----------|:--------------|
-| NO_ERROR             | 0xff8800  | This Document |
-| CONFLICT             | 0xff8801  | This Document |
-| DENIED               | 0xff8802  | This Document |
-{: #iana-close-codes-table title="QUIC Connection ID Close Code Registry Entries"}
-
-Context close codes with a value of the form 41 * N + 19 for integer values of
-N are reserved to exercise the requirement that unknown context close codes be
-treated as NO_ERROR. These values MUST NOT be assigned by IANA and MUST NOT
-appear in the listing of assigned values.
 
 --- back
 
