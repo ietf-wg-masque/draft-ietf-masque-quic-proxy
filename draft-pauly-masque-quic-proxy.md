@@ -32,7 +32,7 @@ author:
 
 --- abstract
 
-This document defines an extension to the UDP over HTTP Extended CONNECT protocol
+This document defines an extension to UDP Proxying over HTTP
 that adds specific optimizations for proxied QUIC connections. This extension
 allows a proxy to reuse UDP 4-tuples for multiple connections. It also defines a
 mode of proxying in which QUIC short header packets can be forwarded through the
@@ -42,7 +42,7 @@ proxy rather than being re-encapsulated and re-encrypted.
 
 # Introduction {#introduction}
 
-The UDP over HTTP Extended CONNECT protocol {{!CONNECT-UDP=I-D.ietf-masque-connect-udp}}
+UDP Proxying over HTTP {{!CONNECT-UDP=I-D.ietf-masque-connect-udp}}
 defines a way to send datagrams through an HTTP proxy, where UDP is used to communicate
 between the proxy and a target server. This can be used to proxy QUIC
 connections {{!QUIC=RFC9000}}, since QUIC runs over UDP datagrams.
@@ -97,7 +97,7 @@ Both clients and proxies can unilaterally choose to disable forwarded mode for
 any client <-> target connection.
 
 The forwarding mode of this extension is only defined for HTTP/3
-{{!HTTP3=I-D.ietf-quic-http}} and not any earlier versions.
+{{!HTTP3=I-D.ietf-quic-http}} and not any earlier versions of HTTP.
 
 QUIC proxies only need to understand the Header Form bit, and the connection ID
 fields from packets in client <-> target QUIC connections. Since these fields
@@ -116,7 +116,7 @@ when, and only when, they appear in all capitals, as shown here.
 This document uses the following terms:
 
 - Client: the client of all QUIC connections discussed in this document.
-- Proxy: the endpoint that responds to the Extended CONNECT request.
+- Proxy: the endpoint that responds to the UDP proxying request.
 - Target: the server that a client is accessing via a proxy.
 - Client <-> Proxy QUIC connection: a single QUIC connection established from
 the client to the proxy.
@@ -272,7 +272,7 @@ Connection ID Capsule {
   Type (i) = 0xffe100..0xffe103,
   Length (i),
   Connection ID Length (8),
-  Connection ID (0..160),
+  Connection ID (8..2040),
 }
 ~~~
 {: #fig-capsule-cid title="Connection ID Capsule Format"}
@@ -310,7 +310,7 @@ to why a connection ID mapping was closed. The codes are defined in
 
 Close Details:
 : This is meant for debugging purposes. It consists of a human-readable
-string encoded in UTF-8.¶
+string encoded in UTF-8.
 
 Connection ID Length:
 : An 8-bit unsigned integer containing the length of the connection ID.
@@ -321,7 +321,7 @@ Connection ID:
 
 # Client Request Behavior {#request}
 
-A client initiates UDP proxying via an extended CONNECT request as defined
+A client initiates UDP proxying via a CONNECT request as defined
 in {{CONNECT-UDP}}. It then sends a REGISTER_CLIENT_CID capsule whenever it
 advertises a new Client Connection ID to the target, and a REGISTER_SERVER_CID
 capsule when it has received a new Server Connection ID for the target.
@@ -418,7 +418,7 @@ packets to the proxy.
 # Proxy Response Behavior {#response}
 
 Upon receipt of a REGISTER_CLIENT_CID or REGISTER_SERVER_CID capsule,
-Sthe proxy validates the registration, tries to establish the appropriate
+the proxy validates the registration, tries to establish the appropriate
 mappings as described in {{mappings}}, and establishes a new server-facing
 socket if necessary.
 
@@ -428,8 +428,8 @@ the hostname in the CONNECT request authority, or finding an existing server-fac
 socket to the authority. The server-facing socket might already be open due to a
 previous request from this client, or another. If the socket is not already
 created, the proxy creates a new one. Proxies can choose to reuse server-facing
-sockets across multiple datagram contexts, or have a unique server-facing socket
-for every datagram context.
+sockets across multiple UDP proxying requests, or have a unique server-facing socket
+for every UDP proxying request.
 
 If a proxy reuses server-facing sockets, it SHOULD store which authorities
 (which could be a domain name or IP address literal) are being accessed over a
@@ -488,7 +488,7 @@ proxy sends a CLOSE_CLIENT_CID or CLOSE_SERVER_CID capsule.
 If a client's connection to the proxy is terminated for any reason, all
 mappings associated with all requests are removed.
 
-A proxy can close its server-facing socket once all proxied connections mapped to
+A proxy can close its server-facing socket once all UDP proxying requests mapped to
 that socket have been removed.
 
 ## Handling Connection Migration
@@ -510,7 +510,7 @@ of the new QUIC Client Connection ID, the client also sends a sends a
 REGISTER_CLIENT_CID capsule.
 
 The client will also send the initial QUIC packet with the Long Header form in
-a DATAGRAM frame on the corresponding quarter stream ID.
+an HTTP datagram.
 
 ~~~
 Client                                             Server
@@ -650,7 +650,7 @@ registry established by {{H3DGRAM}}.
 | CLOSE_SERVER_CID    | 0xffe105  | This Document |
 {: #iana-format-type-table title="Registered Capsule Type"}
 
-## Context Close Codes {#iana-close-codes}
+## CID Close Codes {#iana-close-codes}
 
 This document establishes a registry for HTTP connection ID close codes.
 The "HTTP QUIC Connection ID Close Codes" registry governs a 62-bit space.
