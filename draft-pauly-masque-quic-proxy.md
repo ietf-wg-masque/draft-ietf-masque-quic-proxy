@@ -289,9 +289,26 @@ is limited to 20 bytes, but QUIC invariants allow up to 255 bytes.
 # Client Request Behavior {#request}
 
 A client initiates UDP proxying via a CONNECT request as defined
-in {{CONNECT-UDP}}. It then sends a REGISTER_CLIENT_CID capsule whenever it
-advertises a new Client Connection ID to the target, and a REGISTER_SERVER_CID
-capsule when it has received a new Server Connection ID for the target.
+in {{CONNECT-UDP}}. Within its request, it includes the "Proxy-QUIC" header
+with a value set to "?1" to indicate that it supports QUIC-aware proxying.
+
+The "Proxy-QUIC" is an Item Structured Header {{!RFC8941}}. Its value MUST be
+a Boolean. Its ABNF is:
+
+~~~
+    Proxy-QUIC = sf-boolean
+~~~
+ 
+If the proxy supports QUIC-aware proxying, it will include the "Proxy-QUIC"
+header with a value set to "?1" in successful HTTP responses. If the client
+does not receive this header in responses, it MUST NOT try to enable or use
+the forwarding mode defined in this document.
+
+The client sends a REGISTER_CLIENT_CID capsule whenever it advertises a new
+Client Connection ID to the target, and a REGISTER_SERVER_CID capsule when
+it has received a new Server Connection ID for the target. Note that the
+initial REGISTER_CLIENT_CID capsule MAY be sent prior to receiving an
+HTTP response from the proxy.
 
 ## New Proxied Connection Setup
 
@@ -380,6 +397,11 @@ when communicating with a specific target can simply not start forwarding
 packets to the proxy.
 
 # Proxy Response Behavior {#response}
+
+Upon receipt of a CONNECT request that includes the "Proxy-QUIC" header,
+the proxy indicates to the client that it supports QUIC-aware proxying
+by including the same "Proxy-QUIC" header with a value of "?1" in a
+successful response.
 
 Upon receipt of a REGISTER_CLIENT_CID or REGISTER_SERVER_CID capsule,
 the proxy validates the registration, tries to establish the appropriate
@@ -491,6 +513,7 @@ STREAM(44): HEADERS             -------->
   :scheme = https
   :path = /target.example.com/443/
   :authority = proxy.example.org
+  proxy-quic = ?1
 
 STREAM(44): DATA                -------->
   Capsule Type = REGISTER_DATAGRAM_NO_CONTEXT
@@ -507,6 +530,7 @@ DATAGRAM                        -------->
 
            <--------  STREAM(44): HEADERS
                         :status = 200
+                        proxy-quic = ?1
                         
            <--------  STREAM(44): DATA
                         Capsule Type = ACK_CLIENT_CID
@@ -604,6 +628,19 @@ or decreasing the reputation of a given proxy.
 [comment3]: # packets to induce rate limiting.
 
 # IANA Considerations {#iana}
+
+## HTTP Header {#iana-header}
+
+This document registers the "Proxy-QUIC" header in the "Permanent Message
+Header Field Names" <[](https://www.iana.org/assignments/message-headers)>.
+
+ ~~~
+   +-------------------+----------+--------+---------------+
+   | Header Field Name | Protocol | Status |   Reference   |
+   +-------------------+----------+--------+---------------+
+   | Proxy-QUIC        |   http   |  exp   | This document |
+   +-------------------+----------+--------+---------------+
+ ~~~
 
 ## Capsule Types {#iana-capsule-types}
 
