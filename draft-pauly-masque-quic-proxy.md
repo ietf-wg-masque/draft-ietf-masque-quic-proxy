@@ -35,8 +35,8 @@ author:
 This document defines an extension to UDP Proxying over HTTP
 that adds specific optimizations for proxied QUIC connections. This extension
 allows a proxy to reuse UDP 4-tuples for multiple connections. It also defines a
-mode of proxying in which QUIC short header packets can be forwarded through the
-proxy rather than being re-encapsulated and re-encrypted.
+mode of proxying in which QUIC short header packets can be forwarded using an
+HTTP/3 proxy rather than being re-encapsulated and re-encrypted.
 
 --- middle
 
