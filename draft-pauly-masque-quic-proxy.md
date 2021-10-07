@@ -638,7 +638,7 @@ or decreasing the reputation of a given proxy.
 ## Capsule Types {#iana-capsule-types}
 
 This document registers six new values in the in the "HTTP Capsule Types"
-registry established by {{HTTP-DGRAM}}.
+registry established by {{H3DGRAM}}.
 
 |     Capule Type     |   Value   | Specification |
 |:--------------------|:----------|:--------------|
