@@ -587,7 +587,7 @@ the load balancer, packets can be routed incorrectly.
 QUIC-aware proxies that use forwarding mode generally SHOULD NOT be
 run behind load balancers; and if they are, they MUST coordinate between the
 proxy and the load balancer to create mappings for proxied Connection IDs prior
-to the proxy sending 2xx (Successful) responses to clients.
+to the proxy ACK_CLIENT_CID or ACK_SERVER_CID capsules to clients.
 
 QUIC-aware proxies that do not allow forwarding mode can function unmodified
 behind QUIC load balancers.
