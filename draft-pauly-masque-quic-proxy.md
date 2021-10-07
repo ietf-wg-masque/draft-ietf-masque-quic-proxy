@@ -143,7 +143,7 @@ this way allows the proxy to reuse server-facing sockets for multiple
 connections and support the forwarding mode of proxying.
 
 QUIC packets can be either tunnelled within an HTTP proxy connection using
-HTTP Datagram frames {{!HTTP-DGRAM=I-D.schinazi-quic-h3-datagram}}, or be forwarded
+HTTP Datagram frames {{!HTTP-DGRAM=I-D.ietf-masque-h3-datagram}}, or be forwarded
 directly alongside an HTTP/3 proxy connection on the same set of IP addresses and UDP
 ports. The use of forwarded mode requires the consent of both the client and the
 proxy.
