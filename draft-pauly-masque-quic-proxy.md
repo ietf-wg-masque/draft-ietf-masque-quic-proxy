@@ -634,13 +634,14 @@ or decreasing the reputation of a given proxy.
 This document registers the "Proxy-QUIC" header in the "Permanent Message
 Header Field Names" <[](https://www.iana.org/assignments/message-headers)>.
 
- ~~~
-   +-------------------+----------+--------+---------------+
-   | Header Field Name | Protocol | Status |   Reference   |
-   +-------------------+----------+--------+---------------+
-   | Proxy-QUIC        |   http   |  exp   | This document |
-   +-------------------+----------+--------+---------------+
- ~~~
+~~~
+    +-------------------+----------+--------+---------------+
+    | Header Field Name | Protocol | Status |   Reference   |
+    +-------------------+----------+--------+---------------+
+    | Proxy-QUIC        |   http   |  exp   | This document |
+    +-------------------+----------+--------+---------------+
+~~~
+{: #iana-header-type-table title="Registered HTTP Header"}
 
 ## Capsule Types {#iana-capsule-types}
 
@@ -655,7 +656,7 @@ registry established by {{HTTP-DGRAM}}.
 | ACK_SERVER_CID      | 0xffe103  | This Document |
 | CLOSE_CLIENT_CID    | 0xffe104  | This Document |
 | CLOSE_SERVER_CID    | 0xffe105  | This Document |
-{: #iana-format-type-table title="Registered Capsule Type"}
+{: #iana-format-type-table title="Registered Capsule Types"}
 
 --- back
 
