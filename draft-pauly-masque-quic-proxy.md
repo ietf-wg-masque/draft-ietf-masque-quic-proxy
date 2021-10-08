@@ -291,20 +291,29 @@ is limited to 20 bytes, but QUIC invariants allow up to 255 bytes.
 # Client Request Behavior {#request}
 
 A client initiates UDP proxying via a CONNECT request as defined
-in {{CONNECT-UDP}}. Within its request, it includes the "Proxy-QUIC" header
-with a value set to "?1" to indicate that it supports QUIC-aware proxying.
+in {{CONNECT-UDP}}. Within its request, it includes the "Proxy-QUIC-Forwarding"
+header to indicate whether or not the request should support forwarding.
+If this header is not included, the client MUST NOT send any connection ID
+capsules.
 
-The "Proxy-QUIC" is an Item Structured Header {{!RFC8941}}. Its value MUST be
-a Boolean. Its ABNF is:
+The "Proxy-QUIC-Forwarding" is an Item Structured Header {{!RFC8941}}. Its
+value MUST be a Boolean. Its ABNF is:
 
 ~~~
-    Proxy-QUIC = sf-boolean
+    Proxy-QUIC-Forwarding = sf-boolean
 ~~~
+
+If the client wants to enable QUIC packet forwarding for this request, it sets
+the value to "?1". If it doesn't want to enable forwarding, but instead only
+provide information about QUIC Connection IDs for the purpose of allowing
+the proxy to share a server-facing socket, it sets the value to "?0".
  
-If the proxy supports QUIC-aware proxying, it will include the "Proxy-QUIC"
-header with a value set to "?1" in successful HTTP responses. If the client
-does not receive this header in responses, it MUST NOT try to enable or use
-the forwarding mode defined in this document.
+If the proxy supports QUIC-aware proxying, it will include the
+"Proxy-QUIC-Forwarding" header in successful HTTP responses. The value will
+indicate if the proxy supports forwarding. If the client does not receive
+this header in responses, the client SHALL assume that the proxy does
+not understand how to part Connection ID capsules, and SHOULD NOT send any
+Connection ID capsules.
 
 The client sends a REGISTER_CLIENT_CID capsule whenever it advertises a new
 Client Connection ID to the target, and a REGISTER_SERVER_CID capsule when
@@ -353,6 +362,11 @@ ACK_CLIENT_CID capsule is received that contains the echoed connection ID.
 
 ## Sending With Forwarded Mode
 
+Sending with forwarded mode is only possible if the proxy sent the
+"Proxy-QUIC-Forwarding" header with a value of "?1" in its response to the
+client. If the client has received this, it uses REGISTER_SERVER_CID capsules
+to request the ability to forward packets to the target through the proxy. 
+
 Once the client has learned the target server's Connection ID, such as in the
 response to a QUIC Initial packet, it can send a REGISTER_SERVER_CID capsule
 containing the Server Connection ID to request the ability to forward packets. 
@@ -379,31 +393,24 @@ proxy that was used for the main QUIC connection between client and proxy.
 
 ## Receiving With Forwarded Mode
 
-A proxy MUST NOT forward packets from the target to the client until after the
-client has sent at least one packet in forwarded mode. Once this occurs, the
-proxy MAY use forwarded mode for any Client Connection ID for which it has a
-valid mapping.
+If the client has indicated support for forwarding with the "Proxy-QUIC-Forwarding"
+header, the proxy MAY use forwarded mode for any Client Connection ID for which
+it has a valid mapping.
 
-If a client has started using forwarding mode, it MUST be prepared to receive
-forwarded short header packets on the socket between itself and the proxy for
-any Client Connection ID that has been accepted by the proxy. The client uses
-the received Connection ID to determine if a packet was originated by the
-proxy, or merely forwarded from the target.
-
-## Opting Out of Forwarded Mode
-
-The use of forwarded mode is initiated by the client sending a request with the
-REGISTER_SERVER_CID capsule and sending at least one forwarded packet to the
-proxy. A client that does not wish to accept forwarded packets from the proxy
-when communicating with a specific target can simply not start forwarding
-packets to the proxy.
+Once a client has sent "Proxy-QUIC-Forwarding" with a value of "?1", it MUST be
+prepared to receive forwarded short header packets on the socket between itself
+and the proxy for any Client Connection ID that it has registered with a
+REGISTER_CLIENT_CID capsule. The client uses the received Connection ID to
+determine if a packet was originated by the proxy, or merely forwarded from the
+target.
 
 # Proxy Response Behavior {#response}
 
-Upon receipt of a CONNECT request that includes the "Proxy-QUIC" header,
-the proxy indicates to the client that it supports QUIC-aware proxying
-by including a "Proxy-QUIC" header with a value of "?1" in a
-successful response.
+Upon receipt of a CONNECT request that includes the "Proxy-QUIC-Forwarding"
+header, the proxy indicates to the client that it supports QUIC-aware proxying
+by including a "Proxy-QUIC-Forwarding" header in a successful response.
+If it supports QUIC packet forwarding, it sets the value to "?1"; otherwise,
+it sets it to "?0".
 
 Upon receipt of a REGISTER_CLIENT_CID or REGISTER_SERVER_CID capsule,
 the proxy validates the registration, tries to establish the appropriate
@@ -445,10 +452,10 @@ ACK_CLIENT_CID capsule. After this point, any packets received by the proxy from
 server-facing socket that match the Client Connection ID can to be sent to the
 client. The proxy MUST use tunnelled mode (HTTP Datagram frames) for any long
 header packets. The proxy SHOULD forward directly to the client for any matching
-short header packets once forwarding has been initiated by the client, but
-the proxy MAY tunnel these packets in HTTP Datagram frames instead. If the pair
-is not unique, or the proxy chooses not to support zero-length Client Connection IDs,
-the proxy responds with a CLOSE_CLIENT_CID capsule.
+short header packets if forwarding is supported by the client, but the proxy MAY
+tunnel these packets in HTTP Datagram frames instead. If the pair is not unique,
+or the proxy chooses not to support zero-length Client Connection IDs, the proxy
+responds with a CLOSE_CLIENT_CID capsule.
 
 When the proxy recieves a REGISTER_SERVER_CID capsule, it is receiving a
 request to allow the client to forward packets to the target. If the pair of
@@ -514,7 +521,7 @@ STREAM(44): HEADERS             -------->
   :scheme = https
   :path = /target.example.com/443/
   :authority = proxy.example.org
-  proxy-quic = ?1
+  proxy-quic-forwarding = ?1
 
 STREAM(44): DATA                -------->
   Capsule Type = REGISTER_DATAGRAM_NO_CONTEXT
@@ -531,7 +538,7 @@ DATAGRAM                        -------->
 
            <--------  STREAM(44): HEADERS
                         :status = 200
-                        proxy-quic = ?1
+                          proxy-quic-forwarding = ?1
                         
            <--------  STREAM(44): DATA
                         Capsule Type = ACK_CLIENT_CID
@@ -632,15 +639,15 @@ or decreasing the reputation of a given proxy.
 
 ## HTTP Header {#iana-header}
 
-This document registers the "Proxy-QUIC" header in the "Permanent Message
+This document registers the "Proxy-QUIC-Forwarding" header in the "Permanent Message
 Header Field Names" <[](https://www.iana.org/assignments/message-headers)>.
 
 ~~~
-    +-------------------+----------+--------+---------------+
-    | Header Field Name | Protocol | Status |   Reference   |
-    +-------------------+----------+--------+---------------+
-    | Proxy-QUIC        |   http   |  exp   | This document |
-    +-------------------+----------+--------+---------------+
+    +-----------------------+----------+--------+---------------+
+    | Header Field Name     | Protocol | Status |   Reference   |
+    +-----------------------+----------+--------+---------------+
+    | Proxy-QUIC-Forwarding |   http   |  exp   | This document |
+    +-----------------------+----------+--------+---------------+
 ~~~
 {: #iana-header-type-table title="Registered HTTP Header"}
 
