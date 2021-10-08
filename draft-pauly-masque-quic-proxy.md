@@ -538,7 +538,7 @@ DATAGRAM                        -------->
 
            <--------  STREAM(44): HEADERS
                         :status = 200
-                          proxy-quic-forwarding = ?1
+                        proxy-quic-forwarding = ?1
                         
            <--------  STREAM(44): DATA
                         Capsule Type = ACK_CLIENT_CID
