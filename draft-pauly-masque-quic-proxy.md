@@ -240,7 +240,7 @@ cause conflicts when forwarding.
 
 # Connection ID Capsule Types
 
-Proxy awareness of QUIC Connection IDs relies on using capsules ({{HTTP-DGRAM}}
+Proxy awareness of QUIC Connection IDs relies on using capsules ({{HTTP-DGRAM}})
 to signal the addition and removal of client and server connection IDs.
 
 Note that these capsules do not register contexts or define a new HTTP Datagram
@@ -346,7 +346,7 @@ Prior to informing the target of a new chosen client connection ID, the client
 MUST send a REGISTER_CLIENT_CID capsule request containing the new Client
 Connection ID.
 
-The client should only inform the target of the new Client Connection ID once a
+The client should only inform the target of the new Client Connection ID once an
 ACK_CLIENT_CID capsule is received that contains the echoed connection ID.
 
 ## Sending With Forwarded Mode
@@ -355,7 +355,7 @@ Once the client has learned the target server's Connection ID, such as in the
 response to a QUIC Initial packet, it can send a REGISTER_SERVER_CID capsule
 containing the Server Connection ID to request the ability to forward packets. 
 
-The client MUST wait for a ACK_SERVER_CID capsule that contains the echoed
+The client MUST wait for an ACK_SERVER_CID capsule that contains the echoed
 connection ID before using forwarded mode.
 
 Prior to receiving the server response, the client MUST send short header
@@ -400,7 +400,7 @@ packets to the proxy.
 
 Upon receipt of a CONNECT request that includes the "Proxy-QUIC" header,
 the proxy indicates to the client that it supports QUIC-aware proxying
-by including the same "Proxy-QUIC" header with a value of "?1" in a
+by including a "Proxy-QUIC" header with a value of "?1" in a
 successful response.
 
 Upon receipt of a REGISTER_CLIENT_CID or REGISTER_SERVER_CID capsule,
@@ -417,7 +417,7 @@ Connection ID that was in the registration capsule.
 
 The proxy then determines the server-facing socket to associate with the
 client's request. This will generally involve performing a DNS lookup for
-the hostname in the CONNECT request authority, or finding an existing server-facing
+the target hostname in the CONNECT request, or finding an existing server-facing
 socket to the authority. The server-facing socket might already be open due to a
 previous request from this client, or another. If the socket is not already
 created, the proxy creates a new one. Proxies can choose to reuse server-facing
@@ -498,7 +498,7 @@ path to avoid creating unintentional congestion on the new path.
 
 Consider a client that is establishing a new QUIC connection through the proxy.
 It has selected a Client Connection ID of 0x31323334. In order to inform a proxy
-of the new QUIC Client Connection ID, the client also sends a sends a
+of the new QUIC Client Connection ID, the client also sends a
 REGISTER_CLIENT_CID capsule.
 
 The client will also send the initial QUIC packet with the Long Header form in
@@ -558,7 +558,7 @@ STREAM(44): DATA                -------->
                         Connection ID = 0x61626364
 ~~~
 
-Upon receiving a ACK_SERVER_CID capsule, the client starts sending Short Header
+Upon receiving an ACK_SERVER_CID capsule, the client starts sending Short Header
 packets with a Destination Connection ID of 0x61626364 directly to the proxy
 (not tunnelled), and these are forwarded directly to the target by the proxy.
 Similarly, Short Header packets from the target with a Destination Connection ID
@@ -645,7 +645,7 @@ Header Field Names" <[](https://www.iana.org/assignments/message-headers)>.
 
 ## Capsule Types {#iana-capsule-types}
 
-This document registers six new values in the in the "HTTP Capsule Types"
+This document registers six new values in the "HTTP Capsule Types"
 registry established by {{HTTP-DGRAM}}.
 
 |     Capule Type     |   Value   | Specification |
