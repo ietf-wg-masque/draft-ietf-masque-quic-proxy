@@ -97,7 +97,9 @@ Both clients and proxies can unilaterally choose to disable forwarded mode for
 any client <-> target connection.
 
 The forwarding mode of this extension is only defined for HTTP/3
-{{!HTTP3=I-D.ietf-quic-http}} and not any earlier versions of HTTP.
+{{!HTTP3=I-D.ietf-quic-http}} and not any earlier versions of HTTP. The
+forwarding mode also requires special handling in order to be compatible
+with intermediaries or load balancers (see {{load-balancers}}).
 
 QUIC proxies only need to understand the Header Form bit, and the connection ID
 fields from packets in client <-> target QUIC connections. Since these fields
@@ -441,13 +443,12 @@ If the pair of this Client Connection ID and the selected server-facing socket
 does not create a conflict, the proxy creates the mapping and responds with a
 ACK_CLIENT_CID capsule. After this point, any packets received by the proxy from the
 server-facing socket that match the Client Connection ID can to be sent to the
-client. The proxy MUST use tunnelled mode (HTTP Datagram frames) on the correct
-datagram context for any long header packets. The proxy SHOULD forward directly to
-the client for any matching short header packets, but MAY tunnel them in
-HTTP Datagram frames. If the pair is not unique, or the proxy chooses not to support
-zero-length Client Connection IDs, the proxy responds with a CLOSE_CLIENT_CID
-capsule. If this occurs on the first request for a given HTTP request, the
-proxy removes any mapping for that HTTP request.
+client. The proxy MUST use tunnelled mode (HTTP Datagram frames) for any long
+header packets. The proxy SHOULD forward directly to the client for any matching
+short header packets once forwarding has been initiated by the client, but
+the proxy MAY tunnel these packets in HTTP Datagram frames instead. If the pair
+is not unique, or the proxy chooses not to support zero-length Client Connection IDs,
+the proxy responds with a CLOSE_CLIENT_CID capsule.
 
 When the proxy recieves a REGISTER_SERVER_CID capsule, it is receiving a
 request to allow the client to forward packets to the target. If the pair of
@@ -564,7 +565,7 @@ packets with a Destination Connection ID of 0x61626364 directly to the proxy
 Similarly, Short Header packets from the target with a Destination Connection ID
 of 0x31323334 are forwarded directly to the client.
 
-# Interactions with Load Balancers
+# Interactions with Load Balancers {#load-balancers}
 
 Some QUIC servers are accessed using load balancers, as described in
 {{?QUIC-LB=I-D.ietf-quic-load-balancers}}. These load balancers route packets to
