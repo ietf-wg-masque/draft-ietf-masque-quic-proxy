@@ -127,12 +127,12 @@ remote UDP port). In some implementations, this is referred to as a "connected"
 socket.
 - Client-facing socket: the socket used to communicate between the client and
 the proxy.
-- Server-facing socket: the socket used to communicate between the proxy and
+- Target-facing socket: the socket used to communicate between the proxy and
 the target.
 - Client Connection ID: a QUIC Connection ID that is chosen by the client, and
 is used in the Destination Connection ID field of packets from the target to
 the client.
-- Server Connection ID: a QUIC Connection ID that is chosen by the target, and
+- Target Connection ID: a QUIC Connection ID that is chosen by the target, and
 is used in the Destination Connection ID field of packets from the client to
 the target.
 
@@ -141,7 +141,7 @@ the target.
 In the methods defined in this document, the proxy is aware of the QUIC
 Connection IDs being used by proxied connections, along with the sockets
 used to communicate with the client and the target. Tracking Connection IDs in
-this way allows the proxy to reuse server-facing sockets for multiple
+this way allows the proxy to reuse target-facing sockets for multiple
 connections and support the forwarding mode of proxying.
 
 QUIC packets can be either tunnelled within an HTTP proxy connection using
@@ -157,49 +157,49 @@ required unidirectional mappings, described below.
 ## Stream Mapping
 
 Each pair of client <-> proxy QUIC connection and an HTTP stream
-MUST be mapped to a single server-facing socket.
+MUST be mapped to a single target-facing socket.
 
 ~~~
 (Client <-> Proxy QUIC connection + Stream)
-    => Server-facing socket
+    => Target-facing socket
 ~~~
 
-Multiple streams can map to the same server-facing socket, but a
-single stream cannot be mapped to multiple server-facing sockets.
+Multiple streams can map to the same target-facing socket, but a
+single stream cannot be mapped to multiple target-facing sockets.
 
 This mapping guarantees that any HTTP Datagram using a stream sent
 from the client to the proxy in tunnelled mode can be sent to the correct
 target.
 
-## Server Connection ID Mapping
+## Target Connection ID Mapping
 
-Each pair of Server Connection ID and client-facing socket MUST map to a single
-server-facing socket.
+Each pair of Target Connection ID and client-facing socket MUST map to a single
+target-facing socket.
 
 ~~~
-(Client-facing socket + Server Connection ID)
-    => Server-facing socket
+(Client-facing socket + Target Connection ID)
+    => Target-facing socket
 ~~~
 
-Multiple pairs of Connection IDs and sockets can map to the same server-facing
+Multiple pairs of Connection IDs and sockets can map to the same target-facing
 socket.
 
-This mapping guarantees that any QUIC packet containing the Server Connection ID
+This mapping guarantees that any QUIC packet containing the Target Connection ID
 sent from the client to the proxy in forwarded mode can be sent to the correct
 target. Thus, a proxy that does not allow forwarded mode does not need to
 maintain this mapping.
 
 ## Client Connection ID Mappings
 
-Each pair of Client Connection ID and server-facing socket MUST map to a single
+Each pair of Client Connection ID and target-facing socket MUST map to a single
 stream on a single client <-> proxy QUIC connection. Additionally, the
-pair of Client Connection ID and server-facing socket MUST map to a single
+pair of Client Connection ID and target-facing socket MUST map to a single
 client-facing socket.
 
 ~~~
-(Server-facing socket + Client Connection ID)
+(Target-facing socket + Client Connection ID)
     => (Client <-> Proxy QUIC connection + Stream)
-(Server-facing socket + Client Connection ID)
+(Target-facing socket + Client Connection ID)
     => Client-facing socket
 ~~~
 
@@ -208,9 +208,9 @@ or client-facing socket.
 
 These mappings guarantee that any QUIC packet sent from a target to the proxy
 can be sent to the correct client, in either tunnelled or forwarded mode. Note
-that this mapping becomes trivial if the proxy always opens a new server-facing
+that this mapping becomes trivial if the proxy always opens a new target-facing
 socket for every client request with a unique stream. The mapping is
-critical for any case where server-facing sockets are shared or reused.
+critical for any case where target-facing sockets are shared or reused.
 
 ## Detecting Connection ID Conflicts {#conflicts}
 
@@ -243,7 +243,7 @@ cause conflicts when forwarding.
 # Connection ID Capsule Types
 
 Proxy awareness of QUIC Connection IDs relies on using capsules ({{HTTP-DGRAM}})
-to signal the addition and removal of client and server connection IDs.
+to signal the addition and removal of client and Target Connection IDs.
 
 Note that these capsules do not register contexts or define a new HTTP Datagram
 Format. By default, QUIC packets are encoded using HTTP Datagrams with the
@@ -253,22 +253,22 @@ The capsules used for QUIC-aware proxying allow a client to register connection
 IDs with the proxy, and for the proxy to acknowledge or reject the connection
 ID mappings.
 
-The REGISTER_CLIENT_CID and REGISTER_SERVER_CID capsule types (see 
+The REGISTER_CLIENT_CID and REGISTER_TARGET_CID capsule types (see 
 {{iana-capsule-types}} for the capsule type values) allow a client to inform
-the proxy about a new Client Connection ID or a new Server Connection ID,
+the proxy about a new Client Connection ID or a new Target Connection ID,
 respectively. These capsule types MUST only be sent by a client.
 
-The ACK_CLIENT_CID and ACK_SERVER_CID capsule types (see {{iana-capsule-types}}
+The ACK_CLIENT_CID and ACK_TARGET_CID capsule types (see {{iana-capsule-types}}
 for the capsule type values) are sent by the proxy to the client to indicate
 that a mapping was successfully created for a registered connection ID.
 These capsule types MUST only be sent by a proxy.
 
-The CLOSE_CLIENT_CID and CLOSE_SERVER_CID capsule types (see 
+The CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsule types (see 
 {{iana-capsule-types}} for the capsule type values) allow either a client
 or a proxy to remove a mapping for a connection ID. These capsule types
 MAY be sent by either a client or the proxy. If a proxy sends a
 CLOSE_CLIENT_CID without having sent an ACK_CLIENT_CID, or if a proxy
-sends a CLOSE_SERVER_CID without having sent an ACK_SERVER_CID,
+sends a CLOSE_TARGET_CID without having sent an ACK_TARGET_CID,
 it is rejecting a Connection ID registration.
 
 All Connection ID capsule types share the same format:
@@ -291,24 +291,33 @@ is limited to 20 bytes, but QUIC invariants allow up to 255 bytes.
 # Client Request Behavior {#request}
 
 A client initiates UDP proxying via a CONNECT request as defined
-in {{CONNECT-UDP}}. Within its request, it includes the "Proxy-QUIC" header
-with a value set to "?1" to indicate that it supports QUIC-aware proxying.
+in {{CONNECT-UDP}}. Within its request, it includes the "Proxy-QUIC-Forwarding"
+header to indicate whether or not the request should support forwarding.
+If this header is not included, the client MUST NOT send any connection ID
+capsules.
 
-The "Proxy-QUIC" is an Item Structured Header {{!RFC8941}}. Its value MUST be
-a Boolean. Its ABNF is:
+The "Proxy-QUIC-Forwarding" is an Item Structured Header {{!RFC8941}}. Its
+value MUST be a Boolean. Its ABNF is:
 
 ~~~
-    Proxy-QUIC = sf-boolean
+    Proxy-QUIC-Forwarding = sf-boolean
 ~~~
+
+If the client wants to enable QUIC packet forwarding for this request, it sets
+the value to "?1". If it doesn't want to enable forwarding, but instead only
+provide information about QUIC Connection IDs for the purpose of allowing
+the proxy to share a target-facing socket, it sets the value to "?0".
  
-If the proxy supports QUIC-aware proxying, it will include the "Proxy-QUIC"
-header with a value set to "?1" in successful HTTP responses. If the client
-does not receive this header in responses, it MUST NOT try to enable or use
-the forwarding mode defined in this document.
+If the proxy supports QUIC-aware proxying, it will include the
+"Proxy-QUIC-Forwarding" header in successful HTTP responses. The value
+indicates whether or not the proxy supports forwarding. If the client does
+not receive this header in responses, the client SHALL assume that the proxy
+does not understand how to parse Connection ID capsules, and MUST NOT send any
+Connection ID capsules.
 
 The client sends a REGISTER_CLIENT_CID capsule whenever it advertises a new
-Client Connection ID to the target, and a REGISTER_SERVER_CID capsule when
-it has received a new Server Connection ID for the target. Note that the
+Client Connection ID to the target, and a REGISTER_TARGET_CID capsule when
+it has received a new Target Connection ID for the target. Note that the
 initial REGISTER_CLIENT_CID capsule MAY be sent prior to receiving an
 HTTP response from the proxy.
 
@@ -353,19 +362,22 @@ ACK_CLIENT_CID capsule is received that contains the echoed connection ID.
 
 ## Sending With Forwarded Mode
 
-Once the client has learned the target server's Connection ID, such as in the
-response to a QUIC Initial packet, it can send a REGISTER_SERVER_CID capsule
-containing the Server Connection ID to request the ability to forward packets. 
+Support for forwarding mode is determined by the "Proxy-QUIC-Forwarding" header,
+see {{response}}.
 
-The client MUST wait for an ACK_SERVER_CID capsule that contains the echoed
+Once the client has learned the target server's Connection ID, such as in the
+response to a QUIC Initial packet, it can send a REGISTER_TARGET_CID capsule
+containing the Target Connection ID to request the ability to forward packets. 
+
+The client MUST wait for an ACK_TARGET_CID capsule that contains the echoed
 connection ID before using forwarded mode.
 
-Prior to receiving the server response, the client MUST send short header
+Prior to receiving the proxy server response, the client MUST send short header
 packets tunnelled in HTTP Datagram frames. The client MAY also choose to tunnel
 some short header packets even after receiving the successful response.
 
-If the Server Connection ID registration is rejected, for example with a
-CLOSE_SERVER_CID capsule, it MUST NOT forward packets to the requested Server
+If the Target Connection ID registration is rejected, for example with a
+CLOSE_TARGET_CID capsule, it MUST NOT forward packets to the requested Target
 Connection ID, but only use tunnelled mode. The request might also be rejected
 if the proxy does not support forwarded mode or has it disabled by policy.
 
@@ -379,33 +391,26 @@ proxy that was used for the main QUIC connection between client and proxy.
 
 ## Receiving With Forwarded Mode
 
-A proxy MUST NOT forward packets from the target to the client until after the
-client has sent at least one packet in forwarded mode. Once this occurs, the
-proxy MAY use forwarded mode for any Client Connection ID for which it has a
-valid mapping.
+If the client has indicated support for forwarding with the "Proxy-QUIC-Forwarding"
+header, the proxy MAY use forwarded mode for any Client Connection ID for which
+it has a valid mapping.
 
-If a client has started using forwarding mode, it MUST be prepared to receive
-forwarded short header packets on the socket between itself and the proxy for
-any Client Connection ID that has been accepted by the proxy. The client uses
-the received Connection ID to determine if a packet was originated by the
-proxy, or merely forwarded from the target.
-
-## Opting Out of Forwarded Mode
-
-The use of forwarded mode is initiated by the client sending a request with the
-REGISTER_SERVER_CID capsule and sending at least one forwarded packet to the
-proxy. A client that does not wish to accept forwarded packets from the proxy
-when communicating with a specific target can simply not start forwarding
-packets to the proxy.
+Once a client has sent "Proxy-QUIC-Forwarding" with a value of "?1", it MUST be
+prepared to receive forwarded short header packets on the socket between itself
+and the proxy for any Client Connection ID that it has registered with a
+REGISTER_CLIENT_CID capsule. The client uses the Destination Connection ID field
+of the received packet to determine if the packet was originated by the proxy,
+or merely forwarded from the target.
 
 # Proxy Response Behavior {#response}
 
-Upon receipt of a CONNECT request that includes the "Proxy-QUIC" header,
-the proxy indicates to the client that it supports QUIC-aware proxying
-by including a "Proxy-QUIC" header with a value of "?1" in a
-successful response.
+Upon receipt of a CONNECT request that includes the "Proxy-QUIC-Forwarding"
+header, the proxy indicates to the client that it supports QUIC-aware proxying
+by including a "Proxy-QUIC-Forwarding" header in a successful response.
+If it supports QUIC packet forwarding, it sets the value to "?1"; otherwise,
+it sets it to "?0".
 
-Upon receipt of a REGISTER_CLIENT_CID or REGISTER_SERVER_CID capsule,
+Upon receipt of a REGISTER_CLIENT_CID or REGISTER_TARGET_CID capsule,
 the proxy validates the registration, tries to establish the appropriate
 mappings as described in {{mappings}}.
 
@@ -413,59 +418,58 @@ The proxy MUST reply to each REGISTER_CLIENT_CID capsule with either
 an ACK_CLIENT_CID or CLOSE_CLIENT_CID capsule containing the
 Connection ID that was in the registration capsule.
 
-Similarly, the proxy MUST reply to each REGISTER_SERVER_CID capsule with 
-either an ACK_SERVER_CID or CLOSE_SERVER_CID capsule containing the
+Similarly, the proxy MUST reply to each REGISTER_TARGET_CID capsule with 
+either an ACK_TARGET_CID or CLOSE_TARGET_CID capsule containing the
 Connection ID that was in the registration capsule.
 
-The proxy then determines the server-facing socket to associate with the
+The proxy then determines the target-facing socket to associate with the
 client's request. This will generally involve performing a DNS lookup for
-the target hostname in the CONNECT request, or finding an existing server-facing
-socket to the authority. The server-facing socket might already be open due to a
+the target hostname in the CONNECT request, or finding an existing target-facing
+socket to the authority. The target-facing socket might already be open due to a
 previous request from this client, or another. If the socket is not already
-created, the proxy creates a new one. Proxies can choose to reuse server-facing
-sockets across multiple UDP proxying requests, or have a unique server-facing socket
+created, the proxy creates a new one. Proxies can choose to reuse target-facing
+sockets across multiple UDP proxying requests, or have a unique target-facing socket
 for every UDP proxying request.
 
-If a proxy reuses server-facing sockets, it SHOULD store which authorities
+If a proxy reuses target-facing sockets, it SHOULD store which authorities
 (which could be a domain name or IP address literal) are being accessed over a
-particular server-facing socket so it can avoid performing a new DNS query and
-potentially choosing a different server IP address which could map to a
-different server.
+particular target-facing socket so it can avoid performing a new DNS query and
+potentially choosing a different target server IP address which could map to a
+different target server.
 
-Server-facing sockets MUST NOT be reused across QUIC and non-QUIC UDP proxy
+Target-facing sockets MUST NOT be reused across QUIC and non-QUIC UDP proxy
 requests, since it might not be possible to correctly demultiplex or direct
-the traffic. Any packets received on a server-facing socket used for proxying
+the traffic. Any packets received on a target-facing socket used for proxying
 QUIC that does not correspond to a known Connection ID MUST be dropped.
 
 When the proxy recieves a REGISTER_CLIENT_CID capsule, it is receiving a
 request to be able to route traffic back to the client using that Connection ID.
-If the pair of this Client Connection ID and the selected server-facing socket
+If the pair of this Client Connection ID and the selected target-facing socket
 does not create a conflict, the proxy creates the mapping and responds with a
 ACK_CLIENT_CID capsule. After this point, any packets received by the proxy from the
-server-facing socket that match the Client Connection ID can to be sent to the
+target-facing socket that match the Client Connection ID can to be sent to the
 client. The proxy MUST use tunnelled mode (HTTP Datagram frames) for any long
 header packets. The proxy SHOULD forward directly to the client for any matching
-short header packets once forwarding has been initiated by the client, but
-the proxy MAY tunnel these packets in HTTP Datagram frames instead. If the pair
-is not unique, or the proxy chooses not to support zero-length Client Connection IDs,
-the proxy responds with a CLOSE_CLIENT_CID capsule.
+short header packets if forwarding is supported by the client, but the proxy MAY
+tunnel these packets in HTTP Datagram frames instead. If the mapping would
+create a conflict, the proxy responds with a CLOSE_CLIENT_CID capsule.
 
-When the proxy recieves a REGISTER_SERVER_CID capsule, it is receiving a
+When the proxy recieves a REGISTER_TARGET_CID capsule, it is receiving a
 request to allow the client to forward packets to the target. If the pair of
-this Server Connection ID and the client-facing socket on which the request was
+this Target Connection ID and the client-facing socket on which the request was
 received does not create a conflict, the proxy creates the mapping and responds
-with a ACK_SERVER_CID capsule. Once the successful response is sent, the proxy will
+with a ACK_TARGET_CID capsule. Once the successful response is sent, the proxy will
 forward any short header packets received on the client-facing socket that use
-the Server Connection ID using the correct server-facing socket. If the pair is
-not unique, the server responds with a CLOSE_SERVER_CID capsule. If this occurs,
-traffic for that Server Connection ID can only use tunnelled mode, not forwarded.
+the Target Connection ID using the correct target-facing socket. If the pair is
+not unique, the proxy responds with a CLOSE_TARGET_CID capsule. If this occurs,
+traffic for that Target Connection ID can only use tunnelled mode, not forwarded.
 
 If the proxy does not support forwarded mode, or does not allow forwarded mode
-for a particular client or authority by policy, it can reject all REGISTER_SERVER_CID
-requests with CLOSE_SERVER_CID capsule.
+for a particular client or authority by policy, it can reject all REGISTER_TARGET_CID
+requests with CLOSE_TARGET_CID capsule.
 
 The proxy MUST only forward non-tunnelled packets from the client that are QUIC
-short header packets (based on the Header Form bit) and have mapped Server
+short header packets (based on the Header Form bit) and have mapped Target
 Connection IDs. Packets sent by the client that are forwarded SHOULD be
 considered as activity for restarting QUIC's Idle Timeout {{QUIC}}.
 
@@ -476,12 +480,12 @@ mappings for the connection ID last until either endpoint sends a close capsule
 or the either side of the HTTP stream closes.
 
 A client that no longer wants a given Connection ID to be forwarded by the
-proxy sends a CLOSE_CLIENT_CID or CLOSE_SERVER_CID capsule.
+proxy sends a CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsule.
 
 If a client's connection to the proxy is terminated for any reason, all
 mappings associated with all requests are removed.
 
-A proxy can close its server-facing socket once all UDP proxying requests mapped to
+A proxy can close its target-facing socket once all UDP proxying requests mapped to
 that socket have been removed.
 
 ## Handling Connection Migration
@@ -514,7 +518,7 @@ STREAM(44): HEADERS             -------->
   :scheme = https
   :path = /target.example.com/443/
   :authority = proxy.example.org
-  proxy-quic = ?1
+  proxy-quic-forwarding = ?1
 
 STREAM(44): DATA                -------->
   Capsule Type = REGISTER_DATAGRAM_NO_CONTEXT
@@ -531,7 +535,7 @@ DATAGRAM                        -------->
 
            <--------  STREAM(44): HEADERS
                         :status = 200
-                        proxy-quic = ?1
+                        proxy-quic-forwarding = ?1
                         
            <--------  STREAM(44): DATA
                         Capsule Type = ACK_CLIENT_CID
@@ -551,15 +555,15 @@ following capsule:
 
 ~~~
 STREAM(44): DATA                -------->
-  Capsule Type = REGISTER_SERVER_CID
+  Capsule Type = REGISTER_TARGET_CID
   Connection ID = 0x61626364
   
            <--------  STREAM(44): DATA
-                        Capsule Type = ACK_SERVER_CID
+                        Capsule Type = ACK_TARGET_CID
                         Connection ID = 0x61626364
 ~~~
 
-Upon receiving an ACK_SERVER_CID capsule, the client starts sending Short Header
+Upon receiving an ACK_TARGET_CID capsule, the client starts sending Short Header
 packets with a Destination Connection ID of 0x61626364 directly to the proxy
 (not tunnelled), and these are forwarded directly to the target by the proxy.
 Similarly, Short Header packets from the target with a Destination Connection ID
@@ -575,14 +579,14 @@ in a way that can be coordinated between servers and their load balancers.
 If a proxy that supports this extension is itself running behind a load
 balancer, extra complexity arises once clients start using forwarding mode and
 sending packets to the proxy that have Destination Connection IDs that belong to
-the end servers, not the proxy. If the load balancer is not aware of these
+the target servers, not the proxy. If the load balancer is not aware of these
 Connection IDs, or the Connection IDs conflict with other Connection IDs used by
 the load balancer, packets can be routed incorrectly.
 
 QUIC-aware proxies that use forwarding mode generally SHOULD NOT be
 run behind load balancers; and if they are, they MUST coordinate between the
 proxy and the load balancer to create mappings for proxied Connection IDs prior
-to the proxy ACK_CLIENT_CID or ACK_SERVER_CID capsules to clients.
+to the proxy ACK_CLIENT_CID or ACK_TARGET_CID capsules to clients.
 
 QUIC-aware proxies that do not allow forwarding mode can function unmodified
 behind QUIC load balancers.
@@ -632,15 +636,15 @@ or decreasing the reputation of a given proxy.
 
 ## HTTP Header {#iana-header}
 
-This document registers the "Proxy-QUIC" header in the "Permanent Message
+This document registers the "Proxy-QUIC-Forwarding" header in the "Permanent Message
 Header Field Names" <[](https://www.iana.org/assignments/message-headers)>.
 
 ~~~
-    +-------------------+----------+--------+---------------+
-    | Header Field Name | Protocol | Status |   Reference   |
-    +-------------------+----------+--------+---------------+
-    | Proxy-QUIC        |   http   |  exp   | This document |
-    +-------------------+----------+--------+---------------+
+    +-----------------------+----------+--------+---------------+
+    | Header Field Name     | Protocol | Status |   Reference   |
+    +-----------------------+----------+--------+---------------+
+    | Proxy-QUIC-Forwarding |   http   |  exp   | This document |
+    +-----------------------+----------+--------+---------------+
 ~~~
 {: #iana-header-type-table title="Registered HTTP Header"}
 
@@ -652,11 +656,11 @@ registry established by {{HTTP-DGRAM}}.
 |     Capule Type     |   Value   | Specification |
 |:--------------------|:----------|:--------------|
 | REGISTER_CLIENT_CID | 0xffe100  | This Document |
-| REGISTER_SERVER_CID | 0xffe101  | This Document |
+| REGISTER_TARGET_CID | 0xffe101  | This Document |
 | ACK_CLIENT_CID      | 0xffe102  | This Document |
-| ACK_SERVER_CID      | 0xffe103  | This Document |
+| ACK_TARGET_CID      | 0xffe103  | This Document |
 | CLOSE_CLIENT_CID    | 0xffe104  | This Document |
-| CLOSE_SERVER_CID    | 0xffe105  | This Document |
+| CLOSE_TARGET_CID    | 0xffe105  | This Document |
 {: #iana-format-type-table title="Registered Capsule Types"}
 
 --- back
