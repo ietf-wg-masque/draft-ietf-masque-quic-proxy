@@ -312,7 +312,7 @@ If the proxy supports QUIC-aware proxying, it will include the
 "Proxy-QUIC-Forwarding" header in successful HTTP responses. The value
 indicates whether or not the proxy supports forwarding. If the client does
 not receive this header in responses, the client SHALL assume that the proxy
-does not understand how to parse Connection ID capsules, and SHOULD NOT send any
+does not understand how to parse Connection ID capsules, and MUST NOT send any
 Connection ID capsules.
 
 The client sends a REGISTER_CLIENT_CID capsule whenever it advertises a new
@@ -362,10 +362,8 @@ ACK_CLIENT_CID capsule is received that contains the echoed connection ID.
 
 ## Sending With Forwarded Mode
 
-Sending with forwarded mode is only possible if the proxy sent the
-"Proxy-QUIC-Forwarding" header with a value of "?1" in its response to the
-client. If the client has received this, it uses REGISTER_TARGET_CID capsules
-to request the ability to forward packets to the target through the proxy. 
+Support for forwarding mode is determined by the "Proxy-QUIC-Forwarding" header,
+see {{response}}.
 
 Once the client has learned the target server's Connection ID, such as in the
 response to a QUIC Initial packet, it can send a REGISTER_TARGET_CID capsule
@@ -400,9 +398,9 @@ it has a valid mapping.
 Once a client has sent "Proxy-QUIC-Forwarding" with a value of "?1", it MUST be
 prepared to receive forwarded short header packets on the socket between itself
 and the proxy for any Client Connection ID that it has registered with a
-REGISTER_CLIENT_CID capsule. The client uses the received Connection ID to
-determine if a packet was originated by the proxy, or merely forwarded from the
-target.
+REGISTER_CLIENT_CID capsule. The client uses the Destination Connection ID field
+of the received packet to determine if the packet was originated by the proxy,
+or merely forwarded from the target.
 
 # Proxy Response Behavior {#response}
 
@@ -453,9 +451,8 @@ target-facing socket that match the Client Connection ID can to be sent to the
 client. The proxy MUST use tunnelled mode (HTTP Datagram frames) for any long
 header packets. The proxy SHOULD forward directly to the client for any matching
 short header packets if forwarding is supported by the client, but the proxy MAY
-tunnel these packets in HTTP Datagram frames instead. If the pair is not unique,
-or the proxy chooses not to support zero-length Client Connection IDs, the proxy
-responds with a CLOSE_CLIENT_CID capsule.
+tunnel these packets in HTTP Datagram frames instead. If the mapping would
+create a conflict, the proxy responds with a CLOSE_CLIENT_CID capsule.
 
 When the proxy recieves a REGISTER_TARGET_CID capsule, it is receiving a
 request to allow the client to forward packets to the target. If the pair of
