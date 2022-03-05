@@ -245,9 +245,9 @@ cause conflicts when forwarding.
 Proxy awareness of QUIC Connection IDs relies on using capsules ({{HTTP-DGRAM}})
 to signal the addition and removal of client and Target Connection IDs.
 
-Note that these capsules do not register contexts or define a new HTTP Datagram
-Format. By default, QUIC packets are encoded using HTTP Datagrams with the
-UDP_PAYLOAD HTTP Datagram Format Type as defined in {{CONNECT-UDP}}.
+Note that these capsules do not register contexts. QUIC packets are encoded
+using HTTP Datagrams with the context ID set to zero as defined in
+{{CONNECT-UDP}}.
 
 The capsules used for QUIC-aware proxying allow a client to register connection
 IDs with the proxy, and for the proxy to acknowledge or reject the connection
@@ -519,11 +519,8 @@ STREAM(44): HEADERS             -------->
   :path = /target.example.com/443/
   :authority = proxy.example.org
   proxy-quic-forwarding = ?1
+  capsule-protocol = ?1
 
-STREAM(44): DATA                -------->
-  Capsule Type = REGISTER_DATAGRAM_NO_CONTEXT
-  Datagram Format Type = UDP_PAYLOAD
-  Datagram Format Additional Data = ""
   
 STREAM(44): DATA                -------->
   Capsule Type = REGISTER_CLIENT_CID
@@ -531,11 +528,13 @@ STREAM(44): DATA                -------->
 
 DATAGRAM                        -------->
   Quarter Stream ID = 11
+  Context ID = 0
   Payload = Encapsulated QUIC initial
 
            <--------  STREAM(44): HEADERS
                         :status = 200
                         proxy-quic-forwarding = ?1
+                        capsule-protocol = ?1
                         
            <--------  STREAM(44): DATA
                         Capsule Type = ACK_CLIENT_CID
@@ -545,6 +544,7 @@ DATAGRAM                        -------->
 
            <--------  DATAGRAM
                         Quarter Stream ID = 11
+                        Context ID = 0
                         Payload = Encapsulated QUIC initial
 ~~~
 
@@ -661,7 +661,7 @@ registry established by {{HTTP-DGRAM}}.
 | ACK_TARGET_CID      | 0xffe103  | This Document |
 | CLOSE_CLIENT_CID    | 0xffe104  | This Document |
 | CLOSE_TARGET_CID    | 0xffe105  | This Document |
-{: #iana-format-type-table title="Registered Capsule Types"}
+{: #iana-capsule-type-table title="Registered Capsule Types"}
 
 --- back
 
