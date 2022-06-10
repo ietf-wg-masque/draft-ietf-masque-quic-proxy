@@ -120,7 +120,7 @@ This document uses the following terms:
 - Client: the client of all QUIC connections discussed in this document.
 - Proxy: the endpoint that responds to the UDP proxying request.
 - Target: the server that a client is accessing via a proxy.
-- Client <-> Proxy QUIC connection: a single QUIC connection established from
+- Client <-> Proxy HTTP stream: a single HTTP/3 stream established from
 the client to the proxy.
 - Socket: a UDP 4-tuple (local IP address, local UDP port, remote IP address,
 remote UDP port). In some implementations, this is referred to as a "connected"
@@ -156,12 +156,11 @@ required unidirectional mappings, described below.
 
 ## Stream Mapping
 
-Each pair of client <-> proxy QUIC connection and an HTTP stream
-MUST be mapped to a single target-facing socket.
+Each pair of client <-> proxy HTTP stream MUST be mapped to a single
+target-facing socket.
 
 ~~~
-(Client <-> Proxy QUIC connection + Stream)
-    => Target-facing socket
+(Client <-> Proxy HTTP Stream) => Target-facing socket
 ~~~
 
 Multiple streams can map to the same target-facing socket, but a
@@ -181,8 +180,8 @@ target-facing socket.
     => Target-facing socket
 ~~~
 
-Multiple pairs of Connection IDs and sockets can map to the same target-facing
-socket.
+Multiple pairs of Connection IDs and client-facing sockets can map to the
+same target-facing socket.
 
 This mapping guarantees that any QUIC packet containing the Target Connection ID
 sent from the client to the proxy in forwarded mode can be sent to the correct
@@ -192,19 +191,17 @@ maintain this mapping.
 ## Client Connection ID Mappings
 
 Each pair of Client Connection ID and target-facing socket MUST map to a single
-stream on a single client <-> proxy QUIC connection. Additionally, the
+stream on a single client <-> proxy HTTP stream. Additionally, the
 pair of Client Connection ID and target-facing socket MUST map to a single
 client-facing socket.
 
 ~~~
-(Target-facing socket + Client Connection ID)
-    => (Client <-> Proxy QUIC connection + Stream)
-(Target-facing socket + Client Connection ID)
-    => Client-facing socket
+(Target-facing socket + Client Connection ID) => (Client <-> Proxy HTTP Stream)
+(Target-facing socket + Client Connection ID) => Client-facing socket
 ~~~
 
-Multiple pairs of Connection IDs and sockets can map to the same stream
-or client-facing socket.
+Multiple pairs of Connection IDs and target-facing sockets can map to the same
+stream or client-facing socket.
 
 These mappings guarantee that any QUIC packet sent from a target to the proxy
 can be sent to the correct client, in either tunnelled or forwarded mode. Note
