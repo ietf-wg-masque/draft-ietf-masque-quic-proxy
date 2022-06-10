@@ -250,7 +250,7 @@ The capsules used for QUIC-aware proxying allow a client to register connection
 IDs with the proxy, and for the proxy to acknowledge or reject the connection
 ID mappings.
 
-The REGISTER_CLIENT_CID and REGISTER_TARGET_CID capsule types (see 
+The REGISTER_CLIENT_CID and REGISTER_TARGET_CID capsule types (see
 {{iana-capsule-types}} for the capsule type values) allow a client to inform
 the proxy about a new Client Connection ID or a new Target Connection ID,
 respectively. These capsule types MUST only be sent by a client.
@@ -260,7 +260,7 @@ for the capsule type values) are sent by the proxy to the client to indicate
 that a mapping was successfully created for a registered connection ID.
 These capsule types MUST only be sent by a proxy.
 
-The CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsule types (see 
+The CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsule types (see
 {{iana-capsule-types}} for the capsule type values) allow either a client
 or a proxy to remove a mapping for a connection ID. These capsule types
 MAY be sent by either a client or the proxy. If a proxy sends a
@@ -304,7 +304,7 @@ If the client wants to enable QUIC packet forwarding for this request, it sets
 the value to "?1". If it doesn't want to enable forwarding, but instead only
 provide information about QUIC Connection IDs for the purpose of allowing
 the proxy to share a target-facing socket, it sets the value to "?0".
- 
+
 If the proxy supports QUIC-aware proxying, it will include the
 "Proxy-QUIC-Forwarding" header in successful HTTP responses. The value
 indicates whether or not the proxy supports forwarding. If the client does
@@ -364,7 +364,7 @@ see {{response}}.
 
 Once the client has learned the target server's Connection ID, such as in the
 response to a QUIC Initial packet, it can send a REGISTER_TARGET_CID capsule
-containing the Target Connection ID to request the ability to forward packets. 
+containing the Target Connection ID to request the ability to forward packets.
 
 The client MUST wait for an ACK_TARGET_CID capsule that contains the echoed
 connection ID before using forwarded mode.
@@ -415,7 +415,7 @@ The proxy MUST reply to each REGISTER_CLIENT_CID capsule with either
 an ACK_CLIENT_CID or CLOSE_CLIENT_CID capsule containing the
 Connection ID that was in the registration capsule.
 
-Similarly, the proxy MUST reply to each REGISTER_TARGET_CID capsule with 
+Similarly, the proxy MUST reply to each REGISTER_TARGET_CID capsule with
 either an ACK_TARGET_CID or CLOSE_TARGET_CID capsule containing the
 Connection ID that was in the registration capsule.
 
@@ -518,7 +518,6 @@ STREAM(44): HEADERS             -------->
   proxy-quic-forwarding = ?1
   capsule-protocol = ?1
 
-  
 STREAM(44): DATA                -------->
   Capsule Type = REGISTER_CLIENT_CID
   Connection ID = 0x31323334
@@ -532,7 +531,7 @@ DATAGRAM                        -------->
                         :status = 200
                         proxy-quic-forwarding = ?1
                         capsule-protocol = ?1
-                        
+
            <--------  STREAM(44): DATA
                         Capsule Type = ACK_CLIENT_CID
                         Connection ID = 0x31323334
@@ -554,7 +553,7 @@ following capsule:
 STREAM(44): DATA                -------->
   Capsule Type = REGISTER_TARGET_CID
   Connection ID = 0x61626364
-  
+
            <--------  STREAM(44): DATA
                         Capsule Type = ACK_TARGET_CID
                         Connection ID = 0x61626364
