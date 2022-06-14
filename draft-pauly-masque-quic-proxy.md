@@ -120,7 +120,7 @@ This document uses the following terms:
 - Client: the client of all QUIC connections discussed in this document.
 - Proxy: the endpoint that responds to the UDP proxying request.
 - Target: the server that a client is accessing via a proxy.
-- Client <-> Proxy HTTP stream: a single HTTP/3 stream established from
+- Client <-> Proxy HTTP stream: a single HTTP stream established from
 the client to the proxy.
 - Socket: a UDP 4-tuple (local IP address, local UDP port, remote IP address,
 remote UDP port). In some implementations, this is referred to as a "connected"
@@ -201,7 +201,7 @@ client-facing socket.
 ~~~
 
 Multiple pairs of Connection IDs and target-facing sockets can map to the same
-stream or client-facing socket.
+HTTP stream or client-facing socket.
 
 These mappings guarantee that any QUIC packet sent from a target to the proxy
 can be sent to the correct client, in either tunnelled or forwarded mode. Note
