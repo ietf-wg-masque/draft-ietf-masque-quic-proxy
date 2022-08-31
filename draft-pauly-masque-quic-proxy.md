@@ -257,8 +257,7 @@ conflicts.
 # Connection ID Capsule Types
 
 Proxy awareness of QUIC Connection IDs relies on using capsules ({{HTTP-DGRAM}})
-to signal the addition and removal of Client, Target, and Virtual Target
-Connection IDs.
+to signal the addition and removal of Client and Target Connection IDs.
 
 Note that these capsules do not register contexts. QUIC packets are encoded
 using HTTP Datagrams with the context ID set to zero as defined in
@@ -311,7 +310,7 @@ and a Stateless Reset Token.
 Virtual Target Connection ID Capsule {
   Type (i) = 0xffe103,
   Length (i)
-  Connection Length (i)
+  Connection ID Length (i)
   Connection ID (0..2040),
   Virtual Target Connection ID Length (i)
   Virtual Target Connection ID (0..2040),
@@ -626,23 +625,18 @@ STREAM(44): DATA                -------->
 
            <--------  STREAM(44): DATA
                         Capsule Type = ACK_TARGET_CID
-                        Target Connection ID = 0x61626364
-			Virtual Connection ID = 0x123412341234
-			Stateless Reset Token = Token
+                        Connection ID = 0x61626364
+                        Virtual Target Connection ID = 0x123412341234
+                        Stateless Reset Token = Token
 ~~~
 
 Upon receiving an ACK_TARGET_CID capsule, the client starts sending Short Header
 packets with a Destination Connection ID of 0x123412341234 directly to the proxy
 (not tunnelled), and these are rewritten by the proxy to have the Destination
-Connection ID 0x61626364 prior to being forwarded directly to the target by the
-proxy. In the reverse direction, Short Header packets from the target with a
-Destination Connection ID of 0x31323334 are forwarded directly to the client
-without modification.
-
-# Virtual Target Connection ID Length Considerations
-
-Depending on the implementation, the Virtual Target Connection ID having a different length from the Target
-Connection ID
+Connection ID 0x61626364 prior to being forwarded directly to the target. In the
+reverse direction, Short Header packets from the target with a Destination
+Connection ID of 0x31323334 are forwarded directly to the client without
+modification.
 
 # Packet Size Considerations
 
