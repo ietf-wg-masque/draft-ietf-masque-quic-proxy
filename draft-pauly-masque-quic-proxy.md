@@ -539,7 +539,9 @@ create a conflict, the proxy responds with a CLOSE_CLIENT_CID capsule.
 When the proxy recieves a REGISTER_TARGET_CID capsule, it is receiving a
 request to allow the client to forward packets to the target. The proxy
 generates a Virtual Target Connection ID for the client to use when sending
-packets in forwarding mode. The proxy MUST use a Virtual Target Connection ID 
+packets in forwarding mode. If forwarding mode is not supported, the proxy MUST
+NOT send a Virtual Target Connection ID by setting the length to zero. If
+forwarding mode is supported, the proxy MUST use a Virtual Target Connection ID
 that does not introduce a conflict with any other Connection ID on the
 client-facing socket. The proxy creates the mapping and responds with an
 ACK_TARGET_CID capsule. Once the successful response is sent, the proxy will
@@ -548,11 +550,11 @@ the Virtual Target Connection ID using the correct target-facing socket after
 first rewriting the Virtual Target Connection ID to be the correct Target
 Connection ID.
 
-A proxy that cannot support rewriting the Virtual Target Connection ID to the
-Target Connection ID may instead choose to simply let them be equal. If the
-proxy does choose to leverage Virtual Target Connection IDs, it MUST be able to
-rewrite The Virtual Target Connection ID to the Target Connection ID and
-correctly handle length differences between the two.
+A proxy that supports forwarding mode but chooses not to support rewriting the
+Virtual Target Connection ID to the Target Connection ID may opt to simply let
+them be equal. If the proxy does wish to dictate the Virtual Target Connection
+ID, it MUST be able to replace The Virtual Target Connection ID with the Target
+Connection ID and correctly handle length differences between the two.
 
 If the proxy does not support forwarded mode, or does not allow forwarded mode
 for a particular client or authority by policy, it can reject all REGISTER_TARGET_CID
