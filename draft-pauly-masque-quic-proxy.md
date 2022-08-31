@@ -310,9 +310,9 @@ and a Stateless Reset Token.
 Virtual Target Connection ID Capsule {
   Type (i) = 0xffe203,
   Length (i)
-  Connection ID Length (8)
+  Connection ID Length (i)
   Connection ID (0..2040),
-  Virtual Target Connection ID Length (8)
+  Virtual Target Connection ID Length (i)
   Virtual Target Connection ID (0..2040),
   Stateless Reset Token Length (i),
   Stateless Reset Token (..),
