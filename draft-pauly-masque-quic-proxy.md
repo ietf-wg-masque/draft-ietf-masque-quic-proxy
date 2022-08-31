@@ -290,7 +290,7 @@ All capsule types except for ACK_TARGET_CID are formatted as follows:
 
 ~~~
 Connection ID Capsule {
-  Type (i) = 0xffe100..0xffe102, 0xffe104..0xffe105
+  Type (i) = 0xffe200..0xffe202, 0xffe204..0xffe205
   Length (i),
   Connection ID (0..2040),
 }
@@ -308,7 +308,7 @@ and a Stateless Reset Token.
 
 ~~~
 Virtual Target Connection ID Capsule {
-  Type (i) = 0xffe103,
+  Type (i) = 0xffe203,
   Length (i)
   Connection ID Length (i)
   Connection ID (0..2040),
@@ -704,12 +704,12 @@ registry established by {{HTTP-DGRAM}}.
 
 |     Capule Type     |   Value   | Specification |
 |:--------------------|:----------|:--------------|
-| REGISTER_CLIENT_CID | 0xffe100  | This Document |
-| REGISTER_TARGET_CID | 0xffe101  | This Document |
-| ACK_CLIENT_CID      | 0xffe102  | This Document |
-| ACK_TARGET_CID      | 0xffe103  | This Document |
-| CLOSE_CLIENT_CID    | 0xffe104  | This Document |
-| CLOSE_TARGET_CID    | 0xffe105  | This Document |
+| REGISTER_CLIENT_CID | 0xffe200  | This Document |
+| REGISTER_TARGET_CID | 0xffe201  | This Document |
+| ACK_CLIENT_CID      | 0xffe202  | This Document |
+| ACK_TARGET_CID      | 0xffe203  | This Document |
+| CLOSE_CLIENT_CID    | 0xffe204  | This Document |
+| CLOSE_TARGET_CID    | 0xffe205  | This Document |
 {: #iana-capsule-type-table title="Registered Capsule Types"}
 
 --- back
