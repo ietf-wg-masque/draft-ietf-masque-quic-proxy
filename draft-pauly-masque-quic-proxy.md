@@ -33,10 +33,10 @@ author:
 --- abstract
 
 This document defines an extension to UDP Proxying over HTTP
-that adds specific optimizations for proxied QUIC connections. The extension
+that adds specific optimizations for proxied QUIC connections. This extension
 allows a proxy to reuse UDP 4-tuples for multiple connections. It also defines a
-mode of proxying in which QUIC short header packets can be forwarded rather than
-being re-encapsulated and re-encrypted.
+mode of proxying in which QUIC short header packets can be forwarded using an
+HTTP/3 proxy rather than being re-encapsulated and re-encrypted.
 
 --- middle
 
@@ -51,9 +51,9 @@ This document uses the term "target" to refer to the server that a client is
 accessing via a proxy. This target may be an origin hosting content, or another
 proxy.
 
-This document extends the UDP proxying protocol with signalling about QUIC
+This document extends the UDP proxying protocol to add signalling about QUIC
 Connection IDs. QUIC Connection IDs are used to identify QUIC connections in
-scenarios where there is no strict bidirectional mapping between one QUIC
+scenarios where there is not a strict bidirectional mapping between one QUIC
 connection and one UDP 4-tuple (pairs of IP addresses and ports). A proxy that
 is aware of Connection IDs can reuse UDP 4-tuples between itself and a target
 for multiple proxied QUIC connections.
