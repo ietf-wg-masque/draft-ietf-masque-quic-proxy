@@ -310,9 +310,9 @@ and a Stateless Reset Token.
 Virtual Target Connection ID Capsule {
   Type (i) = 0xffe203,
   Length (i)
-  Connection ID Length (i)
+  Connection ID Length (8)
   Connection ID (0..2040),
-  Virtual Target Connection ID Length (i)
+  Virtual Target Connection ID Length (8)
   Virtual Target Connection ID (0..2040),
   Stateless Reset Token Length (i),
   Stateless Reset Token (..),
@@ -320,11 +320,33 @@ Virtual Target Connection ID Capsule {
 ~~~
 {: #fig-capsule-cid title="Virtual Target Connection ID Capsule Format"}
 
+Connection ID Length
+: The length of the conneciton ID being acknowledged, which is between 0 and
+255. Note that in QUICv1, the length of the Connection ID is limited to 20
+bytes, but QUIC invariants allow up to 255 bytes.
+
+Connection ID
+: A connection ID being acknowledged whose length is equal to Connection ID
+Length. This is the real Target Connection ID.
+
+Virtual Target Connection ID Length
+: The length of the conneciton ID being provided to the client. This must
+be a valid connection ID length for the QUIC version used in the
+client<->proxy QUIC connection. When forwarding mode is not negotiated, the
+length MUST be zero.
+
 Virtual Target Connection ID
 : The Proxy-dictated Connection ID that that client MUST use when sending
 packets in forwarding mode. The proxy rewrites these forwarding mode
 packets to contain the correct Target Connection ID prior to forwarding
 them on to the Target.
+
+Stateless Reset Token Length
+: The length of the stateless reset token that may be sent by the proxy
+in response to forwarded mode packets in order to reset the Client<->Target
+QUIC connection. When forwarding mode is not negotiated, the length MUST be
+zero. Proxies choosing not to support stateless resets may set the length to
+zero. Clients receiving a zero length stateless reset token MUST ignore it.
 
 Stateless Reset Token
 : A Stateless Reset Token provided by the Proxy to the Client allowing the
