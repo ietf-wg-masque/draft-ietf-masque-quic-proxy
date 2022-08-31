@@ -455,8 +455,9 @@ Connection ID in the QUIC short header, using the same socket between client and
 proxy that was used for the main QUIC connection between client and proxy.
 
 If the Virtual Target Connection ID is smaller than the Target Connection ID,
-the client MUST only write the Virtual Target Connection ID bytes over the start of the
-Target Connection ID, leaving the remainder of the Target Connection ID unmodified.
+the client MUST only write the Virtual Target Connection ID bytes over the start
+of the Target Connection ID, leaving the remainder of the Target Connection ID
+unmodified.
 
 ~~~
 | 0  | 1  | 2  | 3  | 4  | 5  | 6  | 7  |
@@ -467,9 +468,12 @@ Target Connection ID, leaving the remainder of the Target Connection ID unmodifi
 ~~~
 
 If the Virtual Target Connection ID is larger than the Target Connection ID,
-the client MUST extend the length of the packet by the difference between the two lengths,
-to include the entire Virtual Target
-Connection ID.
+the client MUST extend the length of the packet by the difference between the
+two lengths, to include the entire Virtual Target Connection ID.
+
+Clients supporting forwarding mode MUST be able to handle Virtual Target
+Connection IDs of different lengths than the corresponding Target Connection
+IDs.
 
 ## Receiving With Forwarded Mode
 
