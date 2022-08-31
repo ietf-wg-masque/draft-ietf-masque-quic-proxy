@@ -143,12 +143,12 @@ uses when sending packets. QUIC load balancing strategies such as those
 described in {{?QUIC-LB=I-D.ietf-quic-load-balancers}} may depend on encoding
 routing information in the Connection ID. When operating in forwarding mode,
 clients send QUIC packets destined for the Target directly to the Proxy. Since
-these packets would have the Target's Connection ID, load balancers may not be
+these packets are generated using the Target Connection ID, load balancers may not be
 able to route packets to the correct Proxy.
 
 The Virtual Target Connection ID is a Proxy-dictated Connection ID the Client
-uses when sending forwarded mode packets to the Proxy. The Proxy rewrites the
-Virtual Target Connection ID to be the Target Connection ID prior to
+uses when sending forwarded mode packets to the Proxy. The Proxy replaces the
+Virtual Target Connection ID with the Target Connection ID prior to
 forwarding the packet to the Target. This is only necessary in the
 Client->Target direction.
 
@@ -433,7 +433,8 @@ Connection ID in the QUIC short header, using the same socket between client and
 proxy that was used for the main QUIC connection between client and proxy.
 
 If the Virtual Target Connection ID is smaller than the Target Connection ID,
-the client must pad with the contents of the Target Connection ID.
+the client MUST only write the Virtual Target Connection ID bytes over the start of the
+Target Connection ID, leaving the remainder of the Target Connection ID unmodified.
 
 ~~~
 | 0  | 1  | 2  | 3  | 4  | 5  | 6  | 7  |
@@ -444,7 +445,8 @@ the client must pad with the contents of the Target Connection ID.
 ~~~
 
 If the Virtual Target Connection ID is larger than the Target Connection ID,
-the client must "grow" the packet to include the entire Virtual Target
+the client MUST extend the length of the packet by the difference between the two lengths,
+to include the entire Virtual Target
 Connection ID.
 
 ## Receiving With Forwarded Mode
@@ -526,7 +528,7 @@ Connection ID.
 
 A proxy that cannot support rewriting the Virtual Target Connection ID to the
 Target Connection ID may instead choose to simply let them be equal. If the
-proxy does choose to leverage Virtual Target Connection ID, it MUST be able to
+proxy does choose to leverage Virtual Target Connection IDs, it MUST be able to
 rewrite The Virtual Target Connection ID to the Target Connection ID and
 correctly handle length differences between the two.
 
