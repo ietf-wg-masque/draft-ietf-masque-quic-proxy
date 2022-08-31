@@ -345,8 +345,8 @@ Stateless Reset Token Length
 : The length of the stateless reset token that may be sent by the proxy
 in response to forwarded mode packets in order to reset the Client<->Target
 QUIC connection. When forwarding mode is not negotiated, the length MUST be
-zero. Proxies choosing not to support stateless resets may set the length to
-zero. Clients receiving a zero length stateless reset token MUST ignore it.
+zero. Proxies choosing not to support stateless resets MAY set the length to
+zero. Clients receiving a zero-length stateless reset token MUST ignore it.
 
 Stateless Reset Token
 : A Stateless Reset Token provided by the Proxy to the Client allowing the
