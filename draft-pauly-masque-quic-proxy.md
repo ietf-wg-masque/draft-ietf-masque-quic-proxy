@@ -318,7 +318,7 @@ Virtual Target Connection ID Capsule {
   Stateless Reset Token (..),
 }
 ~~~
-{: #fig-capsule-cid title="Virtual Target Connection ID Capsule Format"}
+{: #fig-capsule-virtual-cid title="Virtual Target Connection ID Capsule Format"}
 
 Connection ID Length
 : The length of the conneciton ID being acknowledged, which is between 0 and
