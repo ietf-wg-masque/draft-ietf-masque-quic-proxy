@@ -336,7 +336,7 @@ valid connection ID length for the QUIC version used in the client<->proxy QUIC
 connection. When forwarding mode is not negotiated, the length MUST be zero.
 
 Virtual Target Connection ID
-: The Proxy chosen connection ID that the client MUST use when sending packets
+: The Proxy-chosen connection ID that the client MUST use when sending packets
 in forwarding mode. The proxy rewrites forwarding mode packets to contain the
 correct Target Connection ID prior to forwarding them on to the Target.
 
