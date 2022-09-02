@@ -138,19 +138,20 @@ proxy that the client MUST use when sending QUIC packets in forwarding mode.
 
 ## Virtual Target Connection ID
 
-QUIC allows endpoints of a connection to dictate the Connection ID their peer
-uses when sending packets. QUIC load balancing strategies such as those
-described in {{?QUIC-LB=I-D.ietf-quic-load-balancers}} may depend on encoding
-routing information in the Connection ID. When operating in forwarding mode,
-clients send QUIC packets destined for the Target directly to the Proxy. Since
-these packets are generated using the Target Connection ID, load balancers may not be
-able to route packets to the correct Proxy.
+QUIC allows each endpoint of a connection to choose the connection IDs they
+receive with. Load balancing strategies such as those described in
+{{?QUIC-LB=I-D.ietf-quic-load-balancers}} may choose to take advantage of this
+by encoding routing information in the connection ID. When operating in
+forwarding mode, clients send QUIC packets destined for the Target directly to
+the Proxy. Since these packets are generated using the Target Connection ID,
+load balancers may not be able to route packets to the correct Proxy.
 
-The Virtual Target Connection ID is a Proxy-dictated Connection ID the Client
-uses when sending forwarded mode packets to the Proxy. The Proxy replaces the
-Virtual Target Connection ID with the Target Connection ID prior to
-forwarding the packet to the Target. This is only necessary in the
-Client->Target direction.
+The Virtual Target Connection ID is a connection ID chosen by the Proxy that the
+Client uses when sending forwarded mode packets. The Proxy replaces the Virtual
+Target Connection ID with the Target Connection ID prior to forwarding the
+packet to the Target. This is only necessary in the Client->Target direction
+because the Proxy is otherwise the only receiver of QUIC packets with connection
+IDs it did not generate.
 
 Clients and Proxies not implementing forwarding mode do not need to consider
 the Virtual Target Connection ID since all Client->Target datagrams will be
@@ -321,7 +322,7 @@ Virtual Target Connection ID Capsule {
 {: #fig-capsule-virtual-cid title="Virtual Target Connection ID Capsule Format"}
 
 Connection ID Length
-: The length of the conneciton ID being acknowledged, which is between 0 and
+: The length of the connection ID being acknowledged, which is between 0 and
 255. Note that in QUICv1, the length of the Connection ID is limited to 20
 bytes, but QUIC invariants allow up to 255 bytes.
 
@@ -330,16 +331,14 @@ Connection ID
 Length. This is the real Target Connection ID.
 
 Virtual Target Connection ID Length
-: The length of the conneciton ID being provided to the client. This must
-be a valid connection ID length for the QUIC version used in the
-client<->proxy QUIC connection. When forwarding mode is not negotiated, the
-length MUST be zero.
+: The length of the connection ID being provided to the client. This must be a
+valid connection ID length for the QUIC version used in the client<->proxy QUIC
+connection. When forwarding mode is not negotiated, the length MUST be zero.
 
 Virtual Target Connection ID
-: The Proxy-dictated Connection ID that that client MUST use when sending
-packets in forwarding mode. The proxy rewrites these forwarding mode
-packets to contain the correct Target Connection ID prior to forwarding
-them on to the Target.
+: The Proxy chosen connection ID that the client MUST use when sending packets
+in forwarding mode. The proxy rewrites forwarding mode packets to contain the
+correct Target Connection ID prior to forwarding them on to the Target.
 
 Stateless Reset Token Length
 : The length of the stateless reset token that may be sent by the proxy
@@ -556,8 +555,8 @@ Connection ID.
 
 A proxy that supports forwarding mode but chooses not to support rewriting the
 Virtual Target Connection ID to the Target Connection ID may opt to simply let
-them be equal. If the proxy does wish to dictate the Virtual Target Connection
-ID, it MUST be able to replace The Virtual Target Connection ID with the Target
+them be equal. If the proxy does wish to choose a Virtual Target Connection ID,
+it MUST be able to replace the Virtual Target Connection ID with the Target
 Connection ID and correctly handle length differences between the two.
 
 If the proxy does not support forwarded mode, or does not allow forwarded mode
