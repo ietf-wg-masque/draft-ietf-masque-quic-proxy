@@ -350,7 +350,7 @@ This length equality constraint is more easily satisfied by the client since it
 controls both the Connection ID and Virtual Connection ID.
 
 Virtual Connection ID
-: The recevier-chosen connection ID that the sender MUST use when sending
+: The receiver-chosen connection ID that the sender MUST use when sending
 packets in forwarding mode. The proxy rewrites forwarding mode packets to
 contain the correct Connection ID prior to forwarding them.
 
