@@ -159,7 +159,7 @@ when sending forwarded mode packets. The Proxy replaces the Client Connection ID
 with the Virtual Client Connection ID prior to forwarding the packet to the
 Client. Clients take advantage of this to avoid linkability when migrating the
 client to proxy network path. Without the Virtual Client Connection ID, QUIC
-packets destinted for the client would have the same connection ID.
+packets destined for the client would have the same connection ID.
 
 Clients and Proxies not implementing forwarding mode do not need to consider
 Virtual Connection IDs since all Client<->Target datagrams will be encapsulated
