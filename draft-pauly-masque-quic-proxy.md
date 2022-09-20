@@ -264,6 +264,17 @@ particularly zero-length Connection IDs, a proxy MAY choose to reject all
 requests for very short Connection IDs as conflicts, in anticipation of future
 conflicts.
 
+## Stateless Resets for Forwarded Mode QUIC Packets
+
+While the lifecycle of forwarding rules are bound to the lifecycle of the
+client<->proxy HTTP stream, a peer may not be aware that the stream has
+terminated. If the above mappings are lost or removed without the peer's
+knowledge, they may send forwarded mode packets even though the Client
+or Proxy no longer has state for that connection. To allow the Client or
+Proxy to reset the client<->target connection in the absence the mappings
+above, a stateless reset token corresponding to the Virtual Connection ID
+may be provided.
+
 # Connection ID Capsule Types
 
 Proxy awareness of QUIC Connection IDs relies on using capsules ({{HTTP-DGRAM}})
