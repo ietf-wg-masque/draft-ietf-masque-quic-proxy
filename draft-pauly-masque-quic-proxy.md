@@ -157,7 +157,7 @@ IDs aren't reused over multiple network paths to avoid linkability. The Virtual
 Client Connection ID is a connection ID chosen by the Client that the Proxy uses
 when sending forwarded mode packets. The Proxy replaces the Client Connection ID
 with the Virtual Client Connection ID prior to forwarding the packet to the
-Client. Clients take advantage of this to avoid linkability when migrating the
+Client. Clients take advantage of this to avoid linkability when migrating a
 client to proxy network path. Without the Virtual Client Connection ID, QUIC
 packets destined for the client would have the same connection ID.
 
