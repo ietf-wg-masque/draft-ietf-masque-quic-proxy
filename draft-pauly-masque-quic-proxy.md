@@ -341,13 +341,12 @@ Connection ID
 Length. This is the real Target or Client Connection ID.
 
 Virtual Connection ID Length
-: The length of the virtual connection ID being provided. This must be a valid
+: The length of the virtual connection ID being provided. This MUST be a valid
 connection ID length for the QUIC version used in the client<->proxy QUIC
 connection. When forwarding mode is not negotiated, the length MUST be zero.
-The Connection ID Length and Virtual Connection ID Length MAY differ in
-ACK_TARGET_CID capsules, but MUST be equal in REGISTER_CLIENT_CID capsules.
-This length equality constraint is more easily satisfied by the client since it
-controls both the Connection ID and Virtual Connection ID.
+The Virtual Connection ID Length MUST be at least as large as the Connection ID
+Length to prevent exposing the Connection ID and the lengths SHOULD be equal
+when possible to avoid the need to resize packets during replacement.
 
 Virtual Connection ID
 : The receiver-chosen connection ID that the sender MUST use when sending
@@ -469,34 +468,17 @@ When forwarding, the client sends a QUIC packet with the Virtual Target
 Connection ID in the QUIC short header, using the same socket between client and
 proxy that was used for the main QUIC connection between client and proxy.
 
-If the Virtual Target Connection ID is smaller than the Target Connection ID,
-the client MUST only write the Virtual Target Connection ID bytes over the start
-of the Target Connection ID, leaving the remainder of the Target Connection ID
-unmodified.
-
-~~~
-| 0  | 1  | 2  | 3  | 4  | 5  | 6  | 7  |
-
-  aa   bb   cc   aa   bb   cc   aa  bb    <--- Target Connection ID
-  11   22   33                            <--- Virtual Target Connection ID
-  11   22   33   aa   bb   cc   aa  bb    <--- Resulting Connection ID Bytes
-~~~
-
-If the Virtual Target Connection ID is larger than the Target Connection ID,
-the client MUST extend the length of the packet by the difference between the
-two lengths, to include the entire Virtual Target Connection ID.
-
-Clients supporting forwarding mode MUST be able to handle Virtual Target
-Connection IDs of different lengths than the corresponding Target Connection
-IDs.
-
 When forwarding, the proxy sends a QUIC packet with the Virtual Client Target
 Connection ID in the QUIC short header, using the same socket between client
 and proxy that was used for the main QUIC connection between client and proxy.
 
-The Virtual Client Connection ID is the exact same length as the Client
-Connection ID. The Proxy MUST replace the entire Virtual Client Connection ID
-with the Client Connection ID prior to sending.
+Prior to sending a forwarded mode packet, the send must replace the Connection
+ID with the Virtual Connection ID. If the Virtual Connection ID is larger than
+the Connection ID, the sender MUST extend the length of the packet by the
+difference between the two lengths, to include the entire Virtual Connection ID.
+
+Clients and proxies supporting forwarding mode MUST be able to handle Virtual
+Connection IDs of larger lengths than the corresponding Connection IDs.
 
 ## Receiving With Forwarded Mode
 
