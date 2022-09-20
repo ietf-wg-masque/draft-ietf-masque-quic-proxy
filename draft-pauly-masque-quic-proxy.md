@@ -275,6 +275,18 @@ Proxy to reset the client<->target connection in the absence the mappings
 above, a stateless reset token corresponding to the Virtual Connection ID
 may be provided.
 
+Consider a proxy that initiates closure of a client<->proxy QUIC connection.
+If the client is temporarily unresponsive or unreachable, the proxy may have
+considered the connection closed and removed all connection state (including
+the above stream mappings). If the client never learned about the closure, it
+might send forwarded mode packets to the proxy, assuming the stream mappings
+and client<->proxy connection are still intact. The proxy receives these
+forwarding mode packets, but doesn't have any state corresponding to the
+destination connection ID in the packet. If the proxy has provided a stateless
+reset token for the Virtual Target Connection ID, it can send a stateless reset
+packet to quickly notify the client that the client<->target connection is
+broken.
+
 # Connection ID Capsule Types
 
 Proxy awareness of QUIC Connection IDs relies on using capsules ({{HTTP-DGRAM}})
