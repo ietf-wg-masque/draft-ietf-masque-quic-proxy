@@ -133,10 +133,10 @@ the client.
 - Target Connection ID: a QUIC Connection ID that is chosen by the target, and
 is used in the Destination Connection ID field of packets from the client to
 the target.
-- Virtual Target Connection ID: a fake QUIC Connection ID that is chosen by the
-proxy that the client MUST use when sending QUIC packets in forwarding mode.
 - Virtual Client Connection ID: a fake QUIC Connection ID that is chosen by the
 client that the proxy MUST use when sending QUIC packets in forwarding mode.
+- Virtual Target Connection ID: a fake QUIC Connection ID that is chosen by the
+proxy that the client MUST use when sending QUIC packets in forwarding mode.
 
 ## Virtual Connection IDs
 
