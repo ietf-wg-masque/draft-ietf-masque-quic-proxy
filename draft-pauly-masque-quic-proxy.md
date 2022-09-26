@@ -371,9 +371,9 @@ The Virtual Connection ID Length and Connection ID Length SHOULD be equal
 when possible to avoid the need to resize packets during replacement.
 
 Virtual Connection ID
-: The receiver-chosen connection ID that the sender MUST use when sending
-packets in forwarding mode. The proxy rewrites forwarding mode packets to
-contain the correct Connection ID prior to forwarding them.
+: The peer-chosen connection ID that the sender of forwarded mode packets MUST
+use when sending. The endpoint rewrites forwarding mode packets to contain the
+correct Connection ID prior to sending them.
 
 Stateless Reset Token Length
 : The length of the stateless reset token that may be sent by the client or
