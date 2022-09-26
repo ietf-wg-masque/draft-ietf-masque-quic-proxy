@@ -367,8 +367,7 @@ Virtual Connection ID Length
 : The length of the virtual connection ID being provided. This MUST be a valid
 connection ID length for the QUIC version used in the client<->proxy QUIC
 connection. When forwarding mode is not negotiated, the length MUST be zero.
-The Virtual Connection ID Length MUST be at least as large as the Connection ID
-Length to prevent exposing the Connection ID and the lengths SHOULD be equal
+The Virtual Connection ID Length and Connection ID Length SHOULD be equal
 when possible to avoid the need to resize packets during replacement.
 
 Virtual Connection ID
@@ -495,13 +494,15 @@ When forwarding, the proxy sends a QUIC packet with the Virtual Client Target
 Connection ID in the QUIC short header, using the same socket between client
 and proxy that was used for the main QUIC connection between client and proxy.
 
-Prior to sending a forwarded mode packet, the send must replace the Connection
+Prior to sending a forwarded mode packet, the sender MUST replace the Connection
 ID with the Virtual Connection ID. If the Virtual Connection ID is larger than
 the Connection ID, the sender MUST extend the length of the packet by the
 difference between the two lengths, to include the entire Virtual Connection ID.
+If the Virtual Connection ID is smaller than the Connection ID, the sender MUST
+shrink the length of the packet by the difference between the two lengths.
 
 Clients and proxies supporting forwarding mode MUST be able to handle Virtual
-Connection IDs of larger lengths than the corresponding Connection IDs.
+Connection IDs of different lengths than the corresponding Connection IDs.
 
 ## Receiving With Forwarded Mode
 
