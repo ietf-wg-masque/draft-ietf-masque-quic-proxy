@@ -133,29 +133,38 @@ the client.
 - Target Connection ID: a QUIC Connection ID that is chosen by the target, and
 is used in the Destination Connection ID field of packets from the client to
 the target.
+- Virtual Client Connection ID: a fake QUIC Connection ID that is chosen by the
+client that the proxy MUST use when sending QUIC packets in forwarding mode.
 - Virtual Target Connection ID: a fake QUIC Connection ID that is chosen by the
 proxy that the client MUST use when sending QUIC packets in forwarding mode.
 
-## Virtual Target Connection ID
+## Virtual Connection IDs
 
-QUIC allows each endpoint of a connection to choose the connection IDs they
-receive with. Load balancing strategies such as those described in
-{{?QUIC-LB=I-D.ietf-quic-load-balancers}} may choose to take advantage of this
-by encoding routing information in the connection ID. When operating in
-forwarding mode, clients send QUIC packets destined for the Target directly to
-the Proxy. Since these packets are generated using the Target Connection ID,
-load balancers may not be able to route packets to the correct Proxy.
+QUIC allows each endpoint of a connection to choose the connection IDs it
+receives with. Servers receiving QUIC packets can employ load balancing
+strategies such as those described in {{?QUIC-LB=I-D.ietf-quic-load-balancers}}
+that encode routing information in
+the connection ID. When operating in forwarding mode, clients send QUIC packets
+destined for the Target directly to the Proxy. Since these packets are generated
+using the Target Connection ID, load balancers would not be able to route packets
+to the correct Proxy if the packets were sent with the Target Connection ID.
+The Virtual Target Connection ID is a connection ID chosen
+by the Proxy that the Client uses when sending forwarded mode packets. The Proxy
+replaces the Virtual Target Connection ID with the Target Connection ID prior to
+forwarding the packet to the Target.
 
-The Virtual Target Connection ID is a connection ID chosen by the Proxy that the
-Client uses when sending forwarded mode packets. The Proxy replaces the Virtual
-Target Connection ID with the Target Connection ID prior to forwarding the
-packet to the Target. This is only necessary in the Client->Target direction
-because the Proxy is otherwise the only receiver of QUIC packets with connection
-IDs it did not generate.
+Similarly, QUIC requires that connection IDs aren't reused over multiple network
+paths to avoid linkability. The Virtual Client Connection ID is a connection ID
+chosen by the Client that the Proxy uses when sending forwarded mode packets.
+The Proxy replaces the Client Connection ID with the Virtual Client Connection
+ID prior to forwarding the packet to the Client. Clients take advantage of this
+to avoid linkability when migrating a client to proxy network path. The Virtual
+Client Connection ID allows the connection ID bytes to change on the wire
+without requiring the connection IDs on the client to target connection change.
 
 Clients and Proxies not implementing forwarding mode do not need to consider
-the Virtual Target Connection ID since all Client->Target datagrams will be
-encapsulated within the Client<->Proxy connection.
+Virtual Connection IDs since all Client<->Target datagrams will be encapsulated
+within the Client<->Proxy connection.
 
 # Required Proxy State {#mappings}
 
@@ -213,11 +222,12 @@ does not allow forwarded mode does not need to maintain this mapping.
 Each pair of Client Connection ID and target-facing socket MUST map to a single
 stream on a single client <-> proxy HTTP stream. Additionally, when supporting
 forwarding mode, the pair of Client Connection ID and target-facing socket MUST
-map to a single client-facing socket.
+map to a single client-facing socket and Virtual Client Connection ID.
 
 ~~~
 (Target-facing socket + Client Connection ID) => (Client <-> Proxy HTTP Stream)
-(Target-facing socket + Client Connection ID) => Client-facing socket
+(Target-facing socket + Client Connection ID)
+    => (Client-facing socket + Virtual Client Connection ID)
 ~~~
 
 Multiple pairs of Connection IDs and target-facing sockets can map to the same
@@ -255,6 +265,29 @@ particularly zero-length Connection IDs, a proxy MAY choose to reject all
 requests for very short Connection IDs as conflicts, in anticipation of future
 conflicts.
 
+## Stateless Resets for Forwarded Mode QUIC Packets
+
+While the lifecycle of forwarding rules are bound to the lifecycle of the
+client<->proxy HTTP stream, a peer may not be aware that the stream has
+terminated. If the above mappings are lost or removed without the peer's
+knowledge, they may send forwarded mode packets even though the Client
+or Proxy no longer has state for that connection. To allow the Client or
+Proxy to reset the client<->target connection in the absence the mappings
+above, a stateless reset token corresponding to the Virtual Connection ID
+can be provided.
+
+Consider a proxy that initiates closure of a client<->proxy QUIC connection.
+If the client is temporarily unresponsive or unreachable, the proxy might have
+considered the connection closed and removed all connection state (including
+the stream mappings used for forwarding). If the client never learned about the closure, it
+might send forwarded mode packets to the proxy, assuming the stream mappings
+and client<->proxy connection are still intact. The proxy will receive these
+forwarding mode packets, but won't have any state corresponding to the
+destination connection ID in the packet. If the proxy has provided a stateless
+reset token for the Virtual Target Connection ID, it can send a stateless reset
+packet to quickly notify the client that the client<->target connection is
+broken.
+
 # Connection ID Capsule Types
 
 Proxy awareness of QUIC Connection IDs relies on using capsules ({{HTTP-DGRAM}})
@@ -287,11 +320,12 @@ CLOSE_CLIENT_CID without having sent an ACK_CLIENT_CID, or if a proxy
 sends a CLOSE_TARGET_CID without having sent an ACK_TARGET_CID,
 it is rejecting a Connection ID registration.
 
-All capsule types except for ACK_TARGET_CID are formatted as follows:
+REGISTER_TARGET_CID, ACK_CLIENT_CID, CLOSE_CLIENT_CID, and CLOSE_TARGET_CID
+capsule types are formatted as follows:
 
 ~~~
 Connection ID Capsule {
-  Type (i) = 0xffe200..0xffe202, 0xffe204..0xffe205
+  Type (i) = 0xffe301, 0xffe302, 0xffe304, 0xffe305
   Length (i),
   Connection ID (0..2040),
 }
@@ -304,22 +338,22 @@ Connection ID:
 length of the capsule. Note that in QUICv1, the length of the Connection ID
 is limited to 20 bytes, but QUIC invariants allow up to 255 bytes.
 
-The ACK_TARGET_CID capsule type includes the Virtual Target Connection ID
-and a Stateless Reset Token.
+The REGISTER_CLIENT_CID and ACK_TARGET_CID capsule types include a Virtual
+Connection ID and Stateless Reset Token.
 
 ~~~
-Virtual Target Connection ID Capsule {
-  Type (i) = 0xffe203,
+Virtual Connection ID Capsule {
+  Type (i) = 0xffe300, 0xffe303
   Length (i)
   Connection ID Length (i)
   Connection ID (0..2040),
-  Virtual Target Connection ID Length (i)
-  Virtual Target Connection ID (0..2040),
+  Virtual Connection ID Length (i)
+  Virtual Connection ID (0..2040),
   Stateless Reset Token Length (i),
   Stateless Reset Token (..),
 }
 ~~~
-{: #fig-capsule-virtual-cid title="Virtual Target Connection ID Capsule Format"}
+{: #fig-capsule-virtual-cid title="Virtual Connection ID Capsule Format"}
 
 Connection ID Length
 : The length of the connection ID being acknowledged, which is between 0 and
@@ -328,29 +362,31 @@ bytes, but QUIC invariants allow up to 255 bytes.
 
 Connection ID
 : A connection ID being acknowledged whose length is equal to Connection ID
-Length. This is the real Target Connection ID.
+Length. This is the real Target or Client Connection ID.
 
-Virtual Target Connection ID Length
-: The length of the connection ID being provided to the client. This must be a
-valid connection ID length for the QUIC version used in the client<->proxy QUIC
+Virtual Connection ID Length
+: The length of the virtual connection ID being provided. This MUST be a valid
+connection ID length for the QUIC version used in the client<->proxy QUIC
 connection. When forwarding mode is not negotiated, the length MUST be zero.
+The Virtual Connection ID Length and Connection ID Length SHOULD be equal
+when possible to avoid the need to resize packets during replacement.
 
-Virtual Target Connection ID
-: The Proxy-chosen connection ID that the client MUST use when sending packets
-in forwarding mode. The proxy rewrites forwarding mode packets to contain the
-correct Target Connection ID prior to forwarding them on to the Target.
+Virtual Connection ID
+: The peer-chosen connection ID that the sender of forwarded mode packets MUST
+use when sending. The endpoint rewrites forwarding mode packets to contain the
+correct Connection ID prior to sending them.
 
 Stateless Reset Token Length
-: The length of the stateless reset token that may be sent by the proxy
-in response to forwarded mode packets in order to reset the Client<->Target
-QUIC connection. When forwarding mode is not negotiated, the length MUST be
-zero. Proxies choosing not to support stateless resets MAY set the length to
-zero. Clients receiving a zero-length stateless reset token MUST ignore it.
+: The length of the stateless reset token that may be sent by the client or
+proxy in response to forwarded mode packets in order to reset the
+Client<->Target QUIC connection. When forwarding mode is not negotiated, the
+length MUST be zero. Proxies or Clients choosing not to support stateless
+resets MAY set the length to zero. Clients or Proxies receiving a zero-length
+stateless reset token MUST ignore it.
 
 Stateless Reset Token
-: A Stateless Reset Token provided by the Proxy to the Client allowing the
-Proxy to reset the Client<->Target connection in response to Client->Target
-forwarding mode packets.
+: A Stateless Reset Token allowing reset of the Client<->Target connection in
+response to Client<->Target forwarding mode packets.
 
 # Client Request Behavior {#request}
 
@@ -389,10 +425,12 @@ HTTP response from the proxy.
 
 To initiate QUIC-aware proxying, the client sends a REGISTER_CLIENT_CID
 capsule containing the initial Client Connection ID that the client has
-advertised to the target.
+advertised to the target as well as a Virtual Connection ID that the proxy MUST
+use when sending forwarding mode packets. If forwarding mode is not supported,
+the Virtual Connection ID Length MUST be zero.
 
 If the mapping is created successfully, the client will receive a
-ACK_CLIENT_CID capsule that contains the same connection ID that was
+ACK_CLIENT_CID capsule that contains the same Client Connection ID that was
 requested.
 
 Since clients are always aware whether or not they are using a QUIC proxy,
@@ -419,7 +457,7 @@ using them. In QUICv1, this is performed using the NEW_CONNECTION_ID frame.
 
 Prior to informing the target of a new chosen client connection ID, the client
 MUST send a REGISTER_CLIENT_CID capsule request containing the new Client
-Connection ID.
+Connection ID and Virtual Client Connection ID.
 
 The client should only inform the target of the new Client Connection ID once an
 ACK_CLIENT_CID capsule is received that contains the echoed connection ID.
@@ -434,7 +472,7 @@ response to a QUIC Initial packet, it can send a REGISTER_TARGET_CID capsule
 containing the Target Connection ID to request the ability to forward packets.
 
 The client MUST wait for an ACK_TARGET_CID capsule that contains the echoed
-connection ID before using forwarded mode.
+connection ID and Virtual Target Connection ID before using forwarded mode.
 
 Prior to receiving the proxy server response, the client MUST send short header
 packets tunnelled in HTTP Datagram frames. The client MAY also choose to tunnel
@@ -453,26 +491,19 @@ When forwarding, the client sends a QUIC packet with the Virtual Target
 Connection ID in the QUIC short header, using the same socket between client and
 proxy that was used for the main QUIC connection between client and proxy.
 
-If the Virtual Target Connection ID is smaller than the Target Connection ID,
-the client MUST only write the Virtual Target Connection ID bytes over the start
-of the Target Connection ID, leaving the remainder of the Target Connection ID
-unmodified.
+When forwarding, the proxy sends a QUIC packet with the Virtual Client Target
+Connection ID in the QUIC short header, using the same socket between client
+and proxy that was used for the main QUIC connection between client and proxy.
 
-~~~
-| 0  | 1  | 2  | 3  | 4  | 5  | 6  | 7  |
+Prior to sending a forwarded mode packet, the sender MUST replace the Connection
+ID with the Virtual Connection ID. If the Virtual Connection ID is larger than
+the Connection ID, the sender MUST extend the length of the packet by the
+difference between the two lengths, to include the entire Virtual Connection ID.
+If the Virtual Connection ID is smaller than the Connection ID, the sender MUST
+shrink the length of the packet by the difference between the two lengths.
 
-  aa   bb   cc   aa   bb   cc   aa  bb    <--- Target Connection ID
-  11   22   33                            <--- Virtual Target Connection ID
-  11   22   33   aa   bb   cc   aa  bb    <--- Resulting Connection ID Bytes
-~~~
-
-If the Virtual Target Connection ID is larger than the Target Connection ID,
-the client MUST extend the length of the packet by the difference between the
-two lengths, to include the entire Virtual Target Connection ID.
-
-Clients supporting forwarding mode MUST be able to handle Virtual Target
-Connection IDs of different lengths than the corresponding Target Connection
-IDs.
+Clients and proxies supporting forwarding mode MUST be able to handle Virtual
+Connection IDs of different lengths than the corresponding Connection IDs.
 
 ## Receiving With Forwarded Mode
 
@@ -482,10 +513,11 @@ it has a valid mapping.
 
 Once a client has sent "Proxy-QUIC-Forwarding" with a value of "?1", it MUST be
 prepared to receive forwarded short header packets on the socket between itself
-and the proxy for any Client Connection ID that it has registered with a
+and the proxy for any Virtual Client Connection ID that it has registered with a
 REGISTER_CLIENT_CID capsule. The client uses the Destination Connection ID field
 of the received packet to determine if the packet was originated by the proxy,
-or merely forwarded from the target.
+or merely forwarded from the target. The client replaces the Virtual Client
+Connection ID with the real Client Connection ID before processing the packet further.
 
 # Proxy Response Behavior {#response}
 
@@ -528,16 +560,18 @@ the traffic. Any packets received on a target-facing socket used for proxying
 QUIC that does not correspond to a known Connection ID MUST be dropped.
 
 When the proxy recieves a REGISTER_CLIENT_CID capsule, it is receiving a
-request to be able to route traffic back to the client using that Connection ID.
-If the pair of this Client Connection ID and the selected target-facing socket
-does not create a conflict, the proxy creates the mapping and responds with a
-ACK_CLIENT_CID capsule. After this point, any packets received by the proxy from the
-target-facing socket that match the Client Connection ID can to be sent to the
-client. The proxy MUST use tunnelled mode (HTTP Datagram frames) for any long
-header packets. The proxy SHOULD forward directly to the client for any matching
-short header packets if forwarding is supported by the client, but the proxy MAY
-tunnel these packets in HTTP Datagram frames instead. If the mapping would
-create a conflict, the proxy responds with a CLOSE_CLIENT_CID capsule.
+request to be able to route traffic matching the Client Connection ID back to
+the client using the Virtual Client Connection ID. If the pair of this Client
+Connection ID and the selected target-facing socket does not create a conflict,
+the proxy creates the mapping and responds with a ACK_CLIENT_CID capsule. After
+this point, any packets received by the proxy from the target-facing socket that
+match the Client Connection ID can to be sent to the client after the proxy has
+replaced the Connection ID with the Virtual Client Connection ID. The proxy MUST
+use tunnelled mode (HTTP Datagram frames) for any long header packets. The proxy
+SHOULD forward directly to the client for any matching short header packets if
+forwarding is supported by the client, but the proxy MAY tunnel these packets in
+HTTP Datagram frames instead. If the mapping would create a conflict, the proxy
+responds with a CLOSE_CLIENT_CID capsule.
 
 When the proxy recieves a REGISTER_TARGET_CID capsule, it is receiving a
 request to allow the client to forward packets to the target. The proxy
@@ -558,6 +592,9 @@ Virtual Target Connection ID to the Target Connection ID may opt to simply let
 them be equal. If the proxy does wish to choose a Virtual Target Connection ID,
 it MUST be able to replace the Virtual Target Connection ID with the Target
 Connection ID and correctly handle length differences between the two.
+Regardless of whether or not the proxy chooses to support rewriting of the
+Virtual Target Connection ID, it MUST be able to support rewriting the Client
+Connection ID to the Virtual Client Connection ID.
 
 If the proxy does not support forwarded mode, or does not allow forwarded mode
 for a particular client or authority by policy, it can reject all REGISTER_TARGET_CID
@@ -594,6 +631,19 @@ to an unvalidated client address to the size of an initial congestion window.
 Proxies additionally SHOULD pace the rate at which packets are sent over a new
 path to avoid creating unintentional congestion on the new path.
 
+When operating in forwarding mode, the proxy MUST NOT send forwarded mode
+packets with the same Destination Connection ID over multiple network paths.
+
+After switching to a new network path, the proxy MUST tunnel Target to Client
+packets instead of forwarding. Only once a new Virtual Client Connection ID has
+been communicated to the proxy via a REGISTER_CLIENT_CID capsule may the proxy
+begin forwarding packets to the client. Similarly, when a client actively
+migrates, it MUST NOT send any forwarded mode packets until it has registered
+a new Virtual Target Connection ID. In both cases, reusing a connection ID would
+increase linkability of the connection between network paths. Note that the
+Client Connection ID and Target Connection ID may stay the same while the
+Virtual Target Connection ID and Virtual Client Connection ID change.
+
 # Example
 
 Consider a client that is establishing a new QUIC connection through the proxy.
@@ -619,6 +669,8 @@ STREAM(44): HEADERS             -------->
 STREAM(44): DATA                -------->
   Capsule Type = REGISTER_CLIENT_CID
   Connection ID = 0x31323334
+  Virtual CID = 0x62646668
+  Stateless Reset Token = Token
 
 DATAGRAM                        -------->
   Quarter Stream ID = 11
@@ -642,6 +694,13 @@ DATAGRAM                        -------->
                         Payload = Encapsulated QUIC initial
 ~~~
 
+Immediately after sending the REGISTER_CLIENT_CID capsule, the client may
+receive forwarded mode packets from the proxy with a Virtual Client
+Connection ID of 0x62646668 which it will replace with the real Client
+Connection ID of 0x31323334. All forwarded mode packets sent by the proxy
+will have been modified to contain the Virtual Client Connection ID instead
+of the Client Connection ID.
+
 Once the client learns which Connection ID has been selected by the target
 server, it can send a new request to the proxy to establish a mapping for
 forwarding. In this case, that ID is 0x61626364. The client sends the
@@ -664,8 +723,9 @@ packets with a Destination Connection ID of 0x123412341234 directly to the proxy
 (not tunnelled), and these are rewritten by the proxy to have the Destination
 Connection ID 0x61626364 prior to being forwarded directly to the target. In the
 reverse direction, Short Header packets from the target with a Destination
-Connection ID of 0x31323334 are forwarded directly to the client without
-modification.
+Connection ID of 0x31323334 are modified to replace the Destination Connection
+ID with the Virtual Client Connection ID of 0x62646668 and forwarded directly to
+the client.
 
 # Packet Size Considerations
 
@@ -731,12 +791,12 @@ registry established by {{HTTP-DGRAM}}.
 
 |     Capule Type     |   Value   | Specification |
 |:--------------------|:----------|:--------------|
-| REGISTER_CLIENT_CID | 0xffe200  | This Document |
-| REGISTER_TARGET_CID | 0xffe201  | This Document |
-| ACK_CLIENT_CID      | 0xffe202  | This Document |
-| ACK_TARGET_CID      | 0xffe203  | This Document |
-| CLOSE_CLIENT_CID    | 0xffe204  | This Document |
-| CLOSE_TARGET_CID    | 0xffe205  | This Document |
+| REGISTER_CLIENT_CID | 0xffe300  | This Document |
+| REGISTER_TARGET_CID | 0xffe301  | This Document |
+| ACK_CLIENT_CID      | 0xffe302  | This Document |
+| ACK_TARGET_CID      | 0xffe303  | This Document |
+| CLOSE_CLIENT_CID    | 0xffe304  | This Document |
+| CLOSE_TARGET_CID    | 0xffe305  | This Document |
 {: #iana-capsule-type-table title="Registered Capsule Types"}
 
 --- back
