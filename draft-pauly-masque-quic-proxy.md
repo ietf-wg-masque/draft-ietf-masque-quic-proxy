@@ -141,13 +141,14 @@ proxy that the client MUST use when sending QUIC packets in forwarding mode.
 ## Virtual Connection IDs
 
 QUIC allows each endpoint of a connection to choose the connection IDs it
-receives with. Servers receiving QUIC packets may employ load balancing
+receives with. Servers receiving QUIC packets can employ load balancing
 strategies such as those described in {{?QUIC-LB=I-D.ietf-quic-load-balancers}}
-which may choose to take advantage of this by encoding routing information in
+that encode routing information in
 the connection ID. When operating in forwarding mode, clients send QUIC packets
 destined for the Target directly to the Proxy. Since these packets are generated
-using the Target Connection ID, load balancers may not be able to route packets
-to the correct Proxy. The Virtual Target Connection ID is a connection ID chosen
+using the Target Connection ID, load balancers would not be able to route packets
+to the correct Proxy if the packets were sent with the Target Connection ID.
+The Virtual Target Connection ID is a connection ID chosen
 by the Proxy that the Client uses when sending forwarded mode packets. The Proxy
 replaces the Virtual Target Connection ID with the Target Connection ID prior to
 forwarding the packet to the Target.
@@ -273,15 +274,15 @@ knowledge, they may send forwarded mode packets even though the Client
 or Proxy no longer has state for that connection. To allow the Client or
 Proxy to reset the client<->target connection in the absence the mappings
 above, a stateless reset token corresponding to the Virtual Connection ID
-may be provided.
+can be provided.
 
 Consider a proxy that initiates closure of a client<->proxy QUIC connection.
-If the client is temporarily unresponsive or unreachable, the proxy may have
+If the client is temporarily unresponsive or unreachable, the proxy might have
 considered the connection closed and removed all connection state (including
-the above stream mappings). If the client never learned about the closure, it
+the stream mappings used for forwarding). If the client never learned about the closure, it
 might send forwarded mode packets to the proxy, assuming the stream mappings
-and client<->proxy connection are still intact. The proxy receives these
-forwarding mode packets, but doesn't have any state corresponding to the
+and client<->proxy connection are still intact. The proxy will receive these
+forwarding mode packets, but won't have any state corresponding to the
 destination connection ID in the packet. If the proxy has provided a stateless
 reset token for the Virtual Target Connection ID, it can send a stateless reset
 packet to quickly notify the client that the client<->target connection is
@@ -337,7 +338,7 @@ Connection ID:
 length of the capsule. Note that in QUICv1, the length of the Connection ID
 is limited to 20 bytes, but QUIC invariants allow up to 255 bytes.
 
-The REGISTER_CLIENT_CID and ACK_TARGET_CID capsule types includes a Virtual
+The REGISTER_CLIENT_CID and ACK_TARGET_CID capsule types include a Virtual
 Connection ID and Stateless Reset Token.
 
 ~~~
@@ -516,7 +517,7 @@ and the proxy for any Virtual Client Connection ID that it has registered with a
 REGISTER_CLIENT_CID capsule. The client uses the Destination Connection ID field
 of the received packet to determine if the packet was originated by the proxy,
 or merely forwarded from the target. The client replaces the Virtual Client
-Connection ID with the real Client Connection ID.
+Connection ID with the real Client Connection ID before processing the packet further.
 
 # Proxy Response Behavior {#response}
 
