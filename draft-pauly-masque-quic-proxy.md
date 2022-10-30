@@ -288,6 +288,18 @@ reset token for the Virtual Target Connection ID, it can send a stateless reset
 packet to quickly notify the client that the client<->target connection is
 broken.
 
+## Stateless Resets from the Target
+
+Reuse of target-facing sockets is only possible because QUIC connection IDs
+allow distinguishing packets for multiple QUIC connections received with the
+same 5-tuple. One exception to this is Stateless Reset packets, in which the
+connection ID is not used, but rather populated with unpredictable bits followed
+by a Stateless Reset token, to make it indistinguishable from a regular packet
+with a short header. In order for the proxy to correctly recognize Stateless
+Reset packets, the client SHOULD share the Stateless Reset token for each
+registered Target Connection ID. When the proxy receives a Stateless Reset packet,
+it SHOULD forward or tunnel the packet to the client.
+
 # Connection ID Capsule Types
 
 Proxy awareness of QUIC Connection IDs relies on using capsules ({{HTTP-DGRAM}})
@@ -320,12 +332,12 @@ CLOSE_CLIENT_CID without having sent an ACK_CLIENT_CID, or if a proxy
 sends a CLOSE_TARGET_CID without having sent an ACK_TARGET_CID,
 it is rejecting a Connection ID registration.
 
-REGISTER_TARGET_CID, ACK_CLIENT_CID, CLOSE_CLIENT_CID, and CLOSE_TARGET_CID
-capsule types are formatted as follows:
+ACK_CLIENT_CID, CLOSE_CLIENT_CID, and CLOSE_TARGET_CID capsule types are
+formatted as follows:
 
 ~~~
 Connection ID Capsule {
-  Type (i) = 0xffe301, 0xffe302, 0xffe304, 0xffe305
+  Type (i) = 0xffe402, 0xffe404, 0xffe405
   Length (i),
   Connection ID (0..2040),
 }
@@ -333,17 +345,48 @@ Connection ID Capsule {
 {: #fig-capsule-cid title="Connection ID Capsule Format"}
 
 Connection ID:
-: A connection ID being registered or acknowledged, which is between 0 and
-255 bytes in length. The length of the connection ID is implied by the
-length of the capsule. Note that in QUICv1, the length of the Connection ID
-is limited to 20 bytes, but QUIC invariants allow up to 255 bytes.
+: A connection ID being acknowledged, which is between 0 and 255 bytes in
+length. The length of the connection ID is implied by the length of the
+capsule. Note that in QUICv1, the length of the Connection ID is limited
+to 20 bytes, but QUIC invariants allow up to 255 bytes.
+
+The REGISTER_TARGET_CID capsule includes the target-provided connection ID
+and Stateless Reset Token.
+
+~~~
+Register Target Connection ID Capsule {
+  Type (i) = 0xffe401
+  Length (i),
+  Connection ID Length (i)
+  Connection ID (0..2040),
+  Stateless Reset Token Length (i),
+  Stateless Reset Token (..),
+}
+~~~
+{: #fig-capsule-cid title="Register Target Connection ID Capsule Format"}
+
+Connection ID Length
+: The length of the connection ID being registered, which is between 0 and
+255. Note that in QUICv1, the length of the Connection ID is limited to 20
+bytes, but QUIC invariants allow up to 255 bytes.
+
+Connection ID
+: A connection ID being registered whose length is equal to Connection ID
+Length. This is the real Target or Client Connection ID.
+
+Stateless Reset Token Length
+: The length of the target-provided Stateless Reset Token.
+
+Stateless Reset Token
+: The target-provided Stateless Reset token allowing the proxy to correctly
+recognize Stateless Reset packets to be forwarded or tunneled to the client.
 
 The REGISTER_CLIENT_CID and ACK_TARGET_CID capsule types include a Virtual
 Connection ID and Stateless Reset Token.
 
 ~~~
 Virtual Connection ID Capsule {
-  Type (i) = 0xffe300, 0xffe303
+  Type (i) = 0xffe400, 0xffe403
   Length (i)
   Connection ID Length (i)
   Connection ID (0..2040),
@@ -356,13 +399,13 @@ Virtual Connection ID Capsule {
 {: #fig-capsule-virtual-cid title="Virtual Connection ID Capsule Format"}
 
 Connection ID Length
-: The length of the connection ID being acknowledged, which is between 0 and
-255. Note that in QUICv1, the length of the Connection ID is limited to 20
-bytes, but QUIC invariants allow up to 255 bytes.
+: The length of the connection ID being registered or acknowledged, which
+is between 0 and 255. Note that in QUICv1, the length of the Connection ID
+is limited to 20 bytes, but QUIC invariants allow up to 255 bytes.
 
 Connection ID
-: A connection ID being acknowledged whose length is equal to Connection ID
-Length. This is the real Target or Client Connection ID.
+: A connection ID being registered or acknowledged whose length is equal to
+Connection ID Length. This is the real Target or Client Connection ID.
 
 Virtual Connection ID Length
 : The length of the virtual connection ID being provided. This MUST be a valid
@@ -791,12 +834,12 @@ registry established by {{HTTP-DGRAM}}.
 
 |     Capule Type     |   Value   | Specification |
 |:--------------------|:----------|:--------------|
-| REGISTER_CLIENT_CID | 0xffe300  | This Document |
-| REGISTER_TARGET_CID | 0xffe301  | This Document |
-| ACK_CLIENT_CID      | 0xffe302  | This Document |
-| ACK_TARGET_CID      | 0xffe303  | This Document |
-| CLOSE_CLIENT_CID    | 0xffe304  | This Document |
-| CLOSE_TARGET_CID    | 0xffe305  | This Document |
+| REGISTER_CLIENT_CID | 0xffe400  | This Document |
+| REGISTER_TARGET_CID | 0xffe401  | This Document |
+| ACK_CLIENT_CID      | 0xffe402  | This Document |
+| ACK_TARGET_CID      | 0xffe403  | This Document |
+| CLOSE_CLIENT_CID    | 0xffe404  | This Document |
+| CLOSE_TARGET_CID    | 0xffe405  | This Document |
 {: #iana-capsule-type-table title="Registered Capsule Types"}
 
 --- back
