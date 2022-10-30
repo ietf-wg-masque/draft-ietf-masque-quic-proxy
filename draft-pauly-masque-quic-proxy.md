@@ -363,7 +363,7 @@ Register Target Connection ID Capsule {
   Stateless Reset Token (..),
 }
 ~~~
-{: #fig-capsule-cid title="Register Target Connection ID Capsule Format"}
+{: #fig-capsule-register-target-cid title="Register Target Connection ID Capsule Format"}
 
 Connection ID Length
 : The length of the connection ID being registered, which is between 0 and
