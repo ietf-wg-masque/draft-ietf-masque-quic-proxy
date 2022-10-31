@@ -298,9 +298,9 @@ by a Stateless Reset token, to make it indistinguishable from a regular packet
 with a short header. In order for the proxy to correctly recognize Stateless
 Reset packets, the client SHOULD share the Stateless Reset token for each
 registered Target Connection ID. When the proxy receives a Stateless Reset packet,
-it SHOULD tunnel the packet to the client regardless of whether or not forwarding
-is enabled.
-
+it can send the packet to the client as a tunnelled datagram. Although Stateless Reset packets
+look like short header packets, they are not technically short header packets and do not contain
+negotiated connection IDs, and thus are not eligible for forwarded mode.
 # Connection ID Capsule Types
 
 Proxy awareness of QUIC Connection IDs relies on using capsules ({{HTTP-DGRAM}})
