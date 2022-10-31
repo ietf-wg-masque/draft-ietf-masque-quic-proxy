@@ -298,7 +298,8 @@ by a Stateless Reset token, to make it indistinguishable from a regular packet
 with a short header. In order for the proxy to correctly recognize Stateless
 Reset packets, the client SHOULD share the Stateless Reset token for each
 registered Target Connection ID. When the proxy receives a Stateless Reset packet,
-it SHOULD forward or tunnel the packet to the client.
+it SHOULD tunnel the packet to the client regardless of whether or not forwarding
+is enabled.
 
 # Connection ID Capsule Types
 
@@ -379,7 +380,7 @@ Stateless Reset Token Length
 
 Stateless Reset Token
 : The target-provided Stateless Reset token allowing the proxy to correctly
-recognize Stateless Reset packets to be forwarded or tunneled to the client.
+recognize Stateless Reset packets to be tunneled to the client.
 
 The REGISTER_CLIENT_CID and ACK_TARGET_CID capsule types include a Virtual
 Connection ID and Stateless Reset Token.
