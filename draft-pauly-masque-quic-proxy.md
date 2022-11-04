@@ -456,8 +456,7 @@ If the proxy supports QUIC-aware proxying, it will include the
 "Proxy-QUIC-Forwarding" header in successful HTTP responses. The value
 indicates whether or not the proxy supports forwarding. If the client does
 not receive this header in responses, the client SHALL assume that the proxy
-does not understand how to parse Connection ID capsules, and MUST NOT send any
-Connection ID capsules.
+does not support this extension.
 
 The client sends a REGISTER_CLIENT_CID capsule whenever it advertises a new
 Client Connection ID to the target, and a REGISTER_TARGET_CID capsule when
