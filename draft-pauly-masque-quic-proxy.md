@@ -301,6 +301,7 @@ registered Target Connection ID. When the proxy receives a Stateless Reset packe
 it can send the packet to the client as a tunnelled datagram. Although Stateless Reset packets
 look like short header packets, they are not technically short header packets and do not contain
 negotiated connection IDs, and thus are not eligible for forwarded mode.
+
 # Connection ID Capsule Types
 
 Proxy awareness of QUIC Connection IDs relies on using capsules ({{HTTP-DGRAM}})
