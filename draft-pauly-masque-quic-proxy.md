@@ -461,9 +461,16 @@ does not support this extension.
 
 The client sends a REGISTER_CLIENT_CID capsule whenever it advertises a new
 Client Connection ID to the target, and a REGISTER_TARGET_CID capsule when
-it has received a new Target Connection ID for the target. Note that the
-initial REGISTER_CLIENT_CID capsule MAY be sent prior to receiving an
-HTTP response from the proxy.
+it has received a new Target Connection ID for the target. In order to change
+the connection ID bytes on the wire, a client can update a previously advertised Virtual Client
+Connection ID by sending a new REGISTER_CLIENT_CID with the same Connection ID,
+but a different Virtual Connection ID. Similarly, the client may solicit a new
+Virtual Target Connection ID by sending a REGISTER_TARGET_CID capsule with
+a previously registered Target Connection ID. Clients are responsible for
+changing Virtual Connection IDs when the HTTP stream's network path changes to
+avoid linkability across network paths. Note that initial
+REGISTER_CLIENT_CID capsules MAY be sent prior to receiving an HTTP response
+from the proxy.
 
 ## New Proxied Connection Setup
 
@@ -675,18 +682,20 @@ to an unvalidated client address to the size of an initial congestion window.
 Proxies additionally SHOULD pace the rate at which packets are sent over a new
 path to avoid creating unintentional congestion on the new path.
 
-When operating in forwarded mode, the proxy MUST NOT send forwarded mode
-packets with the same Destination Connection ID over multiple network paths.
-
-After switching to a new network path, the proxy MUST tunnel Target to Client
-packets instead of forwarding. Only once a new Virtual Client Connection ID has
-been communicated to the proxy via a REGISTER_CLIENT_CID capsule may the proxy
-begin forwarding packets to the client. Similarly, when a client actively
-migrates, it MUST NOT send any forwarded mode packets until it has registered
-a new Virtual Target Connection ID. In both cases, reusing a connection ID would
-increase linkability of the connection between network paths. Note that the
-Client Connection ID and Target Connection ID may stay the same while the
-Virtual Target Connection ID and Virtual Client Connection ID change.
+When operating in forwarded mode, the proxy reconfigures or removes forwarding
+rules as the network path between the client and proxy changes. In the event of
+passive migration, the proxy automatically reconfigures forwarding rules to use
+the latest active and validated network path for the HTTP stream. In the event of
+active migration, the proxy removes forwarding rules in order to not send
+packets with the same connection ID bytes over multiple network paths. After
+initiating active migration, clients are no longer able to send forwarded mode
+packets since the proxy will have removed forwarding rules. Clients can proceed with
+tunnelled mode or can request new forwarding rules via REGISTER_CLIENT_CID and
+REGISTER_TARGET_CID capsules. Each of these capsules will contain new virtual
+connection IDs to prevent packets with the same connection ID bytes being used
+over multiple network paths. Note that the Client Connection ID and Target
+Connection ID can stay the same while the Virtual Target Connection ID and
+Virtual Client Connection ID change.
 
 # Example
 
