@@ -244,7 +244,7 @@ critical for any case where target-facing sockets are shared or reused.
 In order to be able to route packets correctly in both tunnelled and forwarded
 mode, proxies check for conflicts before creating a new mapping. If a conflict
 is detected, the proxy will reject the client's request, as described in
-{{response}}.
+{{proxy-behavior}}.
 
 Two sockets conflict if and only if all members of the 4-tuple (local IP
 address, local UDP port, remote IP address, and remote UDP port) are identical.
@@ -433,7 +433,7 @@ Stateless Reset Token
 : A Stateless Reset Token allowing reset of the Client<->Target connection in
 response to Client<->Target forwarded mode packets.
 
-# Client Request Behavior {#request}
+# Client Behavior {#client-behavior}
 
 A client initiates UDP proxying via a CONNECT request as defined
 in {{CONNECT-UDP}}. Within its request, it includes the "Proxy-QUIC-Forwarding"
@@ -516,7 +516,7 @@ ACK_CLIENT_CID capsule is received that contains the echoed connection ID.
 ## Sending With Forwarded Mode
 
 Support for forwarded mode is determined by the "Proxy-QUIC-Forwarding" header,
-see {{response}}.
+see {{proxy-behavior}}.
 
 Once the client has learned the target server's Connection ID, such as in the
 response to a QUIC Initial packet, it can send a REGISTER_TARGET_CID capsule
@@ -570,7 +570,7 @@ of the received packet to determine if the packet was originated by the proxy,
 or merely forwarded from the target. The client replaces the Virtual Client
 Connection ID with the real Client Connection ID before processing the packet further.
 
-# Proxy Response Behavior {#response}
+# Proxy Behavior {#proxy-behavior}
 
 Upon receipt of a CONNECT request that includes the "Proxy-QUIC-Forwarding"
 header, the proxy indicates to the client that it supports QUIC-aware proxying
