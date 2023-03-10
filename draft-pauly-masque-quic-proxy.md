@@ -697,6 +697,22 @@ over multiple network paths. Note that the Client Connection ID and Target
 Connection ID can stay the same while the Virtual Target Connection ID and
 Virtual Client Connection ID change.
 
+## Handling ECN Marking
+
+Explicit Congestion Notification marking {{!ECN=RFC3168}} uses two bits in the IP
+header to signal congestion from a network to endpoints. When using forwarded mode,
+the proxy replaces IP headers for packets exchanged between the client and target;
+these headers can include ECN markings. Proxies SHOULD preserve ECN markings on
+forwarded packets in both directions, to allow ECN to function end-to-end. If the proxy does not
+preserve ECN markings, it MUST set ECN marks to zero on the IP headers it genrates.
+
+Forwarded mode does not create an IP-in-IP tunnel, so the guidance in
+{{?ECN-TUNNEL=RFC6040}} about transferring ECN markings between inner and outer IP
+headers does not apply.
+
+A proxy MAY additionally add ECN markings to signal congestion being experienced
+on the proxy itself.
+
 # Example
 
 Consider a client that is establishing a new QUIC connection through the proxy.
