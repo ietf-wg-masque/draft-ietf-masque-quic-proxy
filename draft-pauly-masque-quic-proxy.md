@@ -701,7 +701,7 @@ Virtual Client Connection ID change.
 
 Explicit Congestion Notification marking {{!ECN=RFC3168}} uses two bits in the IP
 header to signal congestion from a network to endpoints. When using forwarded mode,
-the proxy rewrites IP headers for packets exchanged between the client and target;
+the proxy replaces IP headers for packets exchanged between the client and target;
 these headers can include ECN markings. Proxies SHOULD preserve ECN markings on
 forwarded packets in both directions, to allow ECN to function end-to-end. If the proxy does not
 preserve ECN markings, it MUST set ECN marks to zero on the IP headers it genrates.
