@@ -703,7 +703,8 @@ Explicit Congestion Notification marking {{!ECN=RFC3168}} uses two bits in the I
 header to signal congestion from a network to endpoints. When using forwarded mode,
 the proxy rewrites IP headers for packets exchanged between the client and target;
 these headers can include ECN markings. Proxies SHOULD preserve ECN markings on
-forwarded packets in both directions, to allow ECN to function end-to-end.
+forwarded packets in both directions, to allow ECN to function end-to-end. If the proxy does not
+preserve ECN markings, it MUST set ECN marks to zero on the IP headers it genrates.
 
 Forwarded mode does not create an IP-in-IP tunnel, so the guidance in
 {{?ECN-TUNNEL=RFC6040}} about transferring ECN markings between inner and outer IP
