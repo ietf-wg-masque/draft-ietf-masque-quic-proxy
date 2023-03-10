@@ -570,6 +570,18 @@ of the received packet to determine if the packet was originated by the proxy,
 or merely forwarded from the target. The client replaces the Virtual Client
 Connection ID with the real Client Connection ID before processing the packet further.
 
+## Connection Maintenance in Forwarded Mode
+
+When a client and proxy are using forwarded mode, it is possible that there can be
+long periods of time in which no ack-eliciting packets (see {{Section 2 of !QUIC-RETRANSMISSION=RFC9002}}) are exchanged
+between the client and proxy. If these periods extend beyond the effective idle
+timeout for the client-to-proxy QUIC connection (see {{Section 10.1 of QUIC}}),
+the QUIC connection might be closed by the proxy if the proxy does not use
+forwarded packets as an explicit liveness signal. To avoid this, clients SHOULD
+send keepalive packets to the proxy before the idle timeouts would be reached,
+which can be done using a PING frame or another ack-eliciting frame as described
+in {{Section 10.1.1 of QUIC}}.
+
 # Proxy Behavior {#proxy-behavior}
 
 Upon receipt of a CONNECT request that includes the "Proxy-QUIC-Forwarding"
