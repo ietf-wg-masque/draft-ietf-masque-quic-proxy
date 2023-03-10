@@ -22,6 +22,15 @@ author:
     email: tpauly@apple.com
 
  -
+    ins: E. Rosenberg
+    name: Eric Rosenberg
+    org: Apple Inc.
+    street: One Apple Park Way
+    city: Cupertino, California 95014
+    country: United States of America
+    email: eric_rosenberg@apple.com
+
+ -
     ins: "D. Schinazi"
     name: "David Schinazi"
     organization: "Google LLC"
