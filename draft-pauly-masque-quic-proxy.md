@@ -785,8 +785,8 @@ DATAGRAM                        -------->
 
 /* Forwarded mode packets possible in Target -> Client direction  */
 
-           <--------  UDP DATAGRAM
-                        Payload = QUIC SH packet
+           <--------  UDP Datagram
+                        Payload = Forwarded QUIC SH packet
 
 /* All Client -> Target QUIC packets must still be encapsulated  */
 
