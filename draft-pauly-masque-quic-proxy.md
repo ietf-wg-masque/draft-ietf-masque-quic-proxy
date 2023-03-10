@@ -574,8 +574,8 @@ Connection ID with the real Client Connection ID before processing the packet fu
 
 When a client and proxy are using forwarded mode, it is possible that there can be
 long periods of time in which no ack-eliciting packets (see {{Section 2 of !QUIC-RETRANSMISSION=RFC9002}}) are exchanged
-between the client and proxy. If these periods extend beyond the max_idle_timeout
-values for the client-to-proxy QUIC connection (see {{Section 10.1 of QUIC}}),
+between the client and proxy. If these periods extend beyond the effective idle
+timeout for the client-to-proxy QUIC connection (see {{Section 10.1 of QUIC}}),
 the QUIC connection might be closed by the proxy if the proxy does not use
 forwarded packets as an explicit liveness signal. To avoid this, clients SHOULD
 send keepalive packets to the proxy before the idle timeouts would be reached,
