@@ -783,17 +783,17 @@ DATAGRAM                        -------->
                         Context ID = 0
                         Payload = Encapsulated QUIC initial
 
-/* Forwarded mode packets possible in Target -> Client direction  */
-
-           <--------  UDP Datagram
-                        Payload = Forwarded QUIC SH packet
-
 /* All Client -> Target QUIC packets must still be encapsulated  */
 
 DATAGRAM                        -------->
   Quarter Stream ID = 11
   Context ID = 0
   Payload = Encapsulated QUIC packet
+
+/* Forwarded mode packets possible in Target -> Client direction  */
+
+           <--------  UDP Datagram
+                        Payload = Forwarded QUIC SH packet
 
 ~~~
 
