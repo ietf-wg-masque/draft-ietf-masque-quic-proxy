@@ -579,7 +579,8 @@ values for the client-to-proxy QUIC connection (see {{Section 10.1 of QUIC}}),
 the QUIC connection might be closed by the proxy if the proxy does not use
 forwarded packets as an explicit liveness signal. To avoid this, clients SHOULD
 send keepalive packets to the proxy before the idle timeouts would be reached,
-which can be done using PING frames.
+which can be done using a PING frame or another ack-eliciting frame as described
+in {{Section 10.1.1 of QUIC}}.
 
 # Proxy Behavior {#proxy-behavior}
 
