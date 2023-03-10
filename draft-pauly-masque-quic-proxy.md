@@ -782,6 +782,19 @@ DATAGRAM                        -------->
                         Quarter Stream ID = 11
                         Context ID = 0
                         Payload = Encapsulated QUIC initial
+
+/* All Client -> Target QUIC packets must still be encapsulated  */
+
+DATAGRAM                        -------->
+  Quarter Stream ID = 11
+  Context ID = 0
+  Payload = Encapsulated QUIC packet
+
+/* Forwarded mode packets possible in Target -> Client direction  */
+
+           <--------  UDP Datagram
+                        Payload = Forwarded QUIC SH packet
+
 ~~~
 
 Immediately after sending the REGISTER_CLIENT_CID capsule, the client may
@@ -806,6 +819,12 @@ STREAM(44): DATA                -------->
                         Connection ID = 0x61626364
                         Virtual Target Connection ID = 0x123412341234
                         Stateless Reset Token = Token
+
+/* Client -> Target QUIC short header packets may use forwarding mode */
+
+UDP Datagram                     -------->
+  Payload = Forwarded QUIC SH packet
+
 ~~~
 
 Upon receiving an ACK_TARGET_CID capsule, the client starts sending Short Header
