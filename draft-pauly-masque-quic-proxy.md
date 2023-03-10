@@ -822,8 +822,8 @@ STREAM(44): DATA                -------->
 
 /* Client -> Target QUIC short header packets may use forwarding mode */
 
-UDP DATAGRAM                        -------->
-  Payload = QUIC SH packet
+UDP Datagram                     -------->
+  Payload = Forwarded QUIC SH packet
 
 ~~~
 
