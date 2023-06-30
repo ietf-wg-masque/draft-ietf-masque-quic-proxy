@@ -51,7 +51,7 @@ HTTP/3 proxy rather than being re-encapsulated and re-encrypted.
 
 # Introduction {#introduction}
 
-UDP Proxying over HTTP {{!CONNECT-UDP=I-D.ietf-masque-connect-udp}}
+UDP Proxying over HTTP {{!CONNECT-UDP=RFC9298}}
 defines a way to send datagrams through an HTTP proxy, where UDP is used to communicate
 between the proxy and a target server. This can be used to proxy QUIC
 connections {{!QUIC=RFC9000}}, since QUIC runs over UDP datagrams.
@@ -106,7 +106,7 @@ Both clients and proxies can unilaterally choose to disable forwarded mode for
 any client <-> target connection.
 
 The forwarded mode of this extension is only defined for HTTP/3
-{{!HTTP3=I-D.ietf-quic-http}} and not any earlier versions of HTTP.
+{{!HTTP3=RFC9114}} and not any earlier versions of HTTP.
 
 QUIC proxies only need to understand the Header Form bit, and the connection ID
 fields from packets in client <-> target QUIC connections. Since these fields
@@ -184,7 +184,7 @@ this way allows the proxy to reuse target-facing sockets for multiple
 connections and support the forwarded mode of proxying.
 
 QUIC packets can be either tunnelled within an HTTP proxy connection using
-HTTP Datagram frames {{!HTTP-DGRAM=I-D.ietf-masque-h3-datagram}}, or be forwarded
+HTTP Datagram frames {{!HTTP-DGRAM=RFC9297}}, or be forwarded
 directly alongside an HTTP/3 proxy connection on the same set of IP addresses and UDP
 ports. The use of forwarded mode requires the consent of both the client and the
 proxy.
