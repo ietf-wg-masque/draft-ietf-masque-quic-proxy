@@ -2,9 +2,9 @@
 
 This is the working area for the individual Internet-Draft, "QUIC-Aware Proxying Using CONNECT-UDP".
 
-* [Editor's Copy](https://tfpauly.github.io/quic-proxy/#go.draft-pauly-masque-quic-proxy.html)
-* [Individual Draft](https://tools.ietf.org/html/draft-pauly-masque-quic-proxy)
-* [Compare Editor's Copy to Individual Draft](https://tfpauly.github.io/quic-proxy/#go.draft-pauly-masque-quic-proxy.diff)
+* [Editor's Copy](https://ietf-wg-masque.github.io/draft-ietf-masque-quic-proxy/#go.draft-ietf-masque-quic-proxy.html)
+* [Individual Draft](https://tools.ietf.org/html/draft-ietf-masque-quic-proxy)
+* [Compare Editor's Copy to Individual Draft](https://ietf-wg-masque.github.io/draft-ietf-masque-quic-proxy/#go.draft-ietf-masque-quic-proxy.diff)
 
 ## Building the Draft
 
@@ -21,4 +21,4 @@ This requires that you have the necessary software installed.  See
 ## Contributing
 
 See the
-[guidelines for contributions](https://github.com/tfpauly/quic-proxy/blob/main/CONTRIBUTING.md).
+[guidelines for contributions](https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/blob/main/CONTRIBUTING.md).
