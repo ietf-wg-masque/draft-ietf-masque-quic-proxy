@@ -1,7 +1,7 @@
 ---
 title: QUIC-Aware Proxying Using HTTP
 abbrev: QUIC Proxy
-docname: draft-pauly-masque-quic-proxy-latest
+docname: draft-ietf-masque-quic-proxy-latest
 category: exp
 wg: MASQUE
 
