@@ -607,7 +607,11 @@ If it supports QUIC packet forwarding, it sets the value to "?1"; otherwise,
 it sets it to "?0".
 
 The proxy MUST include a "transform" parameter whose value is an `sf-string`
-indicating the selected transform.
+indicating the selected transform. If the proxy does not recognize or accept
+any of the transforms offered by the client, it MUST omit this parameter. When
+the "transform" parameter is omitted, forwarding mode is not enabled but
+Connection IDs can still be registered to support sharing of proxy-origin
+5-tuples.
 
 Upon receipt of a REGISTER_CLIENT_CID or REGISTER_TARGET_CID capsule,
 the proxy validates the registration, tries to establish the appropriate
@@ -769,8 +773,6 @@ Packet transforms are identified by an IANA-registered name, and negotiated in
 the HTTP headers (see {{client-behavior}}).  This document defines two initial
 transforms: "null" and "scramble".
 
-> QUESTION: Should one or both of these be Mandatory To Implement?
-
 ## "null"
 
 The "null" transform does not modify the packet in any way.  When this transform
@@ -832,10 +834,13 @@ The inverse transform operates as follows:
 The encryption keys used in this procedure do not depend on the packet contents,
 so each party only needs to perform AES initialization once for each connection.
 
-NOTE: The security of this arrangement relies on the QUIC payload containing a
-16-byte `sample` that is pseudorandom.  This is guaranteed in QUICv1, but future
-versions of QUIC could in principle produce packets that cannot safely be
-processed by the "scramble" transform.
+NOTE: The security of this arrangement relies on every short-header QUIC packet
+containing a distinct 16 bytes following the Connection ID.  This is true
+for the original ciphersuites of QUICv1, but it is not guaranteed by the QUIC
+Invariants. Future ciphersuites and QUIC versions could in principle produce
+packets that are too short or repeat the values at this location. When using the
+"scramble" transform, clients MUST NOT offer any configuration that could
+cause the client or origin to violate this requirement.
 
 # Example
 
