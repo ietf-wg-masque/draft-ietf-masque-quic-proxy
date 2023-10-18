@@ -97,9 +97,10 @@ proxied packets the target receives.
 target are not able to learn more about the client <-> target communication than
 if no proxy was used.
 
-Forwarded mode does not prevent correlation of client <->
-proxy and proxy <-> target packets by an entity that can observe both
-links. See {{security}} for further discussion.
+Forwarded mode does not prevent correlation of client <-> proxy and proxy <->
+target packets by an entity that can observe both links. The precise risks
+depend on the negotiated transform ({{packet-transforms}}). See {{security}} for
+further discussion.
 
 Both clients and proxies can unilaterally choose to disable forwarded mode for
 any client <-> target connection.
@@ -781,34 +782,55 @@ Use of this transform is NOT RECOMMENDED if "scramble" can be deployed.
 
 ## "scramble"
 
-The "scramble" transform implements length-preserving unauthenticated encryption
-of QUIC packets while preserving the QUIC invariants.  When "scramble" is in use,
-a global passive adversary cannot select any small set of packets that
-conclusively links the client and target.  However, "scramble" does not defend
-against statistical analysis of large numbers of packets, nor does it protect
-privacy against an active attacker.
+The "scramble" transform implements length-preserving unauthenticated
+re-encryption of QUIC packets while preserving the QUIC invariants.  When
+"scramble" is in use, a global passive adversary cannot use the packet contents
+to link the client and target.  However, "scramble" does not defend against
+analysis of packet sizes and timing, nor does it protect privacy against an
+active attacker.
 
 The "scramble" transform is initialized using a 32-byte random symmetric key.
-When offering or selecting this transform, each party MUST select the key that
-they will use to encrypt scrambled packets and add it to the
-Proxy-QUIC-Transform header in a parameter named "scramble-key" whose value is
-`sf-binary`.
+When offering or selecting this transform, the client and server MUST each
+generate the key that they will use to encrypt scrambled packets and add it to the
+Proxy-QUIC-Transform header in an `sf-binary` parameter named "scramble-key".
 
-The forward transform operates as follows:
+This transform relies on the AES-128 block cipher, which is represented by the
+syntax `AES-ECB(key, plaintext_block)` as in {{?RFC9001}}.  The corresponding
+decryption operation is written here as `AES-ECB-inv(key, ciphertext_block)`.
+In brief, the transform applies AES in counter mode (AES-CTR) using an
+initialization vector drawn from the packet, then encrypts the initialization
+vector with AES-ECB. The detailed procedure is as follows:
 
 1. Let `k1, k2 = scramble_key[:16], scramble_key[16:32]`.
-1. Instantiate an AES-CTR stream cipher `S` with key `k1`, using a 128-bit counter.
-    * We represent `S` here as a stateful encryption function.
-1. Instantiate an AES-ECB block cipher `B` with key `k2`.
 1. Let `L` be the Connection ID length.
-1. Let `sample = packet[L+1:L+17]`, i.e., the 16 bytes following the
-   Connection ID.
-1. Set the stream cipher counter to the sample in network byte order:
-   `S.counter = sample`.
-1. Encrypt the first byte: `packet[:1] = S(packet[:1])`.
-1. Restore the Header Form bit: `packet[0] &= 0x7F`.
-1. Encrypt the packet contents after `sample`: `packet[L+17:] = S(packet[L+17:])`.
-1. Encrypt `sample` using a block cipher: `packet[L+1:L+17] = B(sample)`.
+1. Let `counter = copy(packet[L+1:L+17])`, i.e., the 16 bytes following the
+   Connection ID.  This is the AES-CTR initialization vector and counter.
+1. Let `aesctr0 = AES-ECB(k1, counter)`.  (`len(aesctr0) == 16`.)
+1. Encrypt the lower 7 bits of the first byte:\\
+   `packet[0] ^= aesctr0[0] & 0x7F`.
+    * Here "`^`" represents bitwise XOR and "`&`" represents bitwise AND.
+1. Encrypt up to 15 bytes following the sample:\\
+   `packet[L+17:L+32] ^= aesctr0[1:]`.
+1. Encrypt the remainder of the packet (if any) using AES-CTR:
+    1. Let `i = L + 32`.
+    1. `while i < len(packet)`
+      1. Set `counter = increment(counter)`, where `increment()` represents
+         incrementing a 128-bit integer (e.g., uint128) in network byte order.
+      1. Encrypt the next chunk of the packet:\\
+         `packet[i:i+16] ^= AES-ECB(k1, counter)`.
+      1. Set `i = i + 16`.
+1. Encrypt the sample used to initialize `counter` using the block cipher:\\
+   `packet[L+1:L+17] = AES-ECB(k2, packet[L+1:L+17])`.
+
+The inverse transform operates as follows:
+
+1. Decrypt the 16 bytes after the Connection ID:\\
+   `packet[L+1:L+17] = AES-ECB-inv(k2, packet[L+1:L+17])`.
+1. Process the remainder of the packet exactly as in the forward transform.
+   (AES-CTR encryption and decryption are identical.)
+
+The encryption keys used in this procedure do not depend on the packet contents,
+so each party only needs to perform AES initialization once for each connection.
 
 NOTE: The security of this arrangement relies on the QUIC payload containing a
 16-byte `sample` that is pseudorandom.  This is guaranteed in QUICv1, but future
@@ -818,6 +840,7 @@ processed by the "scramble" transform.
 # Example
 
 Consider a client that is establishing a new QUIC connection through the proxy.
+In this example, the client prefers the "scramble" transform, but also offers "null".
 It has selected a Client Connection ID of 0x31323334. In order to inform a proxy
 of the new QUIC Client Connection ID, the client also sends a
 REGISTER_CLIENT_CID capsule.
@@ -834,7 +857,8 @@ STREAM(44): HEADERS             -------->
   :scheme = https
   :path = /target.example.com/443/
   :authority = proxy.example.org
-  proxy-quic-forwarding = ?1
+  proxy-quic-forwarding = ?1; accept-transform=scramble,null \
+      scramble-key=":abc...789=:"
   capsule-protocol = ?1
 
 STREAM(44): DATA                -------->
@@ -850,7 +874,8 @@ DATAGRAM                        -------->
 
            <--------  STREAM(44): HEADERS
                         :status = 200
-                        proxy-quic-forwarding = ?1
+                        proxy-quic-forwarding = ?1; transform=scramble \
+                            scramble-key=":ABC...321=:"
                         capsule-protocol = ?1
 
            <--------  STREAM(44): DATA
@@ -883,7 +908,11 @@ receive forwarded mode packets from the proxy with a Virtual Client
 Connection ID of 0x62646668 which it will replace with the real Client
 Connection ID of 0x31323334. All forwarded mode packets sent by the proxy
 will have been modified to contain the Virtual Client Connection ID instead
-of the Client Connection ID.
+of the Client Connection ID, and processed by the negotiated "scramble"
+packet transform. However, in the unlikely event that a forwarded packet
+arrives before the proxy's HTTP response, the client will not know which
+transform the proxy selected. In this case, the client will have to ignore
+the packet or buffer it until the HTTP response is received.
 
 Once the client learns which Connection ID has been selected by the target
 server, it can send a new request to the proxy to establish a mapping for
