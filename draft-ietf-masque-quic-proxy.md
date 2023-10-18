@@ -832,10 +832,11 @@ The inverse transform operates as follows:
 The encryption keys used in this procedure do not depend on the packet contents,
 so each party only needs to perform AES initialization once for each connection.
 
-NOTE: The security of this arrangement relies on the QUIC payload containing a
-16-byte `sample` that is pseudorandom.  This is guaranteed in QUICv1, but future
-versions of QUIC could in principle produce packets that cannot safely be
-processed by the "scramble" transform.
+NOTE: The security of this arrangement relies on the 16 bytes following the
+Connection ID (i.e., the `sample`) being pseudorandom.  This is guaranteed
+in QUICv1, but future versions of QUIC might not maintain this arrangement.
+The "scramble" transform MUST NOT be used with any QUIC version that
+does not guarantee this property.
 
 # Example
 
