@@ -608,10 +608,8 @@ it sets it to "?0".
 
 The proxy MUST include a "transform" parameter whose value is an `sf-string`
 indicating the selected transform. If the proxy does not recognize or accept
-any of the transforms offered by the client, it MUST omit this parameter. When
-the "transform" parameter is omitted, forwarding mode is not enabled but
-Connection IDs can still be registered to support sharing of proxy-origin
-5-tuples.
+any of the transforms offered by the client, it MUST omit this parameter and
+set the header field value to "?0", or omit the header entirely.
 
 Upon receipt of a REGISTER_CLIENT_CID or REGISTER_TARGET_CID capsule,
 the proxy validates the registration, tries to establish the appropriate
