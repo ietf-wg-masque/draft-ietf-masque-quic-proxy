@@ -762,7 +762,7 @@ Inputs:
 Output:
 
 * A UDP payload that conforms to the QUIC invariants {{?RFC8999}} and does not
-   modify the Connection ID.
+  modify the Connection ID.
 
 More complex transform behaviors could have internal state, but no such transforms
 are presented here.
@@ -813,12 +813,12 @@ vector with AES-ECB. The detailed procedure is as follows:
    `packet[L+17:L+32] ^= aesctr0[1:]`.
 1. Encrypt the remainder of the packet (if any) using AES-CTR:
     1. Let `i = L + 32`.
-    1. `while i < len(packet)`
-      1. Set `counter = increment(counter)`, where `increment()` represents
-         incrementing a 128-bit integer (e.g., uint128) in network byte order.
-      1. Encrypt the next chunk of the packet:\\
-         `packet[i:i+16] ^= AES-ECB(k1, counter)`.
-      1. Set `i = i + 16`.
+    1. `while i < len(packet)`:
+        1. Set `counter = increment(counter)`, where `increment()` represents
+           incrementing a 128-bit integer (e.g., uint128) in network byte order.
+        1. Encrypt the next chunk of the packet:\\
+           `packet[i:i+16] ^= AES-ECB(k1, counter)`.
+        1. Set `i = i + 16`.
 1. Encrypt the sample used to initialize `counter` using the block cipher:\\
    `packet[L+1:L+17] = AES-ECB(k2, packet[L+1:L+17])`.
 
@@ -838,7 +838,7 @@ for the original ciphersuites of QUICv1, but it is not guaranteed by the QUIC
 Invariants. Future ciphersuites and QUIC versions could in principle produce
 packets that are too short or repeat the values at this location. When using the
 "scramble" transform, clients MUST NOT offer any configuration that could
-cause the client or origin to violate this requirement.
+cause the client or target to violate this requirement.
 
 # Example
 
@@ -1010,7 +1010,7 @@ Header Field Names" <[](https://www.iana.org/assignments/message-headers)>.
 {: #iana-header-type-table title="Registered HTTP Header"}
 
 > TODO: Create a registry for the parameter names ("accept-transform", "transform",
-> "scramble-key").
+> "scramble-key"), and possibly also the transform names ("scramble", "null").
 
 ## Capsule Types {#iana-capsule-types}
 
