@@ -862,7 +862,7 @@ STREAM(44): HEADERS             -------->
   :scheme = https
   :path = /target.example.com/443/
   :authority = proxy.example.org
-  proxy-quic-forwarding = ?1; accept-transform=scramble,null \
+  proxy-quic-forwarding = ?1; accept-transform=scramble,null; \
       scramble-key=":abc...789=:"
   capsule-protocol = ?1
 
@@ -879,7 +879,8 @@ DATAGRAM                        -------->
 
            <--------  STREAM(44): HEADERS
                         :status = 200
-                        proxy-quic-forwarding = ?1; transform=scramble \
+                        proxy-quic-forwarding = ?1; \
+                            transform=scramble; \
                             scramble-key=":ABC...321=:"
                         capsule-protocol = ?1
 
