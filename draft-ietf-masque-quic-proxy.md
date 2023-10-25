@@ -861,7 +861,7 @@ STREAM(44): HEADERS             -------->
   :path = /target.example.com/443/
   :authority = proxy.example.org
   proxy-quic-forwarding = ?1; accept-transform=scramble,null; \
-      scramble-key=":abc...789=:"
+      scramble-key=:abc...789=:
   capsule-protocol = ?1
 
 STREAM(44): DATA                -------->
@@ -879,7 +879,7 @@ DATAGRAM                        -------->
                         :status = 200
                         proxy-quic-forwarding = ?1; \
                             transform=scramble; \
-                            scramble-key=":ABC...321=:"
+                            scramble-key=:ABC...321=:
                         capsule-protocol = ?1
 
            <--------  STREAM(44): DATA
