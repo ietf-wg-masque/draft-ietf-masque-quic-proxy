@@ -39,6 +39,16 @@ author:
     country: "United States of America"
     email: dschinazi.ietf@gmail.com
 
+normative:
+    SP800-38A:
+        author:
+            name: Morris Dworkin
+        org: National Institute of Standards and Technology
+        title: >
+            Recommendation for Block Cipher Modes of Operation: Methods and Techniques
+        date: 2001-12-01
+        target: https://nvlpubs.nist.gov/nistpubs/legacy/sp/nistspecialpublication800-38a.pdf
+
 --- abstract
 
 This document defines an extension to UDP Proxying over HTTP
@@ -797,37 +807,36 @@ Proxy-QUIC-Transform header in an `sf-binary` parameter named "scramble-key".
 This transform relies on the AES-128 block cipher, which is represented by the
 syntax `AES-ECB(key, plaintext_block)` as in {{?RFC9001}}.  The corresponding
 decryption operation is written here as `AES-ECB-inv(key, ciphertext_block)`.
+It also uses AES in Counter Mode ({{SP800-38A}}, Section 6.5), which is
+represented by the syntax `AES-CTR(key, iv, input)` for encryption and
+decryption (which are identical).  In this syntax, `iv` is an array of 16 bytes
+containing the initial counter block.  The counter is incremented by the
+standard incrementing function ({{SP800-38A}}, Appendix B.1) on the full block
+width.
+
 In brief, the transform applies AES in counter mode (AES-CTR) using an
 initialization vector drawn from the packet, then encrypts the initialization
 vector with AES-ECB. The detailed procedure is as follows:
 
 1. Let `k1, k2 = scramble_key[:16], scramble_key[16:32]`.
 1. Let `L` be the Connection ID length.
-1. Let `counter = copy(packet[L+1:L+17])`, i.e., the 16 bytes following the
-   Connection ID.  This is the AES-CTR initialization vector and counter.
-1. Let `aesctr0 = AES-ECB(k1, counter)`.  (`len(aesctr0) == 16`.)
-1. Encrypt the lower 7 bits of the first byte:\\
-   `packet[0] ^= aesctr0[0] & 0x7F`.
-    * Here "`^`" represents bitwise XOR and "`&`" represents bitwise AND.
-1. Encrypt up to 15 bytes following the sample:\\
-   `packet[L+17:L+32] ^= aesctr0[1:]`.
-1. Encrypt the remainder of the packet (if any) using AES-CTR:
-    1. Let `i = L + 32`.
-    1. `while i < len(packet)`:
-        1. Set `counter = increment(counter)`, where `increment()` represents
-           incrementing a 128-bit integer (e.g., uint128) in network byte order.
-        1. Encrypt the next chunk of the packet:\\
-           `packet[i:i+16] ^= AES-ECB(k1, counter)`.
-        1. Set `i = i + 16`.
-1. Encrypt the sample used to initialize `counter` using the block cipher:\\
-   `packet[L+1:L+17] = AES-ECB(k2, packet[L+1:L+17])`.
+1. Let `cid = packet[1:L+1]`, i.e., the Connection ID.
+1. Let `iv = packet[L+1:L+17]`, i.e., the 16 bytes following the Connection ID.
+1. Let `ctr_input = packet[0] | packet[L+17:]`.
+1. Let `ctr_output = AES-CTR(k1, iv, ctr_input)`.
+1. Let `header = ctr_output[0] & 0x7F`.  This ensures that the "QUIC bit" is
+   always zero.
+1. Encrypt `iv` with the block cipher: `encrypted_iv = AES-ECB(k2, iv)`.
+1. Produce the output packet as:\\
+   `header | cid | encrypted_iv | ctr_output[1:]`.
 
 The inverse transform operates as follows:
 
-1. Decrypt the 16 bytes after the Connection ID:\\
-   `packet[L+1:L+17] = AES-ECB-inv(k2, packet[L+1:L+17])`.
-1. Process the remainder of the packet exactly as in the forward transform.
+1. Decrypt the AES-CTR initialization vector:\\
+   `iv = AES-ECB-inv(k2, packet[L+1:L+17])`.
+1. Compute the other variables exactly as in the forward transform.
    (AES-CTR encryption and decryption are identical.)
+1. Produce the output: `header | cid | iv | ctr_output[1:]`.
 
 The encryption keys used in this procedure do not depend on the packet contents,
 so each party only needs to perform AES initialization once for each connection.
