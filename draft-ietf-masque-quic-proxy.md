@@ -734,6 +734,21 @@ headers does not apply.
 A proxy MAY additionally add ECN markings to signal congestion being experienced
 on the proxy itself.
 
+## QUIC Version Independence
+
+When forwarding mode is enabled, the client and target MAY negotiate any QUIC
+version, and MAY send packets of that version through the forwarding path.
+The proxy does not know what version they are using, so it can only require that
+these packets conform to the QUIC invariants for short-header packets
+({{?RFC8999}}, Section 5.2).
+
+QUIC version 1 specifies a Fixed Bit (a.k.a. the "QUIC bit") with a fixed value
+to support sharing a 5-tuple with other protocols such as DTLS, but the QUIC
+invariants do not guarantee the value of this bit.  Accordingly proxies with
+forwarding mode enabled MUST NOT rely on this bit for protocol identification,
+and SHOULD send and accept the `grease_quic_bit` transport parameter
+{{?GREASE-QUIC-BIT=RFC9297}} to avoid ossification of the forwarding mode path.
+
 # Example
 
 Consider a client that is establishing a new QUIC connection through the proxy.
