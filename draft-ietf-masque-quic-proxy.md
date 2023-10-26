@@ -824,8 +824,8 @@ vector with AES-ECB. The detailed procedure is as follows:
 1. Let `iv = packet[L+1:L+17]`, i.e., the 16 bytes following the Connection ID.
 1. Let `ctr_input = packet[0] | packet[L+17:]`.
 1. Let `ctr_output = AES-CTR(k1, iv, ctr_input)`.
-1. Let `header = ctr_output[0] & 0x7F`.  This ensures that the "QUIC bit" is
-   always zero.
+1. Let `header = ctr_output[0] & 0x7F`.  This ensures that the Header Form bit
+   is zero, as required by the QUIC invariants ({{?RFC8999}}, Section 5.2).
 1. Encrypt `iv` with the block cipher: `encrypted_iv = AES-ECB(k2, iv)`.
 1. Produce the output packet as:\\
    `header | cid | encrypted_iv | ctr_output[1:]`.
