@@ -881,8 +881,8 @@ or decreasing the reputation of a given proxy.
 
 ## HTTP Header {#iana-header}
 
-This document registers the "Proxy-QUIC-Forwarding" header in the "Permanent Message
-Header Field Names" <[](https://www.iana.org/assignments/message-headers)>.
+This document registers the "Proxy-QUIC-Forwarding" header in the "Hypertext Transfer
+Protocol (HTTP) Field Name Registry" <[](https://www.iana.org/assignments/http-fields)>.
 
 ~~~
     +-----------------------+----------+--------+---------------+
