@@ -464,11 +464,7 @@ If this header is not included, the client MUST NOT send any connection ID
 capsules.
 
 The "Proxy-QUIC-Forwarding" is an Item Structured Header {{!RFC8941}}. Its
-value MUST be a Boolean. Its ABNF is:
-
-~~~
-    Proxy-QUIC-Forwarding = sf-boolean parameters
-~~~
+value MUST be a Boolean.
 
 If the client wants to enable QUIC packet forwarding for this request, it sets
 the value to "?1". If it doesn't want to enable forwarding, but instead only
