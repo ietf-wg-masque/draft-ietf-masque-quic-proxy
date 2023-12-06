@@ -6,6 +6,8 @@ This is the working area for the individual Internet-Draft, "QUIC-Aware Proxying
 * [Individual Draft](https://tools.ietf.org/html/draft-ietf-masque-quic-proxy)
 * [Compare Editor's Copy to Individual Draft](https://ietf-wg-masque.github.io/draft-ietf-masque-quic-proxy/#go.draft-ietf-masque-quic-proxy.diff)
 
+* [Design Team WIP](https://ietf-wg-masque.github.io/draft-ietf-masque-quic-proxy/design-team/draft-ietf-masque-quic-proxy.html)
+
 ## Building the Draft
 
 Formatted text and HTML versions of the draft can be built using `make`.
