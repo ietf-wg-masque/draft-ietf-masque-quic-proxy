@@ -39,6 +39,16 @@ author:
     country: "United States of America"
     email: dschinazi.ietf@gmail.com
 
+normative:
+    SP800-38A:
+        author:
+            name: Morris Dworkin
+        org: National Institute of Standards and Technology
+        title: >
+            Recommendation for Block Cipher Modes of Operation: Methods and Techniques
+        date: 2001-12-01
+        target: https://nvlpubs.nist.gov/nistpubs/legacy/sp/nistspecialpublication800-38a.pdf
+
 --- abstract
 
 This document defines an extension to UDP Proxying over HTTP
@@ -77,12 +87,11 @@ client <-> proxy QUIC packets. These packets use multiple layers of encryption
 and congestion control. QUIC long header packets MUST use this mode. QUIC short
 header packets MAY use this mode. This is the default mode for UDP proxying.
 
-2. Forwarded, in which client <-> target QUIC packets are sent directly over the
-client <-> proxy UDP socket. These packets are only encrypted using the
-client-target keys, and use the client-target congestion control. This mode MUST
-only be used for QUIC short header packets.
+2. Forwarded, in which client <-> target QUIC packets are sent separately over the
+client <-> proxy UDP socket, using a special-purpose transform instead of full
+QUIC encapsulation. This mode MUST only be used for QUIC short header packets.
 
-Forwarded mode is defined as an optimization to reduce CPU processing on clients and
+Forwarded mode is defined as an optimization to reduce CPU and memory cost to clients and
 proxies, as well as avoiding MTU overhead for packets on the wire. This makes it
 suitable for deployment situations that otherwise relied on cleartext TCP
 proxies, which cannot support QUIC and have inferior security and privacy
@@ -98,9 +107,10 @@ proxied packets the target receives.
 target are not able to learn more about the client <-> target communication than
 if no proxy was used.
 
-It is not a goal of forwarded mode to prevent correlation between client <->
-proxy and the proxy <-> target packets from an entity that can observe both
-links. See {{security}} for further discussion.
+Forwarded mode does not prevent correlation of client <-> proxy and proxy <->
+target packets by an entity that can observe both links. The precise risks
+depend on the negotiated transform ({{packet-transforms}}). See {{security}} for
+further discussion.
 
 Both clients and proxies can unilaterally choose to disable forwarded mode for
 any client <-> target connection.
@@ -146,6 +156,8 @@ the target.
 client that the proxy MUST use when sending QUIC packets in forwarded mode.
 - Virtual Target Connection ID: a fake QUIC Connection ID that is chosen by the
 proxy that the client MUST use when sending QUIC packets in forwarded mode.
+- Packet Transform: the procedure used to modify packets before they enter the
+client-proxy link.
 
 ## Virtual Connection IDs
 
@@ -203,6 +215,7 @@ Each client <-> proxy HTTP stream MUST be mapped to a single target-facing socke
 
 Multiple streams can map to the same target-facing socket, but a
 single stream cannot be mapped to multiple target-facing sockets.
+Each stream MUST also be associated with a single Packet Transform.
 
 This mapping guarantees that any HTTP Datagram using a stream sent
 from the client to the proxy in tunnelled mode can be sent to the correct
@@ -451,16 +464,16 @@ If this header is not included, the client MUST NOT send any connection ID
 capsules.
 
 The "Proxy-QUIC-Forwarding" is an Item Structured Header {{!RFC8941}}. Its
-value MUST be a Boolean. Its ABNF is:
-
-~~~
-    Proxy-QUIC-Forwarding = sf-boolean
-~~~
+value MUST be a Boolean.
 
 If the client wants to enable QUIC packet forwarding for this request, it sets
 the value to "?1". If it doesn't want to enable forwarding, but instead only
 provide information about QUIC Connection IDs for the purpose of allowing
 the proxy to share a target-facing socket, it sets the value to "?0".
+
+The client MUST add an "accept-transform" parameter whose value is an
+`sf-string` containing the supported packet transforms ({{packet-transforms}})
+in order of descending preference, separated by commas.
 
 If the proxy supports QUIC-aware proxying, it will include the
 "Proxy-QUIC-Forwarding" header in successful HTTP responses. The value
@@ -599,6 +612,11 @@ by including a "Proxy-QUIC-Forwarding" header in a successful response.
 If it supports QUIC packet forwarding, it sets the value to "?1"; otherwise,
 it sets it to "?0".
 
+The proxy MUST include a "transform" parameter whose value is an `sf-string`
+indicating the selected transform. If the proxy does not recognize or accept
+any of the transforms offered by the client, it MUST omit this parameter and
+set the header field value to "?0", or omit the header entirely.
+
 Upon receipt of a REGISTER_CLIENT_CID or REGISTER_TARGET_CID capsule,
 the proxy validates the registration, tries to establish the appropriate
 mappings as described in {{mappings}}.
@@ -734,9 +752,103 @@ headers does not apply.
 A proxy MAY additionally add ECN markings to signal congestion being experienced
 on the proxy itself.
 
+# Packet Transforms
+
+A packet transform is the procedure applied to packets as they are sent on the
+client-proxy link, and its inverse applied on receipt.  Simple transforms can
+be modelled as a function as follows:
+
+Inputs:
+
+1. A QUIC short header packet (after Connection ID remapping).
+1. The mode (forward or inverse).
+1. The direction (upstream or downstream).
+1. Any configuration info negotiated at startup.
+
+Output:
+
+* A UDP payload that conforms to the QUIC invariants {{?RFC8999}} and does not
+  modify the Connection ID.
+
+More complex transform behaviors could have internal state, but no such transforms
+are presented here.
+
+Packet transforms are identified by an IANA-registered name, and negotiated in
+the HTTP headers (see {{client-behavior}}).  This document defines two initial
+transforms: "null" and "scramble".
+
+## "null"
+
+The "null" transform does not modify the packet in any way.  When this transform
+is in use, a global passive adversary can trivially correlate pairs of packets
+that crossed the forwarder, providing a compact proof that a specific client
+was communicating to a specific target.
+
+Use of this transform is NOT RECOMMENDED if "scramble" can be deployed.
+
+## "scramble"
+
+The "scramble" transform implements length-preserving unauthenticated
+re-encryption of QUIC packets while preserving the QUIC invariants.  When
+"scramble" is in use, a global passive adversary cannot use the packet contents
+to link the client and target.  However, "scramble" does not defend against
+analysis of packet sizes and timing, nor does it protect privacy against an
+active attacker.
+
+The "scramble" transform is initialized using a 32-byte random symmetric key.
+When offering or selecting this transform, the client and server MUST each
+generate the key that they will use to encrypt scrambled packets and add it to the
+Proxy-QUIC-Transform header in an `sf-binary` parameter named "scramble-key".
+
+This transform relies on the AES-128 block cipher, which is represented by the
+syntax `AES-ECB(key, plaintext_block)` as in {{?RFC9001}}.  The corresponding
+decryption operation is written here as `AES-ECB-inv(key, ciphertext_block)`.
+It also uses AES in Counter Mode ({{SP800-38A}}, Section 6.5), which is
+represented by the syntax `AES-CTR(key, iv, input)` for encryption and
+decryption (which are identical).  In this syntax, `iv` is an array of 16 bytes
+containing the initial counter block.  The counter is incremented by the
+standard incrementing function ({{SP800-38A}}, Appendix B.1) on the full block
+width.
+
+In brief, the transform applies AES in counter mode (AES-CTR) using an
+initialization vector drawn from the packet, then encrypts the initialization
+vector with AES-ECB. The detailed procedure is as follows:
+
+1. Let `k1, k2 = scramble_key[:16], scramble_key[16:32]`.
+1. Let `L` be the Connection ID length.
+1. Let `cid = packet[1:L+1]`, i.e., the Connection ID.
+1. Let `iv = packet[L+1:L+17]`, i.e., the 16 bytes following the Connection ID.
+1. Let `ctr_input = packet[0] | packet[L+17:]`.
+1. Let `ctr_output = AES-CTR(k1, iv, ctr_input)`.
+1. Let `header = ctr_output[0] & 0x7F`.  This ensures that the Header Form bit
+   is zero, as required by the QUIC invariants ({{?RFC8999}}, Section 5.2).
+1. Encrypt `iv` with the block cipher: `encrypted_iv = AES-ECB(k2, iv)`.
+1. Produce the output packet as:\\
+   `header | cid | encrypted_iv | ctr_output[1:]`.
+
+The inverse transform operates as follows:
+
+1. Decrypt the AES-CTR initialization vector:\\
+   `iv = AES-ECB-inv(k2, packet[L+1:L+17])`.
+1. Compute the other variables exactly as in the forward transform.
+   (AES-CTR encryption and decryption are identical.)
+1. Produce the output: `header | cid | iv | ctr_output[1:]`.
+
+The encryption keys used in this procedure do not depend on the packet contents,
+so each party only needs to perform AES initialization once for each connection.
+
+NOTE: The security of this arrangement relies on every short-header QUIC packet
+containing a distinct 16 bytes following the Connection ID.  This is true
+for the original ciphersuites of QUICv1, but it is not guaranteed by the QUIC
+Invariants. Future ciphersuites and QUIC versions could in principle produce
+packets that are too short or repeat the values at this location. When using the
+"scramble" transform, clients MUST NOT offer any configuration that could
+cause the client or target to violate this requirement.
+
 # Example
 
 Consider a client that is establishing a new QUIC connection through the proxy.
+In this example, the client prefers the "scramble" transform, but also offers "null".
 It has selected a Client Connection ID of 0x31323334. In order to inform a proxy
 of the new QUIC Client Connection ID, the client also sends a
 REGISTER_CLIENT_CID capsule.
@@ -753,7 +865,8 @@ STREAM(44): HEADERS             -------->
   :scheme = https
   :path = /target.example.com/443/
   :authority = proxy.example.org
-  proxy-quic-forwarding = ?1
+  proxy-quic-forwarding = ?1; accept-transform=scramble,null; \
+      scramble-key=:abc...789=:
   capsule-protocol = ?1
 
 STREAM(44): DATA                -------->
@@ -769,7 +882,9 @@ DATAGRAM                        -------->
 
            <--------  STREAM(44): HEADERS
                         :status = 200
-                        proxy-quic-forwarding = ?1
+                        proxy-quic-forwarding = ?1; \
+                            transform=scramble; \
+                            scramble-key=:ABC...321=:
                         capsule-protocol = ?1
 
            <--------  STREAM(44): DATA
@@ -802,7 +917,11 @@ receive forwarded mode packets from the proxy with a Virtual Client
 Connection ID of 0x62646668 which it will replace with the real Client
 Connection ID of 0x31323334. All forwarded mode packets sent by the proxy
 will have been modified to contain the Virtual Client Connection ID instead
-of the Client Connection ID.
+of the Client Connection ID, and processed by the negotiated "scramble"
+packet transform. However, in the unlikely event that a forwarded packet
+arrives before the proxy's HTTP response, the client will not know which
+transform the proxy selected. In this case, the client will have to ignore
+the packet or buffer it until the HTTP response is received.
 
 Once the client learns which Connection ID has been selected by the target
 server, it can send a new request to the proxy to establish a mapping for
@@ -873,6 +992,8 @@ integrity check, it is possible that these packets are either malformed,
 replays, or otherwise malicious. This may result in proxy targets rate limiting
 or decreasing the reputation of a given proxy.
 
+> TODO: Update security considerations to mention the impact of packet transforms.
+
 [comment1]: # OPEN ISSUE: Figure out how clients and proxies could interact to
 [comment2]: # learn whether an adversary is injecting malicious forwarded
 [comment3]: # packets to induce rate limiting.
@@ -892,6 +1013,9 @@ Header Field Names" <[](https://www.iana.org/assignments/message-headers)>.
     +-----------------------+----------+--------+---------------+
 ~~~
 {: #iana-header-type-table title="Registered HTTP Header"}
+
+> TODO: Create a registry for the parameter names ("accept-transform", "transform",
+> "scramble-key"), and possibly also the transform names ("scramble", "null").
 
 ## Capsule Types {#iana-capsule-types}
 
