@@ -1037,7 +1037,7 @@ Specification Required policy (Section 4.6 of [IANA-POLICY]).
 ## Packet Transform Names
 
 This document establishes a new registry for packet transform names
-in <[](https://www.iana.org/assignments/masque/masque.xhtml)> 
+in <[](https://www.iana.org/assignments/masque/masque.xhtml)>
 and defines two initial transforms: "null" and "scramble".
 Registrations in this registry are assigned using the
 Specification Required policy (Section 4.6 of [IANA-POLICY]).
