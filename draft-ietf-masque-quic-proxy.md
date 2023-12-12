@@ -1014,9 +1014,6 @@ Header Field Names" <[](https://www.iana.org/assignments/message-headers)>.
 ~~~
 {: #iana-header-type-table title="Registered HTTP Header"}
 
-> TODO: Create a registry for the parameter names ("accept-transform", "transform",
-> "scramble-key"), and possibly also the transform names ("scramble", "null").
-
 ## QUIC Proxy Parameter Names
 
 This document establishes a new registry for QUIC proxy parameter names
@@ -1037,6 +1034,20 @@ Specification Required policy (Section 4.6 of [IANA-POLICY]).
 ~~~
 {: #iana-parameter-names-table title="Initial QUIC Proxy Parameter Names"}
 
+## Packet Transform Names
+
+This document establishes a new registry for packet transform names
+in <[](https://www.iana.org/assignments/masque/masque.xhtml)> 
+and defines two initial transforms: "null" and "scramble".
+Registrations in this registry are assigned using the
+Specification Required policy (Section 4.6 of [IANA-POLICY]).
+
+| Transform Name | Description       | Specification | Notes                          |
+|:---------------|:------------------|:--------------|--------------------------------|
+| null           | no transformation | This Document | Section {{null-transform}}     |
+| scramble       | simples scramble  | This Document | Section {{scramble-transform}} |
+{: #iana-packet-transforms-table title="Initial Packet Transform Names"}
+
 ## Capsule Types {#iana-capsule-types}
 
 This document registers six new values in the "HTTP Capsule Types"
@@ -1051,20 +1062,6 @@ registry established by {{HTTP-DGRAM}}.
 | CLOSE_CLIENT_CID    | 0xffe404  | This Document |
 | CLOSE_TARGET_CID    | 0xffe405  | This Document |
 {: #iana-capsule-type-table title="Registered Capsule Types"}
-
-## Packet Transform Names
-
-This document establishes a new registry for packet transform names
-in <[](https://www.iana.org/assignments/masque/masque.xhtml)> 
-and defines two initial transforms: "null" and "scramble".
-Registrations in this registry are assigned using the
-Specification Required policy (Section 4.6 of [IANA-POLICY]).
-
-| Transform Name | Description       | Specification | Notes                          |
-|:---------------|:------------------|:--------------|--------------------------------|
-| null           | no transformation | This Document | Section {{null-transform}}     |
-| scramble       | simples scramble  | This Document | Section {{scramble-transform}} |
-{: #iana-packet-transforms-table title="Initial Packet Transform Names"}
 
 --- back
 
