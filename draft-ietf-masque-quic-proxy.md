@@ -1014,9 +1014,10 @@ Header Field Names" <[](https://www.iana.org/assignments/message-headers)>.
 ~~~
 {: #iana-header-type-table title="Registered HTTP Header"}
 
-## QUIC Proxy Parameter Names
+## Proxy QUIC Forwarding Parameter Names
 
-This document establishes a new registry for QUIC proxy parameter names
+This document establishes a new registry, "Proxy QUIC Forwarding Parameter Names",
+for parameter names to use with the `Proxy-QUIC-Forwarding` header field,
 in <[](https://www.iana.org/assignments/masque/masque.xhtml)>.
 Registrations in this registry are assigned using the
 Specification Required policy (Section 4.6 of [IANA-POLICY]).
@@ -1032,7 +1033,7 @@ Specification Required policy (Section 4.6 of [IANA-POLICY]).
     | scramble-key          | contains key for scramble transform | This document | Section {{scramble-transform}} |
     +-----------------------+-------------------------------------+---------------+--------------------------------+
 ~~~
-{: #iana-parameter-names-table title="Initial QUIC Proxy Parameter Names"}
+{: #iana-parameter-names-table title="Initial Proxy QUIC Forwarding Parameter Names"}
 
 ## Packet Transform Names
 
