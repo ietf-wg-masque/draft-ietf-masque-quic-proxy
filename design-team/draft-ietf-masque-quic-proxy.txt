@@ -5,9 +5,9 @@
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
 Intended status: Experimental                                 Apple Inc.
-Expires: 8 June 2024                                         D. Schinazi
+Expires: 6 July 2024                                         D. Schinazi
                                                               Google LLC
-                                                         6 December 2023
+                                                          3 January 2024
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -45,11 +45,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 8 June 2024.
+   This Internet-Draft will expire on 6 July 2024.
 
 Copyright Notice
 
-   Copyright (c) 2023 IETF Trust and the persons identified as the
+   Copyright (c) 2024 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -93,7 +93,9 @@ Table of Contents
    9.  Security Considerations
    10. IANA Considerations
      10.1.  HTTP Header
-     10.2.  Capsule Types
+     10.2.  Proxy QUIC Forwarding Parameter Names
+     10.3.  Packet Transform Names
+     10.4.  Capsule Types
    11. References
      11.1.  Normative References
      11.2.  Informative References
@@ -413,11 +415,11 @@ Table of Contents
    reject the connection ID mappings.
 
    The REGISTER_CLIENT_CID and REGISTER_TARGET_CID capsule types (see
-   Section 10.2 for the capsule type values) allow a client to inform
+   Section 10.4 for the capsule type values) allow a client to inform
    the proxy about a new Client Connection ID or a new Target Connection
    ID, respectively.  These capsule types MUST only be sent by a client.
 
-   The ACK_CLIENT_CID and ACK_TARGET_CID capsule types (see Section 10.2
+   The ACK_CLIENT_CID and ACK_TARGET_CID capsule types (see Section 10.4
    for the capsule type values) are sent by the proxy to the client to
    indicate that a mapping was successfully created for a registered
    connection ID as well as provide the Virtual Target Connection ID
@@ -425,7 +427,7 @@ Table of Contents
    sent by a proxy.
 
    The CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsule types (see
-   Section 10.2 for the capsule type values) allow either a client or a
+   Section 10.4 for the capsule type values) allow either a client or a
    proxy to remove a mapping for a connection ID.  These capsule types
    MAY be sent by either a client or the proxy.  If a proxy sends a
    CLOSE_CLIENT_CID without having sent an ACK_CLIENT_CID, or if a proxy
@@ -1145,11 +1147,49 @@ UDP Datagram                     -------->
 
                       Figure 4: Registered HTTP Header
 
-      TODO: Create a registry for the parameter names ("accept-
-      transform", "transform", "scramble-key"), and possibly also the
-      transform names ("scramble", "null").
+10.2.  Proxy QUIC Forwarding Parameter Names
 
-10.2.  Capsule Types
+   This document establishes a new registry, "Proxy QUIC Forwarding
+   Parameter Names", for parameter names to use with the Proxy-QUIC-
+   Forwarding header field, in <https://www.iana.org/assignments/masque/
+   masque.xhtml>.  Registrations in this registry are assigned using the
+   Specification Required policy (Section 4.6 of [IANA-POLICY]).
+
+    +-----------------------+-------------------------------------+---------------+--------------------------------+
+    | Parameter Name        | Description                         | Reference     | Notes                          |
+    +-----------------------+-------------------------------------+---------------+--------------------------------+
+    | accept-transform      | contains supported transforms       | This document | Section {{client-behavior}}    |
+    +-----------------------+-------------------------------------+---------------+--------------------------------+
+    | transform             | indicates selected transforms       | This document | Section {{proxy-behavior}}     |
+    +-----------------------+-------------------------------------+---------------+--------------------------------+
+    | scramble-key          | contains key for scramble transform | This document | Section {{scramble-transform}} |
+    +-----------------------+-------------------------------------+---------------+--------------------------------+
+
+       Figure 5: Initial Proxy QUIC Forwarding Parameter Names
+
+10.3.  Packet Transform Names
+
+   This document establishes a new registry for packet transform names
+   in <https://www.iana.org/assignments/masque/masque.xhtml> and defines
+   two initial transforms: "null" and "scramble".  Registrations in this
+   registry are assigned using the Specification Required policy
+   (Section 4.6 of [IANA-POLICY]).
+
+      +===========+===================+===============+=============+
+      | Transform | Description       | Specification | Notes       |
+      | Name      |                   |               |             |
+      +===========+===================+===============+=============+
+      | null      | no transformation | This Document | Section     |
+      |           |                   |               | Section 6.1 |
+      +-----------+-------------------+---------------+-------------+
+      | scramble  | AES-128 size-     | This Document | Section     |
+      |           | maintaining       |               | Section 6.2 |
+      |           | scramble of bytes |               |             |
+      +-----------+-------------------+---------------+-------------+
+
+                  Table 1: Initial Packet Transform Names
+
+10.4.  Capsule Types
 
    This document registers six new values in the "HTTP Capsule Types"
    registry established by [HTTP-DGRAM].
@@ -1170,7 +1210,7 @@ UDP Datagram                     -------->
             | CLOSE_TARGET_CID    | 0xffe405 | This Document |
             +---------------------+----------+---------------+
 
-                    Table 1: Registered Capsule Types
+                    Table 2: Registered Capsule Types
 
 11.  References
 
