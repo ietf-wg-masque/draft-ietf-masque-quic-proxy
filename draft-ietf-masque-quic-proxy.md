@@ -777,7 +777,7 @@ Packet transforms are identified by an IANA-registered name, and negotiated in
 the HTTP headers (see {{client-behavior}}).  This document defines two initial
 transforms: "null" and "scramble".
 
-## "null"
+## "null" {#null-transform}
 
 The "null" transform does not modify the packet in any way.  When this transform
 is in use, a global passive adversary can trivially correlate pairs of packets
@@ -786,7 +786,7 @@ was communicating to a specific target.
 
 Use of this transform is NOT RECOMMENDED if "scramble" can be deployed.
 
-## "scramble"
+## "scramble" {#scramble-transform}
 
 The "scramble" transform implements length-preserving unauthenticated
 re-encryption of QUIC packets while preserving the QUIC invariants.  When
@@ -1014,8 +1014,40 @@ Header Field Names" <[](https://www.iana.org/assignments/message-headers)>.
 ~~~
 {: #iana-header-type-table title="Registered HTTP Header"}
 
-> TODO: Create a registry for the parameter names ("accept-transform", "transform",
-> "scramble-key"), and possibly also the transform names ("scramble", "null").
+## Proxy QUIC Forwarding Parameter Names
+
+This document establishes a new registry, "Proxy QUIC Forwarding Parameter Names",
+for parameter names to use with the `Proxy-QUIC-Forwarding` header field,
+in <[](https://www.iana.org/assignments/masque/masque.xhtml)>.
+Registrations in this registry are assigned using the
+Specification Required policy (Section 4.6 of [IANA-POLICY]).
+
+~~~
+    +-----------------------+-------------------------------------+---------------+--------------------------------+
+    | Parameter Name        | Description                         | Reference     | Notes                          |
+    +-----------------------+-------------------------------------+---------------+--------------------------------+
+    | accept-transform      | contains supported transforms       | This document | Section {{client-behavior}}    |
+    +-----------------------+-------------------------------------+---------------+--------------------------------+
+    | transform             | indicates selected transforms       | This document | Section {{proxy-behavior}}     |
+    +-----------------------+-------------------------------------+---------------+--------------------------------+
+    | scramble-key          | contains key for scramble transform | This document | Section {{scramble-transform}} |
+    +-----------------------+-------------------------------------+---------------+--------------------------------+
+~~~
+{: #iana-parameter-names-table title="Initial Proxy QUIC Forwarding Parameter Names"}
+
+## Packet Transform Names
+
+This document establishes a new registry for packet transform names
+in <[](https://www.iana.org/assignments/masque/masque.xhtml)>
+and defines two initial transforms: "null" and "scramble".
+Registrations in this registry are assigned using the
+Specification Required policy (Section 4.6 of [IANA-POLICY]).
+
+| Transform Name | Description       | Specification | Notes                          |
+|:---------------|:------------------|:--------------|--------------------------------|
+| null           | no transformation | This Document | Section {{null-transform}}     |
+| scramble       | AES-128 size-maintaining scramble of bytes  | This Document | Section {{scramble-transform}} |
+{: #iana-packet-transforms-table title="Initial Packet Transform Names"}
 
 ## Capsule Types {#iana-capsule-types}
 
