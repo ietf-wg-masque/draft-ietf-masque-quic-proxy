@@ -1045,7 +1045,7 @@ Specification Required policy (Section 4.6 of [IANA-POLICY]).
 | Transform Name | Description       | Specification | Notes                          |
 |:---------------|:------------------|:--------------|--------------------------------|
 | null           | no transformation | This Document | Section {{null-transform}}     |
-| scramble       | simples scramble  | This Document | Section {{scramble-transform}} |
+| scramble       | AES-128 size-maintaining scramble of bytes  | This Document | Section {{scramble-transform}} |
 {: #iana-packet-transforms-table title="Initial Packet Transform Names"}
 
 ## Capsule Types {#iana-capsule-types}
