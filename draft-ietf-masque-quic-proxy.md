@@ -979,10 +979,11 @@ or restrict clients from opening an excessive number of proxied connections, so
 as to limit abuse or use of proxies to launch Denial-of-Service attacks.
 
 Sending QUIC packets by forwarding through a proxy without tunnelling exposes
-clients to additional deanonymization attacks which need to be carefully
-considered. Analysis should consider both passive and active attackers which
-may be global or localized to the network paths used on each side of a proxy.
-The following highlights deanonymization risks with using forwarded mode.
+clients to additional information exposure and deanonymization attacks which
+need to be carefully considered. Analysis should consider both passive and
+active attackers which may be global or localized to the network paths used
+on each side of a proxy. The following highlights deanonymization risks with
+using forwarded mode.
 
 ## Passive Attacks
 
@@ -997,8 +998,10 @@ cryptographically preventing such byte comparisons
 Regardless of which packet transform is used, both tunneled and forwarded mode
 are still vulnerable to size and timing attacks.
 
-TODO(ER): do we want to describe CID many->one, on->many? In practice, it'll be
-one per network path which seems no different than tunneled mode.
+Unlike tunnelled mode where packets are fully encapsulated in the client to
+proxy connection, clients using forwarded mode to access multiple target servers
+over the same client to proxy connection expose the number of target servers
+they are communicating with on each connection.
 
 ## Active Attacks
 
