@@ -996,7 +996,8 @@ cryptographically preventing such byte comparisons
 (see {{!scramble-transform=scramble-transform}}).
 
 Regardless of which packet transform is used, both tunnelled and forwarded mode
-are still vulnerable to size and timing attacks.
+are still vulnerable to size and timing attacks, without the addition of techniques that go beyond the analysis
+in this document, such as padding and adding chaff packets.
 
 Unlike tunnelled mode where packets are fully encapsulated in the client to
 proxy connection, clients using forwarded mode to access multiple target servers
