@@ -403,7 +403,7 @@ Stateless Reset Token Length
 
 Stateless Reset Token
 : The target-provided Stateless Reset token allowing the proxy to correctly
-recognize Stateless Reset packets to be tunneled to the client.
+recognize Stateless Reset packets to be tunnelled to the client.
 
 The REGISTER_CLIENT_CID and ACK_TARGET_CID capsule types include a Virtual
 Connection ID and Stateless Reset Token.
@@ -995,7 +995,7 @@ on the other. Packet transforms such as scramble mitigate this by
 cryptographically preventing such byte comparisons
 (see {{!scramble-transform=scramble-transform}}).
 
-Regardless of which packet transform is used, both tunneled and forwarded mode
+Regardless of which packet transform is used, both tunnelled and forwarded mode
 are still vulnerable to size and timing attacks.
 
 Unlike tunnelled mode where packets are fully encapsulated in the client to
@@ -1008,18 +1008,18 @@ they are communicating with on each connection.
 An active attacker is an adversary that can inject, modify, drop, and view
 packets in the network.
 
-Both tunneled mode and forwarded mode (regardless of packet transform) are
+Both tunnelled mode and forwarded mode (regardless of packet transform) are
 vulnerable to packet injection in the target-to-client direction. An attacker
 can inject a burst of packets with a known QUIC Connection ID and see which
 Connection ID bytes are used on the proxy to client network path.
 
 Packet injection with a known QUIC Connection ID can also happen in the
-client-to-proxy direction, however, this only affects forwarded mode since tunneled
+client-to-proxy direction, however, this only affects forwarded mode since tunnelled
 mode leverages QUIC packet authentication (see {{?RFC9001}}). None
 of the packet transforms defined in this document provide packet authentication.
 Even if a packet transform did provide packet authentication, attackers may
 inject replayed packets which would satisfy authentication checks. Protection
-against replayed packets is similarly provided by QUIC in tunneled mode, but
+against replayed packets is similarly provided by QUIC in tunnelled mode, but
 not provided by any of the forwarded mode packet transforms defined in this
 document.
 
