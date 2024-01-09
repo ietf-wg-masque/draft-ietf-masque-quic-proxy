@@ -1009,12 +1009,12 @@ An active attacker is an adversary that can inject, modify, drop, and view
 packets in the network.
 
 Both tunneled mode and forwarded mode (regardless of packet transform) are
-vulnerable to packet injection in the target to client direction. An attacker
+vulnerable to packet injection in the target-to-client direction. An attacker
 can inject a burst of packets with a known QUIC Connection ID and see which
 Connection ID bytes are used on the proxy to client network path.
 
-Packet injection with a known QUIC Connection ID can also happen in the client
-to proxy direction, however, this only affects forwarded mode since tunneled
+Packet injection with a known QUIC Connection ID can also happen in the
+client-to-proxy direction, however, this only affects forwarded mode since tunneled
 mode leverages QUIC packet authentication (see {{?RFC9001}}). None
 of the packet transforms defined in this document provide packet authentication.
 Even if a packet transform did provide packet authentication, attackers may
