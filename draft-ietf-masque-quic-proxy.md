@@ -1000,8 +1000,8 @@ are still vulnerable to size and timing attacks, without the addition of techniq
 in this document, such as padding and adding chaff packets.  Such techniques could be supported
 in future packet transforms, subject to additional security analysis.
 
-Unlike tunnelled mode where packets are fully encapsulated in the client to
-proxy connection, clients using forwarded mode to access multiple target servers
+Unlike tunnelled mode where packets are fully encapsulated in the client-to-proxy
+connection, clients using forwarded mode to access multiple target servers
 over the same client-to-proxy connection expose the number of target servers
 they are communicating with on each connection.
 
@@ -1013,7 +1013,7 @@ packets in the network.
 Both tunnelled mode and forwarded mode (regardless of packet transform) are
 vulnerable to packet injection in the target-to-client direction. An attacker
 can inject a burst of packets with a known QUIC Connection ID and see which
-Connection ID is used for the corresponding burst on the proxy to client network path.
+Connection ID is used for the corresponding burst on the proxy-to-client network path.
 
 Packet injection with a known QUIC Connection ID can also happen in the
 client-to-proxy direction, however, this only affects forwarded mode since
