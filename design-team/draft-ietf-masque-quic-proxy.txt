@@ -5,9 +5,9 @@
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
 Intended status: Experimental                                 Apple Inc.
-Expires: 6 July 2024                                         D. Schinazi
+Expires: 13 July 2024                                        D. Schinazi
                                                               Google LLC
-                                                          3 January 2024
+                                                         10 January 2024
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -45,7 +45,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 6 July 2024.
+   This Internet-Draft will expire on 13 July 2024.
 
 Copyright Notice
 
@@ -86,8 +86,8 @@ Table of Contents
      5.2.  Handling Connection Migration
      5.3.  Handling ECN Marking
    6.  Packet Transforms
-     6.1.  "null"
-     6.2.  "scramble"
+     6.1.  The null transform
+     6.2.  The scramble transform
    7.  Example
    8.  Packet Size Considerations
    9.  Security Considerations
@@ -892,29 +892,38 @@ Table of Contents
 
    Packet transforms are identified by an IANA-registered name, and
    negotiated in the HTTP headers (see Section 4).  This document
-   defines two initial transforms: "null" and "scramble".
+   defines two initial transforms: the null transform and the scramble
+   transform.
 
-6.1.  "null"
+6.1.  The null transform
 
-   The "null" transform does not modify the packet in any way.  When
-   this transform is in use, a global passive adversary can trivially
+   The null transform does not modify the packet in any way.  When this
+   transform is in use, a global passive adversary can trivially
    correlate pairs of packets that crossed the forwarder, providing a
    compact proof that a specific client was communicating to a specific
    target.
 
-   Use of this transform is NOT RECOMMENDED if "scramble" can be
-   deployed.
+   The null transform is identified by the value "null" Section 10.3.
 
-6.2.  "scramble"
+   Use of this transform is NOT RECOMMENDED if the scramble transform
+   can be deployed.
 
-   The "scramble" transform implements length-preserving unauthenticated
+6.2.  The scramble transform
+
+   The scramble transform implements length-preserving unauthenticated
    re-encryption of QUIC packets while preserving the QUIC invariants.
-   When "scramble" is in use, a global passive adversary cannot use the
-   packet contents to link the client and target.  However, "scramble"
-   does not defend against analysis of packet sizes and timing, nor does
-   it protect privacy against an active attacker.
+   When the scramble transform is in use, a global passive adversary
+   cannot use the packet contents to link the client and target.
+   However, the scramble transform does not defend against analysis of
+   packet sizes and timing, nor does it protect privacy against an
+   active attacker.
 
-   The "scramble" transform is initialized using a 32-byte random
+   Deployments that implement the version of the scramble transform
+   defined in this document MUST use the value "scramble-dt".  The
+   finalized version is expected to use the reserved value "scramble"
+   Section 10.3.
+
+   The scramble transform is initialized using a 32-byte random
    symmetric key.  When offering or selecting this transform, the client
    and server MUST each generate the key that they will use to encrypt
    scrambled packets and add it to the Proxy-QUIC-Transform header in an
@@ -977,17 +986,17 @@ Table of Contents
    ID.  This is true for the original ciphersuites of QUICv1, but it is
    not guaranteed by the QUIC Invariants.  Future ciphersuites and QUIC
    versions could in principle produce packets that are too short or
-   repeat the values at this location.  When using the "scramble"
+   repeat the values at this location.  When using the scramble
    transform, clients MUST NOT offer any configuration that could cause
    the client or target to violate this requirement.
 
 7.  Example
 
    Consider a client that is establishing a new QUIC connection through
-   the proxy.  In this example, the client prefers the "scramble"
-   transform, but also offers "null".  It has selected a Client
-   Connection ID of 0x31323334.  In order to inform a proxy of the new
-   QUIC Client Connection ID, the client also sends a
+   the proxy.  In this example, the client prefers the scramble
+   transform, but also offers the null transform.  It has selected a
+   Client Connection ID of 0x31323334.  In order to inform a proxy of
+   the new QUIC Client Connection ID, the client also sends a
    REGISTER_CLIENT_CID capsule.
 
    The client will also send the initial QUIC packet with the Long
@@ -1052,11 +1061,11 @@ Table of Contents
    real Client Connection ID of 0x31323334.  All forwarded mode packets
    sent by the proxy will have been modified to contain the Virtual
    Client Connection ID instead of the Client Connection ID, and
-   processed by the negotiated "scramble" packet transform.  However, in
-   the unlikely event that a forwarded packet arrives before the proxy's
-   HTTP response, the client will not know which transform the proxy
-   selected.  In this case, the client will have to ignore the packet or
-   buffer it until the HTTP response is received.
+   processed by the negotiated the scramble packet transform.  However,
+   in the unlikely event that a forwarded packet arrives before the
+   proxy's HTTP response, the client will not know which transform the
+   proxy selected.  In this case, the client will have to ignore the
+   packet or buffer it until the HTTP response is received.
 
    Once the client learns which Connection ID has been selected by the
    target server, it can send a new request to the proxy to establish a
@@ -1171,23 +1180,26 @@ UDP Datagram                     -------->
 
    This document establishes a new registry for packet transform names
    in <https://www.iana.org/assignments/masque/masque.xhtml> and defines
-   two initial transforms: "null" and "scramble".  Registrations in this
-   registry are assigned using the Specification Required policy
-   (Section 4.6 of [IANA-POLICY]).
+   two initial transforms: "null" and "scramble".  Prior to
+   finalization, deployments that implement the version of the scramble
+   transform defined in this document should use the value "scramble-
+   dt".  Once the design team proposal is adopted and a new draft is
+   submitted, the wire identifier will become "scramble-XX" where XX is
+   the draft number.  Registrations in this registry are assigned using
+   the Specification Required policy (Section 4.6 of [IANA-POLICY]).
 
-      +===========+===================+===============+=============+
-      | Transform | Description       | Specification | Notes       |
-      | Name      |                   |               |             |
-      +===========+===================+===============+=============+
-      | null      | no transformation | This Document | Section     |
-      |           |                   |               | Section 6.1 |
-      +-----------+-------------------+---------------+-------------+
-      | scramble  | AES-128 size-     | This Document | Section     |
-      |           | maintaining       |               | Section 6.2 |
-      |           | scramble of bytes |               |             |
-      +-----------+-------------------+---------------+-------------+
+   +===========+========================+===============+=============+
+   | Transform | Description            | Specification | Notes       |
+   | Name      |                        |               |             |
+   +===========+========================+===============+=============+
+   | null      | no transformation      | This Document | Section     |
+   |           |                        |               | Section 6.1 |
+   +-----------+------------------------+---------------+-------------+
+   | scramble  | Reserved (will be used | This Document | Section     |
+   |           | for final version)     |               | Section 6.2 |
+   +-----------+------------------------+---------------+-------------+
 
-                  Table 1: Initial Packet Transform Names
+                 Table 1: Initial Packet Transform Names
 
 10.4.  Capsule Types
 
