@@ -403,7 +403,7 @@ Stateless Reset Token Length
 
 Stateless Reset Token
 : The target-provided Stateless Reset token allowing the proxy to correctly
-recognize Stateless Reset packets to be tunneled to the client.
+recognize Stateless Reset packets to be tunnelled to the client.
 
 The REGISTER_CLIENT_CID and ACK_TARGET_CID capsule types include a Virtual
 Connection ID and Stateless Reset Token.
@@ -986,20 +986,51 @@ or restrict clients from opening an excessive number of proxied connections, so
 as to limit abuse or use of proxies to launch Denial-of-Service attacks.
 
 Sending QUIC packets by forwarding through a proxy without tunnelling exposes
-some QUIC header metadata to onlookers, and can be used to correlate packet
-flows if an attacker is able to see traffic on both sides of the proxy.
-Tunnelled packets have similar inference problems. An attacker on both sides
-of the proxy can use the size of ingress and egress packets to correlate packets
-belonging to the same connection. (Absent client-side padding, tunnelled packets
-will typically have a fixed amount of overhead that is removed before their
-HTTP Datagram contents are written to the target.)
+clients to additional information exposure and deanonymization attacks which
+need to be carefully considered. Analysis should consider both passive and
+active attackers which may be global or localized to the network paths used
+on each side of a proxy. The following highlights deanonymization risks with
+using forwarded mode.
 
-Since proxies that forward QUIC packets do not perform any cryptographic
-integrity check, it is possible that these packets are either malformed,
-replays, or otherwise malicious. This may result in proxy targets rate limiting
-or decreasing the reputation of a given proxy.
+## Passive Attacks
 
-> TODO: Update security considerations to mention the impact of packet transforms.
+A passive attacker aims to deanonymize a client by correlating traffic across
+both sides of the proxy. When using forwarded mode with the null packet
+transform (see {{null-transform}}), such correlation is trivial by matching
+a subset of QUIC packet bytes as packets enter the proxy on one side and exit
+on the other. Packet transforms such as scramble mitigate this by
+cryptographically preventing such byte comparisons
+(see {{!scramble-transform=scramble-transform}}).
+
+Regardless of which packet transform is used, both tunnelled and forwarded mode
+are still vulnerable to size and timing attacks, without the addition of techniques that go beyond the analysis
+in this document, such as padding and adding chaff packets.  Such techniques could be supported
+in future packet transforms, subject to additional security analysis.
+
+Unlike tunnelled mode where packets are fully encapsulated in the client-to-proxy
+connection, clients using forwarded mode to access multiple target servers
+over the same client-to-proxy connection expose the number of target servers
+they are communicating with on each connection.
+
+## Active Attacks
+
+An active attacker is an adversary that can inject, modify, drop, and view
+packets in the network.
+
+Both tunnelled mode and forwarded mode (regardless of packet transform) are
+vulnerable to packet injection in the target-to-client direction. An attacker
+can inject a burst of packets with a known QUIC Connection ID and see which
+Connection ID is used for the corresponding burst on the proxy-to-client network path.
+
+Packet injection with a known QUIC Connection ID can also happen in the
+client-to-proxy direction, however, this only affects forwarded mode since
+tunnelled mode sends packets within an authenticated and integrity protected
+QUIC connection to the proxy (see {{?RFC9001}}). None of the packet transforms
+defined in this document provide integrity protection. Even if a packet
+transform did provide integrity protection, attackers can inject replayed
+packets. Protection against replayed packets is similarly provided by QUIC in
+tunnelled mode, but not provided by any of the forwarded mode packet transforms
+defined in this document.
 
 [comment1]: # OPEN ISSUE: Figure out how clients and proxies could interact to
 [comment2]: # learn whether an adversary is injecting malicious forwarded
