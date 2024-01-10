@@ -1013,7 +1013,7 @@ packets in the network.
 Both tunnelled mode and forwarded mode (regardless of packet transform) are
 vulnerable to packet injection in the target-to-client direction. An attacker
 can inject a burst of packets with a known QUIC Connection ID and see which
-Connection ID bytes are used on the proxy to client network path.
+Connection ID is used for the corresponding burst on the proxy to client network path.
 
 Packet injection with a known QUIC Connection ID can also happen in the
 client-to-proxy direction, however, this only affects forwarded mode since
