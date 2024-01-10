@@ -1049,7 +1049,9 @@ in <[](https://www.iana.org/assignments/masque/masque.xhtml)>
 and defines two initial transforms: "null" and "scramble".
 Prior to finalization, deployments that implement the version of
 the scramble transform defined in this document should use the value
-"scramble-dt". Registrations in this registry are assigned using the
+"scramble-dt". Once the design team PR is merged and a new draft is submitted,
+the wire identifier will become "scramble-XX" where XX is the draft number.
+Registrations in this registry are assigned using the
 Specification Required policy (Section 4.6 of [IANA-POLICY]).
 
 | Transform Name | Description       | Specification | Notes                          |
