@@ -5,9 +5,9 @@
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
 Intended status: Experimental                                 Apple Inc.
-Expires: 6 July 2024                                         D. Schinazi
+Expires: 13 July 2024                                        D. Schinazi
                                                               Google LLC
-                                                          3 January 2024
+                                                         10 January 2024
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -45,7 +45,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 6 July 2024.
+   This Internet-Draft will expire on 13 July 2024.
 
 Copyright Notice
 
@@ -1186,16 +1186,16 @@ UDP Datagram                     -------->
    dt".  Registrations in this registry are assigned using the
    Specification Required policy (Section 4.6 of [IANA-POLICY]).
 
-   +================+===================+===============+=============+
-   | Transform Name | Description       | Specification | Notes       |
-   +================+===================+===============+=============+
-   | null           | no transformation | This Document | Section     |
-   |                |                   |               | Section 6.1 |
-   +----------------+-------------------+---------------+-------------+
-   | Reserved (will | AES-128 size-     | This Document | Section     |
-   | be "scramble") | maintaining       |               | Section 6.2 |
-   |                | scramble of bytes |               |             |
-   +----------------+-------------------+---------------+-------------+
+   +===========+========================+===============+=============+
+   | Transform | Description            | Specification | Notes       |
+   | Name      |                        |               |             |
+   +===========+========================+===============+=============+
+   | null      | no transformation      | This Document | Section     |
+   |           |                        |               | Section 6.1 |
+   +-----------+------------------------+---------------+-------------+
+   | scramble  | Reserved (will be used | This Document | Section     |
+   |           | for final version)     |               | Section 6.2 |
+   +-----------+------------------------+---------------+-------------+
 
                  Table 1: Initial Packet Transform Names
 
