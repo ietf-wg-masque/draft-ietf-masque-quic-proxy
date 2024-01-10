@@ -1019,7 +1019,7 @@ client-to-proxy direction, however, this only affects forwarded mode since
 tunnelled mode sends packets within an authenticated and integrity protected
 QUIC connection to the proxy (see {{?RFC9001}}). None of the packet transforms
 defined in this document provide integrity protection. Even if a packet
-transform did provide integrity protection, attackers may inject replayed
+transform did provide integrity protection, attackers can inject replayed
 packets. Protection against replayed packets is similarly provided by QUIC in
 tunnelled mode, but not provided by any of the forwarded mode packet transforms
 defined in this document.
