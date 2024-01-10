@@ -997,7 +997,8 @@ cryptographically preventing such byte comparisons
 
 Regardless of which packet transform is used, both tunnelled and forwarded mode
 are still vulnerable to size and timing attacks, without the addition of techniques that go beyond the analysis
-in this document, such as padding and adding chaff packets.
+in this document, such as padding and adding chaff packets.  Such techniques could be supported
+in a future packet transform, subject to additional security analysis.
 
 Unlike tunnelled mode where packets are fully encapsulated in the client to
 proxy connection, clients using forwarded mode to access multiple target servers
