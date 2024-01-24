@@ -1158,7 +1158,8 @@ UDP Datagram                     -------->
    multiple target servers over the same client-to-proxy connection
    expose the number of target servers they are communicating with on
    each connection to passive attackers that can observe the client-to-
-   proxy traffic.
+   proxy traffic.  This additional metadata revealed on each packet
+   simplifies size and timing attacks.
 
 9.2.  Active Attacks
 
