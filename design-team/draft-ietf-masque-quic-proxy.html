@@ -2119,8 +2119,10 @@ is in use, a global passive adversary can trivially correlate pairs of packets
 that crossed the forwarder, providing a compact proof that a specific client
 was communicating to a specific target.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
 <p id="section-6.1-2">The null transform is identified by the value "null" <a href="#iana-transforms" class="auto internal xref">Section 10.3</a>.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
-<p id="section-6.1-3">Use of this transform is NOT RECOMMENDED if the scramble transform can be
-deployed.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
+<p id="section-6.1-3">Use of this transform is NOT RECOMMENDED if the scramble transform is supported
+by both the client and the proxy. Implementations MAY choose to not implement or
+support the "null" transform, depending on the use cases and privacy requirements of
+the deployment.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="scramble-transform">

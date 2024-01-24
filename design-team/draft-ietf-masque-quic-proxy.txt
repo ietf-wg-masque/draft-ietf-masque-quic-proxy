@@ -912,8 +912,10 @@ Table of Contents
 
    The null transform is identified by the value "null" Section 10.3.
 
-   Use of this transform is NOT RECOMMENDED if the scramble transform
-   can be deployed.
+   Use of this transform is NOT RECOMMENDED if the scramble transform is
+   supported by both the client and the proxy.  Implementations MAY
+   choose to not implement or support the "null" transform, depending on
+   the use cases and privacy requirements of the deployment.
 
 6.2.  The scramble transform
 
