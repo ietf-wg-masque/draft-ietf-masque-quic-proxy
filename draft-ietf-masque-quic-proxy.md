@@ -927,7 +927,7 @@ receive forwarded mode packets from the proxy with a Virtual Client
 Connection ID of 0x62646668 which it will replace with the real Client
 Connection ID of 0x31323334. All forwarded mode packets sent by the proxy
 will have been modified to contain the Virtual Client Connection ID instead
-of the Client Connection ID, and processed by the negotiated the scramble
+of the Client Connection ID, and processed by the negotiated "scramble"
 packet transform. However, in the unlikely event that a forwarded packet
 arrives before the proxy's HTTP response, the client will not know which
 transform the proxy selected. In this case, the client will have to ignore
