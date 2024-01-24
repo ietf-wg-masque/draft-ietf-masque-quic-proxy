@@ -1013,7 +1013,9 @@ in future packet transforms, subject to additional security analysis.
 Unlike tunnelled mode where packets are fully encapsulated in the client-to-proxy
 connection, clients using forwarded mode to access multiple target servers
 over the same client-to-proxy connection expose the number of target servers
-they are communicating with on each connection to passive attackers that can observe the client-to-proxy traffic.
+they are communicating with on each connection to passive attackers that can
+observe the client-to-proxy traffic. This additional metadata revealed on each
+packet simplifies size and timing attacks.
 
 ## Active Attacks
 
