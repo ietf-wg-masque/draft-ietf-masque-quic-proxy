@@ -473,7 +473,10 @@ the proxy to share a target-facing socket, it sets the value to "?0".
 
 The client MUST add an "accept-transform" parameter whose value is an
 `sf-string` containing the supported packet transforms ({{packet-transforms}})
-in order of descending preference, separated by commas.
+in order of descending preference, separated by commas. If the proxy receives a
+"Proxy-QUIC-Forwarding" header without the "accept-transform" parameters, it
+MUST ignore the header and respond as if the client had not sent the
+"Proxy-QUIC-Forwarding" header.
 
 If the proxy supports QUIC-aware proxying, it will include the
 "Proxy-QUIC-Forwarding" header in successful HTTP responses. The value
@@ -609,7 +612,7 @@ in {{Section 10.1.1 of QUIC}}.
 Upon receipt of a CONNECT request that includes the "Proxy-QUIC-Forwarding"
 header, the proxy indicates to the client that it supports QUIC-aware proxying
 by including a "Proxy-QUIC-Forwarding" header in a successful response.
-If it supports QUIC packet forwarding, it sets the value to "?1"; otherwise,
+If it supports QUIC packet proxying in forwarded mode, it sets the value to "?1"; otherwise,
 it sets it to "?0".
 
 The proxy MUST include a "transform" parameter whose value is an `sf-string`
