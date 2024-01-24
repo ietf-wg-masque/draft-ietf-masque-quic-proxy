@@ -884,9 +884,9 @@ Table of Contents
 
    2.  The mode (forward or inverse).
 
-   3.  The direction (upstream or downstream).
+   3.  The direction (client-to-proxy or proxy-to-client).
 
-   4.  Any configuration info negotiated at startup.
+   4.  Any configuration information negotiated at startup.
 
    Output:
 
