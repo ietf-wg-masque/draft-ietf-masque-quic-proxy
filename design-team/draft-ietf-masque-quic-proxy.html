@@ -2079,16 +2079,16 @@ on the proxy itself.<a href="#section-5.3-3" class="pilcrow">¶</a></p>
       <h2 id="name-packet-transforms">
 <a href="#section-6" class="section-number selfRef">6. </a><a href="#name-packet-transforms" class="section-name selfRef">Packet Transforms</a>
       </h2>
-<p id="section-6-1">A packet transform is the procedure applied to packets as they are sent on the
-client-proxy link, and its inverse applied on receipt.  Simple transforms can
-be modelled as a function as follows:<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-1">A packet transform is the procedure applied to encode packets as they are sent
+on the link between the client and proxy, along with the inverse decode step applied
+on receipt. Simple transforms can be modeled as a function as follows:<a href="#section-6-1" class="pilcrow">¶</a></p>
 <p id="section-6-2">Inputs:<a href="#section-6-2" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-6-3">
 <li id="section-6-3.1">
           <p id="section-6-3.1.1">A QUIC short header packet (after Connection ID remapping).<a href="#section-6-3.1.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-6-3.2">
-          <p id="section-6-3.2.1">The mode (forward or inverse).<a href="#section-6-3.2.1" class="pilcrow">¶</a></p>
+          <p id="section-6-3.2.1">The mode (encode or decode).<a href="#section-6-3.2.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-6-3.3">
           <p id="section-6-3.3.1">The direction (client-to-proxy or proxy-to-client).<a href="#section-6-3.3.1" class="pilcrow">¶</a></p>
