@@ -992,7 +992,7 @@ Sending QUIC packets by forwarding through a proxy without tunnelling exposes
 clients to additional information exposure and deanonymization attacks which
 need to be carefully considered. Analysis should consider both passive and
 active attackers which may be global or localized to the network paths used
-on each side of a proxy. The following highlights deanonymization risks with
+on one side of the proxy. The following sections highlight deanonymization risks with
 using forwarded mode.
 
 ## Passive Attacks
