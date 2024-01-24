@@ -806,8 +806,8 @@ document MUST use the value "scramble-dt". The finalized version is expected
 to use the reserved value "scramble" {{iana-transforms}}.
 
 The scramble transform is initialized using a 32-byte random symmetric key.
-When offering or selecting this transform, the client and server MUST each
-generate the key that they will use to encrypt scrambled packets and add it to the
+When offering or selecting this transform, the client and server each
+generate the key that they will use to encrypt scrambled packets and MUST add it to the
 Proxy-QUIC-Transform header in an `sf-binary` parameter named "scramble-key".
 
 This transform relies on the AES-128 block cipher, which is represented by the
