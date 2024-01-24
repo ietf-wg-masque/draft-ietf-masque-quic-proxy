@@ -757,14 +757,14 @@ on the proxy itself.
 
 # Packet Transforms
 
-A packet transform is the procedure applied to packets as they are sent on the
-client-proxy link, and its inverse applied on receipt.  Simple transforms can
-be modelled as a function as follows:
+A packet transform is the procedure applied to encode packets as they are sent
+on the link between the client and proxy, along with the inverse decode step applied
+on receipt. Simple transforms can be modeled as a function as follows:
 
 Inputs:
 
 1. A QUIC short header packet (after Connection ID remapping).
-1. The mode (forward or inverse).
+1. The mode (encode or decode).
 1. The direction (client-to-proxy or proxy-to-client).
 1. Any configuration information negotiated at startup.
 
