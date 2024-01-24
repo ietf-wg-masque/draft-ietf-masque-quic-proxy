@@ -1157,7 +1157,8 @@ UDP Datagram                     -------->
    client-to-proxy connection, clients using forwarded mode to access
    multiple target servers over the same client-to-proxy connection
    expose the number of target servers they are communicating with on
-   each connection.
+   each connection to passive attackers that can observe the client-to-
+   proxy traffic.
 
 9.2.  Active Attacks
 
