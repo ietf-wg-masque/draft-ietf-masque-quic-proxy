@@ -796,7 +796,8 @@ deployed.
 
 The scramble transform implements length-preserving unauthenticated
 re-encryption of QUIC packets while preserving the QUIC invariants.  When
-the scramble transform is in use, a global passive adversary cannot use the packet contents
+the scramble transform is in use, a global passive adversary cannot simply compare the packet
+contents on both sides of the proxy
 to link the client and target.  However, the scramble transform does not defend against
 analysis of packet sizes and timing, nor does it protect privacy against an
 active attacker.
