@@ -463,7 +463,7 @@ header to indicate whether or not the request should support forwarding.
 If this header is not included, the client MUST NOT send any connection ID
 capsules.
 
-The "Proxy-QUIC-Forwarding" is an Item Structured Header {{!RFC8941}}. Its
+"Proxy-QUIC-Forwarding" is an Item Structured Header {{!RFC8941}}. Its
 value MUST be a Boolean.
 
 If the client wants to enable QUIC packet forwarding for this request, it sets
