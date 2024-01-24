@@ -765,8 +765,8 @@ Inputs:
 
 1. A QUIC short header packet (after Connection ID remapping).
 1. The mode (forward or inverse).
-1. The direction (upstream or downstream).
-1. Any configuration info negotiated at startup.
+1. The direction (client-to-proxy or proxy-to-client).
+1. Any configuration information negotiated at startup.
 
 Output:
 
