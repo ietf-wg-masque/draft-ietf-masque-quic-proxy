@@ -809,6 +809,8 @@ The scramble transform is initialized using a 32-byte random symmetric key.
 When offering or selecting this transform, the client and server each
 generate the key that they will use to encrypt scrambled packets and MUST add it to the
 Proxy-QUIC-Transform header in an `sf-binary` parameter named "scramble-key".
+If either side receives a scramble transform without the "scramble-key" parameter,
+forwarding mode MUST be disabled.
 
 This transform relies on the AES-128 block cipher, which is represented by the
 syntax `AES-ECB(key, plaintext_block)` as in {{?RFC9001}}.  The corresponding
