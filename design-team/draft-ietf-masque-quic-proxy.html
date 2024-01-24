@@ -2138,8 +2138,8 @@ active attacker.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
 document MUST use the value "scramble-dt". The finalized version is expected
 to use the reserved value "scramble" <a href="#iana-transforms" class="auto internal xref">Section 10.3</a>.<a href="#section-6.2-2" class="pilcrow">¶</a></p>
 <p id="section-6.2-3">The scramble transform is initialized using a 32-byte random symmetric key.
-When offering or selecting this transform, the client and server MUST each
-generate the key that they will use to encrypt scrambled packets and add it to the
+When offering or selecting this transform, the client and server each
+generate the key that they will use to encrypt scrambled packets and MUST add it to the
 Proxy-QUIC-Transform header in an <code>sf-binary</code> parameter named "scramble-key".<a href="#section-6.2-3" class="pilcrow">¶</a></p>
 <p id="section-6.2-4">This transform relies on the AES-128 block cipher, which is represented by the
 syntax <code>AES-ECB(key, plaintext_block)</code> as in <span>[<a href="#RFC9001" class="cite xref">RFC9001</a>]</span>.  The corresponding
