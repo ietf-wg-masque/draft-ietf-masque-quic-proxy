@@ -789,8 +789,10 @@ was communicating to a specific target.
 
 The null transform is identified by the value "null" {{iana-transforms}}.
 
-Use of this transform is NOT RECOMMENDED if the scramble transform can be
-deployed.
+Use of this transform is NOT RECOMMENDED if the scramble transform is supported
+by both the client and the proxy. Implementations MAY choose to not implement or
+support the "null" transform, depending on the use cases and privacy requirements of
+the deployment.
 
 ## The scramble transform {#scramble-transform}
 
