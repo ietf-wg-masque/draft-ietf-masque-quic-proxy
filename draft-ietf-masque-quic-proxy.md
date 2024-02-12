@@ -1,15 +1,33 @@
 ---
 title: QUIC-Aware Proxying Using HTTP
 abbrev: QUIC Proxy
-docname: draft-ietf-masque-quic-proxy-latest
 category: exp
+docname: draft-ietf-masque-quic-proxy-latest
+submissiontype: IETF
+number:
+date:
+consensus: true
+v: 3
+area: Transport
 wg: MASQUE
-
-ipr: trust200902
-keyword: Internet-Draft
-
-stand_alone: yes
-pi: [toc, sortrefs, symrefs]
+venue:
+  group: "MASQUE"
+  type: "Working Group"
+  mail: "masque@ietf.org"
+  arch: "https://mailarchive.ietf.org/arch/browse/masque/"
+  github: "ietf-wg-masque/draft-ietf-masque-quic-proxy"
+  latest: "https://ietf-wg-masque.github.io/draft-ietf-masque-quic-proxy/draft-ietf-masque-quic-proxy.html"
+keyword:
+  - quic
+  - http
+  - datagram
+  - udp
+  - proxy
+  - tunnels
+  - quic in quic
+  - turtles all the way down
+  - masque
+  - http-ng
 
 author:
  -
