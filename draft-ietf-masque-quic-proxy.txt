@@ -5,9 +5,9 @@
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
 Intended status: Experimental                                 Apple Inc.
-Expires: 3 May 2024                                          D. Schinazi
+Expires: 15 August 2024                                      D. Schinazi
                                                               Google LLC
-                                                         31 October 2023
+                                                        12 February 2024
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -22,13 +22,22 @@ Abstract
    header packets can be forwarded using an HTTP/3 proxy rather than
    being re-encapsulated and re-encrypted.
 
-Discussion Venues
+About This Document
 
    This note is to be removed before publishing as an RFC.
 
+   The latest revision of this draft can be found at https://ietf-wg-
+   masque.github.io/draft-ietf-masque-quic-proxy/draft-ietf-masque-quic-
+   proxy.html.  Status information for this document may be found at
+   https://datatracker.ietf.org/doc/draft-ietf-masque-quic-proxy/.
+
+   Discussion of this document takes place on the MASQUE Working Group
+   mailing list (mailto:masque@ietf.org), which is archived at
+   https://mailarchive.ietf.org/arch/browse/masque/.  Subscribe at
+   https://www.ietf.org/mailman/listinfo/masque/.
+
    Source for this draft and an issue tracker can be found at
-   https://github.com/tfpauly/quic-proxy (https://github.com/tfpauly/
-   quic-proxy).
+   https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy.
 
 Status of This Memo
 
@@ -45,11 +54,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 3 May 2024.
+   This Internet-Draft will expire on 15 August 2024.
 
 Copyright Notice
 
-   Copyright (c) 2023 IETF Trust and the persons identified as the
+   Copyright (c) 2024 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -1083,9 +1092,9 @@ UDP Datagram                     -------->
 
    [QUIC-LB]  Duke, M., Banks, N., and C. Huitema, "QUIC-LB: Generating
               Routable QUIC Connection IDs", Work in Progress, Internet-
-              Draft, draft-ietf-quic-load-balancers-17, 15 August 2023,
+              Draft, draft-ietf-quic-load-balancers-19, 5 February 2024,
               <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
-              load-balancers-17>.
+              load-balancers-19>.
 
 Acknowledgments
 
