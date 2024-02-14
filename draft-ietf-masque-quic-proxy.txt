@@ -5,9 +5,9 @@
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
 Intended status: Experimental                                 Apple Inc.
-Expires: 15 August 2024                                      D. Schinazi
+Expires: 17 August 2024                                      D. Schinazi
                                                               Google LLC
-                                                        12 February 2024
+                                                        14 February 2024
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 15 August 2024.
+   This Internet-Draft will expire on 17 August 2024.
 
 Copyright Notice
 
@@ -365,7 +365,7 @@ Table of Contents
    without the peer's knowledge, they may send forwarded mode packets
    even though the Client or Proxy no longer has state for that
    connection.  To allow the Client or Proxy to reset the
-   client<->target connection in the absence the mappings above, a
+   client<->target connection in the absence of the mappings above, a
    stateless reset token corresponding to the Virtual Connection ID can
    be provided.
 
@@ -708,7 +708,7 @@ Table of Contents
    forwarding, it sets the value to "?1"; otherwise, it sets it to "?0".
 
    Upon receipt of a REGISTER_CLIENT_CID or REGISTER_TARGET_CID capsule,
-   the proxy validates the registration, tries to establish the
+   the proxy validates the registration and tries to establish the
    appropriate mappings as described in Section 2.
 
    The proxy MUST reply to each REGISTER_CLIENT_CID capsule with either
@@ -848,7 +848,7 @@ Table of Contents
    ECN markings.  Proxies SHOULD preserve ECN markings on forwarded
    packets in both directions, to allow ECN to function end-to-end.  If
    the proxy does not preserve ECN markings, it MUST set ECN marks to
-   zero on the IP headers it genrates.
+   zero on the IP headers it generates.
 
    Forwarded mode does not create an IP-in-IP tunnel, so the guidance in
    [ECN-TUNNEL] about transferring ECN markings between inner and outer

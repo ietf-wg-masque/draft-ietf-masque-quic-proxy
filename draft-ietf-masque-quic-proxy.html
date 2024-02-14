@@ -1044,7 +1044,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Pauly, et al.</td>
-<td class="center">Expires 15 August 2024</td>
+<td class="center">Expires 17 August 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1057,12 +1057,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-masque-quic-proxy-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-02-12" class="published">12 February 2024</time>
+<time datetime="2024-02-14" class="published">14 February 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Experimental</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-08-15">15 August 2024</time></dd>
+<dd class="expires"><time datetime="2024-08-17">17 August 2024</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1124,7 +1124,7 @@ HTTP/3 proxy rather than being re-encapsulated and re-encrypted.<a href="#sectio
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 15 August 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 17 August 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1551,7 +1551,7 @@ client&lt;-&gt;proxy HTTP stream, a peer may not be aware that the stream has
 terminated. If the above mappings are lost or removed without the peer's
 knowledge, they may send forwarded mode packets even though the Client
 or Proxy no longer has state for that connection. To allow the Client or
-Proxy to reset the client&lt;-&gt;target connection in the absence the mappings
+Proxy to reset the client&lt;-&gt;target connection in the absence of the mappings
 above, a stateless reset token corresponding to the Virtual Connection ID
 can be provided.<a href="#section-2.5-1" class="pilcrow">¶</a></p>
 <p id="section-2.5-2">Consider a proxy that initiates closure of a client&lt;-&gt;proxy QUIC connection.
@@ -1926,7 +1926,7 @@ by including a "Proxy-QUIC-Forwarding" header in a successful response.
 If it supports QUIC packet forwarding, it sets the value to "?1"; otherwise,
 it sets it to "?0".<a href="#section-5-1" class="pilcrow">¶</a></p>
 <p id="section-5-2">Upon receipt of a REGISTER_CLIENT_CID or REGISTER_TARGET_CID capsule,
-the proxy validates the registration, tries to establish the appropriate
+the proxy validates the registration and tries to establish the appropriate
 mappings as described in <a href="#mappings" class="auto internal xref">Section 2</a>.<a href="#section-5-2" class="pilcrow">¶</a></p>
 <p id="section-5-3">The proxy MUST reply to each REGISTER_CLIENT_CID capsule with either
 an ACK_CLIENT_CID or CLOSE_CLIENT_CID capsule containing the
@@ -2046,7 +2046,7 @@ header to signal congestion from a network to endpoints. When using forwarded mo
 the proxy replaces IP headers for packets exchanged between the client and target;
 these headers can include ECN markings. Proxies SHOULD preserve ECN markings on
 forwarded packets in both directions, to allow ECN to function end-to-end. If the proxy does not
-preserve ECN markings, it MUST set ECN marks to zero on the IP headers it genrates.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
+preserve ECN markings, it MUST set ECN marks to zero on the IP headers it generates.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
 <p id="section-5.3-2">Forwarded mode does not create an IP-in-IP tunnel, so the guidance in
 <span>[<a href="#ECN-TUNNEL" class="cite xref">ECN-TUNNEL</a>]</span> about transferring ECN markings between inner and outer IP
 headers does not apply.<a href="#section-5.3-2" class="pilcrow">¶</a></p>
