@@ -299,7 +299,7 @@ client<->proxy HTTP stream, a peer may not be aware that the stream has
 terminated. If the above mappings are lost or removed without the peer's
 knowledge, they may send forwarded mode packets even though the Client
 or Proxy no longer has state for that connection. To allow the Client or
-Proxy to reset the client<->target connection in the absence the mappings
+Proxy to reset the client<->target connection in the absence of the mappings
 above, a stateless reset token corresponding to the Virtual Connection ID
 can be provided.
 
@@ -618,7 +618,7 @@ If it supports QUIC packet forwarding, it sets the value to "?1"; otherwise,
 it sets it to "?0".
 
 Upon receipt of a REGISTER_CLIENT_CID or REGISTER_TARGET_CID capsule,
-the proxy validates the registration, tries to establish the appropriate
+the proxy validates the registration and tries to establish the appropriate
 mappings as described in {{mappings}}.
 
 The proxy MUST reply to each REGISTER_CLIENT_CID capsule with either
@@ -743,7 +743,7 @@ header to signal congestion from a network to endpoints. When using forwarded mo
 the proxy replaces IP headers for packets exchanged between the client and target;
 these headers can include ECN markings. Proxies SHOULD preserve ECN markings on
 forwarded packets in both directions, to allow ECN to function end-to-end. If the proxy does not
-preserve ECN markings, it MUST set ECN marks to zero on the IP headers it genrates.
+preserve ECN markings, it MUST set ECN marks to zero on the IP headers it generates.
 
 Forwarded mode does not create an IP-in-IP tunnel, so the guidance in
 {{?ECN-TUNNEL=RFC6040}} about transferring ECN markings between inner and outer IP
