@@ -5,9 +5,9 @@
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
 Intended status: Experimental                                 Apple Inc.
-Expires: 27 July 2024                                        D. Schinazi
+Expires: 14 September 2024                                   D. Schinazi
                                                               Google LLC
-                                                         24 January 2024
+                                                           13 March 2024
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -45,7 +45,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 27 July 2024.
+   This Internet-Draft will expire on 14 September 2024.
 
 Copyright Notice
 
@@ -86,7 +86,7 @@ Table of Contents
      5.2.  Handling Connection Migration
      5.3.  Handling ECN Marking
    6.  Packet Transforms
-     6.1.  The null transform
+     6.1.  The identify transform
      6.2.  The scramble transform
    7.  Example
    8.  Packet Size Considerations
@@ -899,23 +899,24 @@ Table of Contents
 
    Packet transforms are identified by an IANA-registered name, and
    negotiated in the HTTP headers (see Section 4).  This document
-   defines two initial transforms: the null transform and the scramble
-   transform.
+   defines two initial transforms: the identity transform and the
+   scramble transform.
 
-6.1.  The null transform
+6.1.  The identify transform
 
-   The null transform does not modify the packet in any way.  When this
-   transform is in use, a global passive adversary can trivially
+   The identity transform does not modify the packet in any way.  When
+   this transform is in use, a global passive adversary can trivially
    correlate pairs of packets that crossed the forwarder, providing a
    compact proof that a specific client was communicating to a specific
    target.
 
-   The null transform is identified by the value "null" Section 10.3.
+   The identity transform is identified by the value "identity"
+   Section 10.3.
 
    Use of this transform is NOT RECOMMENDED if the scramble transform is
    supported by both the client and the proxy.  Implementations MAY
-   choose to not implement or support the "null" transform, depending on
-   the use cases and privacy requirements of the deployment.
+   choose to not implement or support the identity transform, depending
+   on the use cases and privacy requirements of the deployment.
 
 6.2.  The scramble transform
 
@@ -1005,7 +1006,7 @@ Table of Contents
 
    Consider a client that is establishing a new QUIC connection through
    the proxy.  In this example, the client prefers the scramble
-   transform, but also offers the null transform.  It has selected a
+   transform, but also offers the identity transform.  It has selected a
    Client Connection ID of 0x31323334.  In order to inform a proxy of
    the new QUIC Client Connection ID, the client also sends a
    REGISTER_CLIENT_CID capsule.
@@ -1021,7 +1022,7 @@ Table of Contents
      :scheme = https
      :path = /target.example.com/443/
      :authority = proxy.example.org
-     proxy-quic-forwarding = ?1; accept-transform=scramble,null; \
+     proxy-quic-forwarding = ?1; accept-transform=scramble,identity; \
          scramble-key=:abc...789=:
      capsule-protocol = ?1
 
@@ -1144,11 +1145,11 @@ UDP Datagram                     -------->
 
    A passive attacker aims to deanonymize a client by correlating
    traffic across both sides of the proxy.  When using forwarded mode
-   with the null packet transform (see Section 6.1), such correlation is
-   trivial by matching a subset of QUIC packet bytes as packets enter
-   the proxy on one side and exit on the other.  Packet transforms such
-   as scramble mitigate this by cryptographically preventing such byte
-   comparisons (see Section 6.2).
+   with the identity packet transform (see Section 6.1), such
+   correlation is trivial by matching a subset of QUIC packet bytes as
+   packets enter the proxy on one side and exit on the other.  Packet
+   transforms such as scramble mitigate this by cryptographically
+   preventing such byte comparisons (see Section 6.2).
 
    Regardless of which packet transform is used, both tunnelled and
    forwarded mode are still vulnerable to size and timing attacks,
@@ -1227,7 +1228,7 @@ UDP Datagram                     -------->
 
    This document establishes a new registry for packet transform names
    in <https://www.iana.org/assignments/masque/masque.xhtml> and defines
-   two initial transforms: "null" and "scramble".  Prior to
+   two initial transforms: "identity" and "scramble".  Prior to
    finalization, deployments that implement the version of the scramble
    transform defined in this document should use the value "scramble-
    dt".  Once the design team proposal is adopted and a new draft is
@@ -1239,7 +1240,7 @@ UDP Datagram                     -------->
    | Transform | Description            | Specification | Notes       |
    | Name      |                        |               |             |
    +===========+========================+===============+=============+
-   | null      | no transformation      | This Document | Section     |
+   | identity  | no transformation      | This Document | Section     |
    |           |                        |               | Section 6.1 |
    +-----------+------------------------+---------------+-------------+
    | scramble  | Reserved (will be used | This Document | Section     |
@@ -1336,9 +1337,9 @@ UDP Datagram                     -------->
 
    [QUIC-LB]  Duke, M., Banks, N., and C. Huitema, "QUIC-LB: Generating
               Routable QUIC Connection IDs", Work in Progress, Internet-
-              Draft, draft-ietf-quic-load-balancers-18, 19 January 2024,
+              Draft, draft-ietf-quic-load-balancers-19, 5 February 2024,
               <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
-              load-balancers-18>.
+              load-balancers-19>.
 
    [RFC8999]  Thomson, M., "Version-Independent Properties of QUIC",
               RFC 8999, DOI 10.17487/RFC8999, May 2021,
