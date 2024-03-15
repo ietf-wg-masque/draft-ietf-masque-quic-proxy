@@ -916,15 +916,38 @@ Protocol (HTTP) Field Name Registry" <[](https://www.iana.org/assignments/http-f
 This document registers six new values in the "HTTP Capsule Types"
 registry established by {{HTTP-DGRAM}}.
 
-|     Capule Type     |   Value   | Specification |
-|:--------------------|:----------|:--------------|
-| REGISTER_CLIENT_CID | 0xffe400  | This Document |
-| REGISTER_TARGET_CID | 0xffe401  | This Document |
-| ACK_CLIENT_CID      | 0xffe402  | This Document |
-| ACK_TARGET_CID      | 0xffe403  | This Document |
-| CLOSE_CLIENT_CID    | 0xffe404  | This Document |
-| CLOSE_TARGET_CID    | 0xffe405  | This Document |
+|     Capule Type     |   Value   |
+|:--------------------|:----------|
+| REGISTER_CLIENT_CID | 0xffe400  |
+| REGISTER_TARGET_CID | 0xffe401  |
+| ACK_CLIENT_CID      | 0xffe402  |
+| ACK_TARGET_CID      | 0xffe403  |
+| CLOSE_CLIENT_CID    | 0xffe404  |
+| CLOSE_TARGET_CID    | 0xffe405  |
 {: #iana-capsule-type-table title="Registered Capsule Types"}
+
+All of these new entries use the following values for these fields:
+
+Status:
+
+: permanent
+
+Reference:
+
+: This document
+
+Change Controller:
+
+: IETF
+
+Contact:
+
+: masque@ietf.org
+
+Notes:
+
+: None
+{: spacing="compact" newline="false"}
 
 --- back
 
