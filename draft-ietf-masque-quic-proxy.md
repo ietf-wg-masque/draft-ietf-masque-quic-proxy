@@ -930,7 +930,7 @@ All of these new entries use the following values for these fields:
 
 Status:
 
-: permanent
+: provisional (permanent when this document is published)
 
 Reference:
 
