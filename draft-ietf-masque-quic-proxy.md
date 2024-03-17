@@ -914,7 +914,8 @@ Protocol (HTTP) Field Name Registry" <[](https://www.iana.org/assignments/http-f
 ## Capsule Types {#iana-capsule-types}
 
 This document registers six new values in the "HTTP Capsule Types"
-registry established by {{HTTP-DGRAM}}.
+registry established by {{HTTP-DGRAM}}. Note that the codepoints below
+will be replaced with lower values before publication.
 
 |     Capule Type     |   Value   |
 |:--------------------|:----------|
