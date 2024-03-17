@@ -1025,7 +1025,9 @@ packet simplifies size and timing attacks.
 ## Active Attacks
 
 An active attacker is an adversary that can inject, modify, drop, and view
-packets in the network.
+packets in the network. Some active attacks have different effects between
+forwarded mode and tunnelled mode, but active attacks can be used to correlate
+flows in either mode.
 
 Both tunnelled mode and forwarded mode (regardless of packet transform) are
 vulnerable to packet injection in the target-to-client direction. An attacker
@@ -1033,7 +1035,7 @@ can inject a burst of packets with a known QUIC Connection ID and see which
 Connection ID is used for the corresponding burst on the proxy-to-client network path.
 
 Packet injection with a known QUIC Connection ID can also happen in the
-client-to-proxy direction, however, this only affects forwarded mode since
+client-to-proxy direction, which only affects forwarded mode since
 tunnelled mode sends packets within an authenticated and integrity protected
 QUIC connection to the proxy (see {{?RFC9001}}). None of the packet transforms
 defined in this document provide integrity protection. Even if a packet
@@ -1041,6 +1043,11 @@ transform did provide integrity protection, attackers can inject replayed
 packets. Protection against replayed packets is similarly provided by QUIC in
 tunnelled mode, but not provided by any of the forwarded mode packet transforms
 defined in this document.
+
+An active attacker can modify packets in the client-to-proxy direction, which
+would cause a tunnelling proxy to silently drop packets, while a forwarding proxy
+would forward the packets. In this way, forwarded mode is less vulnerable to
+flow recognition based on corrupting a portion of packets in a burst.
 
 [comment1]: # OPEN ISSUE: Figure out how clients and proxies could interact to
 [comment2]: # learn whether an adversary is injecting malicious forwarded
