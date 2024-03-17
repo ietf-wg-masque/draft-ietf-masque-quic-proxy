@@ -778,41 +778,41 @@ are presented here.
 
 Packet transforms are identified by an IANA-registered name, and negotiated in
 the HTTP headers (see {{client-behavior}}).  This document defines two initial
-transforms: the null transform and the scramble transform.
+transforms: the `identity` transform and the `scramble` transform.
 
-## The null transform {#null-transform}
+## The identify transform {#identity-transform}
 
-The null transform does not modify the packet in any way.  When this transform
+The `identity` transform does not modify the packet in any way.  When this transform
 is in use, a global passive adversary can trivially correlate pairs of packets
 that crossed the forwarder, providing a compact proof that a specific client
 was communicating to a specific target.
 
-The null transform is identified by the value "null" {{iana-transforms}}.
+The `identity` transform is identified by the value "identity" {{iana-transforms}}.
 
-Use of this transform is NOT RECOMMENDED if the scramble transform is supported
+Use of this transform is NOT RECOMMENDED if the `scramble` transform is supported
 by both the client and the proxy. Implementations MAY choose to not implement or
-support the "null" transform, depending on the use cases and privacy requirements of
+support the `identity` transform, depending on the use cases and privacy requirements of
 the deployment.
 
 ## The scramble transform {#scramble-transform}
 
-The scramble transform implements length-preserving unauthenticated
+The `scramble` transform implements length-preserving unauthenticated
 re-encryption of QUIC packets while preserving the QUIC invariants.  When
-the scramble transform is in use, a global passive adversary cannot simply compare the packet
+the `scramble` transform is in use, a global passive adversary cannot simply compare the packet
 contents on both sides of the proxy
-to link the client and target.  However, the scramble transform does not defend against
+to link the client and target.  However, the `scramble` transform does not defend against
 analysis of packet sizes and timing, nor does it protect privacy against an
 active attacker.
 
-Deployments that implement the version of the scramble transform defined in this
+Deployments that implement the version of the `scramble` transform defined in this
 document MUST use the value "scramble-dt". The finalized version is expected
 to use the reserved value "scramble" {{iana-transforms}}.
 
-The scramble transform is initialized using a 32-byte random symmetric key.
+The `scramble` transform is initialized using a 32-byte random symmetric key.
 When offering or selecting this transform, the client and server each
 generate the key that they will use to encrypt scrambled packets and MUST add it to the
 Proxy-QUIC-Transform header in an `sf-binary` parameter named "scramble-key".
-If either side receives a scramble transform without the "scramble-key" parameter,
+If either side receives a `scramble` transform without the "scramble-key" parameter,
 forwarding mode MUST be disabled.
 
 This transform relies on the AES-128 block cipher, which is represented by the
@@ -857,13 +857,13 @@ containing a distinct 16 bytes following the Connection ID.  This is true
 for the original ciphersuites of QUICv1, but it is not guaranteed by the QUIC
 Invariants. Future ciphersuites and QUIC versions could in principle produce
 packets that are too short or repeat the values at this location. When using the
-scramble transform, clients MUST NOT offer any configuration that could
+`scramble` transform, clients MUST NOT offer any configuration that could
 cause the client or target to violate this requirement.
 
 # Example
 
 Consider a client that is establishing a new QUIC connection through the proxy.
-In this example, the client prefers the scramble transform, but also offers the null
+In this example, the client prefers the `scramble` transform, but also offers the `identity`
 transform. It has selected a Client Connection ID of 0x31323334. In order to inform a proxy
 of the new QUIC Client Connection ID, the client also sends a
 REGISTER_CLIENT_CID capsule.
@@ -880,7 +880,7 @@ STREAM(44): HEADERS             -------->
   :scheme = https
   :path = /target.example.com/443/
   :authority = proxy.example.org
-  proxy-quic-forwarding = ?1; accept-transform=scramble,null; \
+  proxy-quic-forwarding = ?1; accept-transform=scramble,identity; \
       scramble-key=:abc...789=:
   capsule-protocol = ?1
 
@@ -1003,10 +1003,10 @@ using forwarded mode.
 ## Passive Attacks
 
 A passive attacker aims to deanonymize a client by correlating traffic across
-both sides of the proxy. When using forwarded mode with the null packet
-transform (see {{null-transform}}), such correlation is trivial by matching
+both sides of the proxy. When using forwarded mode with the `identity` packet
+transform (see {{identity-transform}}), such correlation is trivial by matching
 a subset of QUIC packet bytes as packets enter the proxy on one side and exit
-on the other. Packet transforms such as scramble mitigate this by
+on the other. Packet transforms such as `scramble` mitigate this by
 cryptographically preventing such byte comparisons
 (see {{!scramble-transform=scramble-transform}}).
 
@@ -1087,9 +1087,9 @@ Specification Required policy (Section 4.6 of [IANA-POLICY]).
 
 This document establishes a new registry for packet transform names
 in <[](https://www.iana.org/assignments/masque/masque.xhtml)>
-and defines two initial transforms: "null" and "scramble".
+and defines two initial transforms: "identity" and "scramble".
 Prior to finalization, deployments that implement the version of
-the scramble transform defined in this document should use the value
+the `scramble` transform defined in this document should use the value
 "scramble-dt". Once the design team proposal is adopted and a new draft is submitted,
 the wire identifier will become "scramble-XX" where XX is the draft number.
 Registrations in this registry are assigned using the
@@ -1097,8 +1097,8 @@ Specification Required policy (Section 4.6 of [IANA-POLICY]).
 
 | Transform Name | Description       | Specification | Notes                          |
 |:---------------|:------------------|:--------------|--------------------------------|
-| null           | no transformation | This Document | Section {{null-transform}}     |
-| scramble      | Reserved (will be used for final version)  | This Document | Section {{scramble-transform}} |
+| identity       | no transformation | This Document | Section {{identity-transform}}     |
+| scramble       | Reserved (will be used for final version)  | This Document | Section {{scramble-transform}} |
 {: #iana-packet-transforms-table title="Initial Packet Transform Names"}
 
 ## Capsule Types {#iana-capsule-types}
