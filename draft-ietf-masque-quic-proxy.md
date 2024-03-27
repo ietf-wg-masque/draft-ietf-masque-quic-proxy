@@ -187,6 +187,9 @@ ID prior to forwarding the packet to the Client. Clients take advantage of this
 to avoid linkability when migrating a client to proxy network path. The Virtual
 Client Connection ID allows the connection ID bytes to change on the wire
 without requiring the connection IDs on the client to target connection change.
+To reduce the likelihood of connection ID conflicts, the proxy SHOULD choose a
+Virtual Client Connection ID that is at least as long as the Client Connection
+ID.
 
 Clients and Proxies not implementing forwarded mode do not need to consider
 Virtual Connection IDs since all Client<->Target datagrams will be encapsulated
@@ -498,7 +501,9 @@ Virtual Connection ID Length
 valid connection ID length for the QUIC version used in the client<->proxy QUIC
 connection. When forwarded mode is not negotiated, the length MUST be zero.
 The Virtual Connection ID Length and Connection ID Length SHOULD be equal
-when possible to avoid the need to resize packets during replacement.
+when possible to avoid the need to resize packets during replacement. The
+Virtual Client Connection ID Length SHOULD be at least as large as the
+Connection ID to reduce the likelihood of connection ID conflicts.
 
 Virtual Connection ID
 : The proxy-chosen connection ID that the proxy MUST use when sending in
