@@ -189,7 +189,13 @@ Client Connection ID allows the connection ID bytes to change on the wire
 without requiring the connection IDs on the client to target connection change.
 To reduce the likelihood of connection ID conflicts, the proxy SHOULD choose a
 Virtual Client Connection ID that is at least as long as the Client Connection
-ID.
+ID. Similarly, clients multiplexing connections on the same UDP socket SHOULD
+choose a Client Connection ID that's sufficiently long to reduce the likelihood
+of a conflict with the proxy-chosen Virtual Client Connection ID. The Virtual
+Client Connection ID MUST either be constructed such that it is unpredictable to
+the client or to guarantee no conflicts among all proxyies sharing an IP address
+and port. See {{security}} for more discussion on Virtual Client Connection ID
+construction.
 
 Clients and Proxies not implementing forwarded mode do not need to consider
 Virtual Connection IDs since all Client<->Target datagrams will be encapsulated
@@ -1006,6 +1012,13 @@ Since proxies that forward QUIC packets do not perform any cryptographic
 integrity check, it is possible that these packets are either malformed,
 replays, or otherwise malicious. This may result in proxy targets rate limiting
 or decreasing the reputation of a given proxy.
+
+Chaining of proxies using forwarded mode introduces the risk of forwarding loop
+attacks. Preventing Virtual Client Connection ID conflicts across proxies
+sharing an IP address and port mitigates one such forwarding loop attack.
+Conflicts can be avoided by partitioning the Virtual Client Connection ID space
+across proxies, using sufficiently long and random values, or by other means.
+
 
 [comment1]: # OPEN ISSUE: Figure out how clients and proxies could interact to
 [comment2]: # learn whether an adversary is injecting malicious forwarded
