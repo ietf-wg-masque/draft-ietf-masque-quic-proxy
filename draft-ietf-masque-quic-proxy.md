@@ -193,7 +193,7 @@ ID. Similarly, clients multiplexing connections on the same UDP socket SHOULD
 choose a Client Connection ID that's sufficiently long to reduce the likelihood
 of a conflict with the proxy-chosen Virtual Client Connection ID. The Virtual
 Client Connection ID MUST either be constructed such that it is unpredictable to
-the client or to guarantee no conflicts among all proxyies sharing an IP address
+the client or to guarantee no conflicts among all proxies sharing an IP address
 and port. See {{security}} for more discussion on Virtual Client Connection ID
 construction.
 
@@ -1018,7 +1018,6 @@ attacks. Preventing Virtual Client Connection ID conflicts across proxies
 sharing an IP address and port mitigates one such forwarding loop attack.
 Conflicts can be avoided by partitioning the Virtual Client Connection ID space
 across proxies, using sufficiently long and random values, or by other means.
-
 
 [comment1]: # OPEN ISSUE: Figure out how clients and proxies could interact to
 [comment2]: # learn whether an adversary is injecting malicious forwarded
