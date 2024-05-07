@@ -15,7 +15,7 @@ allows a proxy to reuse UDP 4-tuples for multiple connections. It also defines a
 mode of proxying in which QUIC short header packets can be forwarded using an
 HTTP/3 proxy rather than being re-encapsulated and re-encrypted. 
     " name="description">
-<meta content="xml2rfc 3.20.0" name="generator">
+<meta content="xml2rfc 3.21.0" name="generator">
 <meta content="quic" name="keyword">
 <meta content="http" name="keyword">
 <meta content="datagram" name="keyword">
@@ -28,14 +28,14 @@ HTTP/3 proxy rather than being re-encapsulated and re-encrypted.
 <meta content="http-ng" name="keyword">
 <meta content="draft-ietf-masque-quic-proxy-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.20.0
-    Python 3.11.8
+  xml2rfc 3.21.0
+    Python 3.11.9
     ConfigArgParse 1.7
     google-i18n-address 3.1.0
     intervaltree 3.1.0
     Jinja2 3.1.2
     lxml 4.9.3
-    platformdirs 4.2.0
+    platformdirs 4.2.1
     pycountry 22.3.5
     PyYAML 6.0.1
     requests 2.31.0
@@ -1040,11 +1040,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">QUIC Proxy</td>
-<td class="right">March 2024</td>
+<td class="right">May 2024</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Pauly, et al.</td>
-<td class="center">Expires 18 September 2024</td>
+<td class="center">Expires 8 November 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1057,12 +1057,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-masque-quic-proxy-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-03-17" class="published">17 March 2024</time>
+<time datetime="2024-05-07" class="published">7 May 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Experimental</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-09-18">18 September 2024</time></dd>
+<dd class="expires"><time datetime="2024-11-08">8 November 2024</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1124,7 +1124,7 @@ HTTP/3 proxy rather than being re-encapsulated and re-encrypted.<a href="#sectio
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 18 September 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 8 November 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1228,41 +1228,66 @@ HTTP/3 proxy rather than being re-encapsulated and re-encrypted.<a href="#sectio
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-example" class="internal xref">Example</a></p>
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-packet-transforms" class="internal xref">Packet Transforms</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-the-identify-transform" class="internal xref">The identify transform</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-the-scramble-transform" class="internal xref">The scramble transform</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-packet-size-considerations" class="internal xref">Packet Size Considerations</a></p>
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-example" class="internal xref">Example</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-packet-size-considerations" class="internal xref">Packet Size Considerations</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
-                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-http-header" class="internal xref">HTTP Header</a></p>
+                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-passive-attacks" class="internal xref">Passive Attacks</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
-                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-capsule-types" class="internal xref">Capsule Types</a></p>
+                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-active-attacks" class="internal xref">Active Attacks</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-references" class="internal xref">References</a></p>
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1">
-                <p id="section-toc.1-1.10.2.1.1"><a href="#section-10.1" class="auto internal xref">10.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+                <p id="section-toc.1-1.10.2.1.1"><a href="#section-10.1" class="auto internal xref">10.1</a>.  <a href="#name-http-header" class="internal xref">HTTP Header</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.2">
-                <p id="section-toc.1-1.10.2.2.1"><a href="#section-10.2" class="auto internal xref">10.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+                <p id="section-toc.1-1.10.2.2.1"><a href="#section-10.2" class="auto internal xref">10.2</a>.  <a href="#name-proxy-quic-forwarding-param" class="internal xref">Proxy QUIC Forwarding Parameter Names</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.3">
+                <p id="section-toc.1-1.10.2.3.1"><a href="#section-10.3" class="auto internal xref">10.3</a>.  <a href="#name-packet-transform-names" class="internal xref">Packet Transform Names</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.4">
+                <p id="section-toc.1-1.10.2.4.1"><a href="#section-10.4" class="auto internal xref">10.4</a>.  <a href="#name-capsule-types" class="internal xref">Capsule Types</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
-            <p id="section-toc.1-1.11.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1">
+                <p id="section-toc.1-1.11.2.1.1"><a href="#section-11.1" class="auto internal xref">11.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.2">
+                <p id="section-toc.1-1.11.2.2.1"><a href="#section-11.2" class="auto internal xref">11.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
-            <p id="section-toc.1-1.12.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+            <p id="section-toc.1-1.12.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
+            <p id="section-toc.1-1.13.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1298,13 +1323,12 @@ and congestion control. QUIC long header packets MUST use this mode. QUIC short
 header packets MAY use this mode. This is the default mode for UDP proxying.<a href="#section-1-5.1.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-1-5.2">
-          <p id="section-1-5.2.1">Forwarded, in which client &lt;-&gt; target QUIC packets are sent directly over the
-client &lt;-&gt; proxy UDP socket. These packets are only encrypted using the
-client-target keys, and use the client-target congestion control. This mode MUST
-only be used for QUIC short header packets.<a href="#section-1-5.2.1" class="pilcrow">¶</a></p>
+          <p id="section-1-5.2.1">Forwarded, in which client &lt;-&gt; target QUIC packets are sent separately over the
+client &lt;-&gt; proxy UDP socket, using a special-purpose transform instead of full
+QUIC encapsulation. This mode MUST only be used for QUIC short header packets.<a href="#section-1-5.2.1" class="pilcrow">¶</a></p>
 </li>
       </ol>
-<p id="section-1-6">Forwarded mode is defined as an optimization to reduce CPU processing on clients and
+<p id="section-1-6">Forwarded mode is defined as an optimization to reduce CPU and memory cost to clients and
 proxies, as well as avoiding MTU overhead for packets on the wire. This makes it
 suitable for deployment situations that otherwise relied on cleartext TCP
 proxies, which cannot support QUIC and have inferior security and privacy
@@ -1325,9 +1349,10 @@ target are not able to learn more about the client &lt;-&gt; target communicatio
 if no proxy was used.<a href="#section-1-8.3.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-1-9">It is not a goal of forwarded mode to prevent correlation between client &lt;-&gt;
-proxy and the proxy &lt;-&gt; target packets from an entity that can observe both
-links. See <a href="#security" class="auto internal xref">Section 8</a> for further discussion.<a href="#section-1-9" class="pilcrow">¶</a></p>
+<p id="section-1-9">Forwarded mode does not prevent correlation of client &lt;-&gt; proxy and proxy &lt;-&gt;
+target packets by an entity that can observe both links. The precise risks
+depend on the negotiated transform (<a href="#packet-transforms" class="auto internal xref">Section 6</a>). See <a href="#security" class="auto internal xref">Section 9</a> for
+further discussion.<a href="#section-1-9" class="pilcrow">¶</a></p>
 <p id="section-1-10">Both clients and proxies can unilaterally choose to disable forwarded mode for
 any client &lt;-&gt; target connection.<a href="#section-1-10" class="pilcrow">¶</a></p>
 <p id="section-1-11">The forwarded mode of this extension is only defined for HTTP/3
@@ -1398,6 +1423,10 @@ client that the proxy MUST use when sending QUIC packets in forwarded mode.<a hr
             <p id="section-1.2-2.11.1">Virtual Target Connection ID: a fake QUIC Connection ID that is chosen by the
 proxy that the client MUST use when sending QUIC packets in forwarded mode.<a href="#section-1.2-2.11.1" class="pilcrow">¶</a></p>
 </li>
+          <li class="normal" id="section-1.2-2.12">
+            <p id="section-1.2-2.12.1">Packet Transform: the procedure used to modify packets before they enter the
+client-proxy link.<a href="#section-1.2-2.12.1" class="pilcrow">¶</a></p>
+</li>
         </ul>
 </section>
 </div>
@@ -1463,7 +1492,8 @@ required unidirectional mappings, described below.<a href="#section-2-3" class="
 </pre><a href="#section-2.1-2" class="pilcrow">¶</a>
 </div>
 <p id="section-2.1-3">Multiple streams can map to the same target-facing socket, but a
-single stream cannot be mapped to multiple target-facing sockets.<a href="#section-2.1-3" class="pilcrow">¶</a></p>
+single stream cannot be mapped to multiple target-facing sockets.
+Each stream MUST also be associated with a single Packet Transform.<a href="#section-2.1-3" class="pilcrow">¶</a></p>
 <p id="section-2.1-4">This mapping guarantees that any HTTP Datagram using a stream sent
 from the client to the proxy in tunnelled mode can be sent to the correct
 target.<a href="#section-2.1-4" class="pilcrow">¶</a></p>
@@ -1601,16 +1631,16 @@ using HTTP Datagrams with the context ID set to zero as defined in
 IDs with the proxy, and for the proxy to acknowledge or reject the connection
 ID mappings.<a href="#section-3-3" class="pilcrow">¶</a></p>
 <p id="section-3-4">The REGISTER_CLIENT_CID and REGISTER_TARGET_CID capsule types (see
-<a href="#iana-capsule-types" class="auto internal xref">Section 9.2</a> for the capsule type values) allow a client to inform
+<a href="#iana-capsule-types" class="auto internal xref">Section 10.4</a> for the capsule type values) allow a client to inform
 the proxy about a new Client Connection ID or a new Target Connection ID,
 respectively. These capsule types MUST only be sent by a client.<a href="#section-3-4" class="pilcrow">¶</a></p>
-<p id="section-3-5">The ACK_CLIENT_CID and ACK_TARGET_CID capsule types (see <a href="#iana-capsule-types" class="auto internal xref">Section 9.2</a>
+<p id="section-3-5">The ACK_CLIENT_CID and ACK_TARGET_CID capsule types (see <a href="#iana-capsule-types" class="auto internal xref">Section 10.4</a>
 for the capsule type values) are sent by the proxy to the client to indicate
 that a mapping was successfully created for a registered connection ID as well
 as provide the Virtual Target Connection ID that may be used in forwarded mode.
 These capsule types MUST only be sent by a proxy.<a href="#section-3-5" class="pilcrow">¶</a></p>
 <p id="section-3-6">The CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsule types (see
-<a href="#iana-capsule-types" class="auto internal xref">Section 9.2</a> for the capsule type values) allow either a client
+<a href="#iana-capsule-types" class="auto internal xref">Section 10.4</a> for the capsule type values) allow either a client
 or a proxy to remove a mapping for a connection ID. These capsule types
 MAY be sent by either a client or the proxy. If a proxy sends a
 CLOSE_CLIENT_CID without having sent an ACK_CLIENT_CID, or if a proxy
@@ -1685,7 +1715,7 @@ Length. This is the real Target or Client Connection ID.<a href="#section-3-12.4
 <dt id="section-3-12.7">Stateless Reset Token</dt>
         <dd style="margin-left: 1.5em" id="section-3-12.8">
           <p id="section-3-12.8.1">The target-provided Stateless Reset token allowing the proxy to correctly
-recognize Stateless Reset packets to be tunneled to the client.<a href="#section-3-12.8.1" class="pilcrow">¶</a></p>
+recognize Stateless Reset packets to be tunnelled to the client.<a href="#section-3-12.8.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
@@ -1770,17 +1800,18 @@ in <span>[<a href="#CONNECT-UDP" class="cite xref">CONNECT-UDP</a>]</span>. With
 header to indicate whether or not the request should support forwarding.
 If this header is not included, the client MUST NOT send any connection ID
 capsules.<a href="#section-4-1" class="pilcrow">¶</a></p>
-<p id="section-4-2">The "Proxy-QUIC-Forwarding" is an Item Structured Header <span>[<a href="#RFC8941" class="cite xref">RFC8941</a>]</span>. Its
-value MUST be a Boolean. Its ABNF is:<a href="#section-4-2" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-4-3">
-<pre>
-    Proxy-QUIC-Forwarding = sf-boolean
-</pre><a href="#section-4-3" class="pilcrow">¶</a>
-</div>
-<p id="section-4-4">If the client wants to enable QUIC packet forwarding for this request, it sets
+<p id="section-4-2">"Proxy-QUIC-Forwarding" is an Item Structured Header <span>[<a href="#RFC8941" class="cite xref">RFC8941</a>]</span>. Its
+value MUST be a Boolean.<a href="#section-4-2" class="pilcrow">¶</a></p>
+<p id="section-4-3">If the client wants to enable QUIC packet forwarding for this request, it sets
 the value to "?1". If it doesn't want to enable forwarding, but instead only
 provide information about QUIC Connection IDs for the purpose of allowing
-the proxy to share a target-facing socket, it sets the value to "?0".<a href="#section-4-4" class="pilcrow">¶</a></p>
+the proxy to share a target-facing socket, it sets the value to "?0".<a href="#section-4-3" class="pilcrow">¶</a></p>
+<p id="section-4-4">The client MUST add an "accept-transform" parameter whose value is an
+<code>sf-string</code> containing the supported packet transforms (<a href="#packet-transforms" class="auto internal xref">Section 6</a>)
+in order of descending preference, separated by commas. If the proxy receives a
+"Proxy-QUIC-Forwarding" header without the "accept-transform" parameters, it
+MUST ignore the header and respond as if the client had not sent the
+"Proxy-QUIC-Forwarding" header.<a href="#section-4-4" class="pilcrow">¶</a></p>
 <p id="section-4-5">If the proxy supports QUIC-aware proxying, it will include the
 "Proxy-QUIC-Forwarding" header in successful HTTP responses. The value
 indicates whether or not the proxy supports forwarding. If the client does
@@ -1923,35 +1954,39 @@ in <span><a href="https://rfc-editor.org/rfc/rfc9000#section-10.1.1" class="relr
 <p id="section-5-1">Upon receipt of a CONNECT request that includes the "Proxy-QUIC-Forwarding"
 header, the proxy indicates to the client that it supports QUIC-aware proxying
 by including a "Proxy-QUIC-Forwarding" header in a successful response.
-If it supports QUIC packet forwarding, it sets the value to "?1"; otherwise,
+If it supports QUIC packet proxying in forwarded mode, it sets the value to "?1"; otherwise,
 it sets it to "?0".<a href="#section-5-1" class="pilcrow">¶</a></p>
-<p id="section-5-2">Upon receipt of a REGISTER_CLIENT_CID or REGISTER_TARGET_CID capsule,
+<p id="section-5-2">The proxy MUST include a "transform" parameter whose value is an <code>sf-string</code>
+indicating the selected transform. If the proxy does not recognize or accept
+any of the transforms offered by the client, it MUST omit this parameter and
+set the header field value to "?0", or omit the header entirely.<a href="#section-5-2" class="pilcrow">¶</a></p>
+<p id="section-5-3">Upon receipt of a REGISTER_CLIENT_CID or REGISTER_TARGET_CID capsule,
 the proxy validates the registration and tries to establish the appropriate
-mappings as described in <a href="#mappings" class="auto internal xref">Section 2</a>.<a href="#section-5-2" class="pilcrow">¶</a></p>
-<p id="section-5-3">The proxy MUST reply to each REGISTER_CLIENT_CID capsule with either
+mappings as described in <a href="#mappings" class="auto internal xref">Section 2</a>.<a href="#section-5-3" class="pilcrow">¶</a></p>
+<p id="section-5-4">The proxy MUST reply to each REGISTER_CLIENT_CID capsule with either
 an ACK_CLIENT_CID or CLOSE_CLIENT_CID capsule containing the
-Connection ID that was in the registration capsule.<a href="#section-5-3" class="pilcrow">¶</a></p>
-<p id="section-5-4">Similarly, the proxy MUST reply to each REGISTER_TARGET_CID capsule with
-either an ACK_TARGET_CID or CLOSE_TARGET_CID capsule containing the
 Connection ID that was in the registration capsule.<a href="#section-5-4" class="pilcrow">¶</a></p>
-<p id="section-5-5">The proxy then determines the target-facing socket to associate with the
+<p id="section-5-5">Similarly, the proxy MUST reply to each REGISTER_TARGET_CID capsule with
+either an ACK_TARGET_CID or CLOSE_TARGET_CID capsule containing the
+Connection ID that was in the registration capsule.<a href="#section-5-5" class="pilcrow">¶</a></p>
+<p id="section-5-6">The proxy then determines the target-facing socket to associate with the
 client's request. This will generally involve performing a DNS lookup for
 the target hostname in the CONNECT request, or finding an existing target-facing
 socket to the authority. The target-facing socket might already be open due to a
 previous request from this client, or another. If the socket is not already
 created, the proxy creates a new one. Proxies can choose to reuse target-facing
 sockets across multiple UDP proxying requests, or have a unique target-facing socket
-for every UDP proxying request.<a href="#section-5-5" class="pilcrow">¶</a></p>
-<p id="section-5-6">If a proxy reuses target-facing sockets, it SHOULD store which authorities
+for every UDP proxying request.<a href="#section-5-6" class="pilcrow">¶</a></p>
+<p id="section-5-7">If a proxy reuses target-facing sockets, it SHOULD store which authorities
 (which could be a domain name or IP address literal) are being accessed over a
 particular target-facing socket so it can avoid performing a new DNS query and
 potentially choosing a different target server IP address which could map to a
-different target server.<a href="#section-5-6" class="pilcrow">¶</a></p>
-<p id="section-5-7">Target-facing sockets MUST NOT be reused across QUIC and non-QUIC UDP proxy
+different target server.<a href="#section-5-7" class="pilcrow">¶</a></p>
+<p id="section-5-8">Target-facing sockets MUST NOT be reused across QUIC and non-QUIC UDP proxy
 requests, since it might not be possible to correctly demultiplex or direct
 the traffic. Any packets received on a target-facing socket used for proxying
-QUIC that does not correspond to a known Connection ID MUST be dropped.<a href="#section-5-7" class="pilcrow">¶</a></p>
-<p id="section-5-8">When the proxy recieves a REGISTER_CLIENT_CID capsule, it is receiving a
+QUIC that does not correspond to a known Connection ID MUST be dropped.<a href="#section-5-8" class="pilcrow">¶</a></p>
+<p id="section-5-9">When the proxy recieves a REGISTER_CLIENT_CID capsule, it is receiving a
 request to be able to route traffic matching the Client Connection ID back to
 the client using the Virtual Client Connection ID. If the pair of this Client
 Connection ID and the selected target-facing socket does not create a conflict,
@@ -1963,8 +1998,8 @@ use tunnelled mode (HTTP Datagram frames) for any long header packets. The proxy
 SHOULD forward directly to the client for any matching short header packets if
 forwarding is supported by the client, but the proxy MAY tunnel these packets in
 HTTP Datagram frames instead. If the mapping would create a conflict, the proxy
-responds with a CLOSE_CLIENT_CID capsule.<a href="#section-5-8" class="pilcrow">¶</a></p>
-<p id="section-5-9">When the proxy recieves a REGISTER_TARGET_CID capsule, it is receiving a
+responds with a CLOSE_CLIENT_CID capsule.<a href="#section-5-9" class="pilcrow">¶</a></p>
+<p id="section-5-10">When the proxy recieves a REGISTER_TARGET_CID capsule, it is receiving a
 request to allow the client to forward packets to the target. The proxy
 generates a Virtual Target Connection ID for the client to use when sending
 packets in forwarded mode. If forwarded mode is not supported, the proxy MUST
@@ -1976,22 +2011,22 @@ ACK_TARGET_CID capsule. Once the successful response is sent, the proxy will
 forward any short header packets received on the client-facing socket that use
 the Virtual Target Connection ID using the correct target-facing socket after
 first rewriting the Virtual Target Connection ID to be the correct Target
-Connection ID.<a href="#section-5-9" class="pilcrow">¶</a></p>
-<p id="section-5-10">A proxy that supports forwarded mode but chooses not to support rewriting the
+Connection ID.<a href="#section-5-10" class="pilcrow">¶</a></p>
+<p id="section-5-11">A proxy that supports forwarded mode but chooses not to support rewriting the
 Virtual Target Connection ID to the Target Connection ID may opt to simply let
 them be equal. If the proxy does wish to choose a Virtual Target Connection ID,
 it MUST be able to replace the Virtual Target Connection ID with the Target
 Connection ID and correctly handle length differences between the two.
 Regardless of whether or not the proxy chooses to support rewriting of the
 Virtual Target Connection ID, it MUST be able to support rewriting the Client
-Connection ID to the Virtual Client Connection ID.<a href="#section-5-10" class="pilcrow">¶</a></p>
-<p id="section-5-11">If the proxy does not support forwarded mode, or does not allow forwarded mode
+Connection ID to the Virtual Client Connection ID.<a href="#section-5-11" class="pilcrow">¶</a></p>
+<p id="section-5-12">If the proxy does not support forwarded mode, or does not allow forwarded mode
 for a particular client or authority by policy, it can reject all REGISTER_TARGET_CID
-requests with CLOSE_TARGET_CID capsule.<a href="#section-5-11" class="pilcrow">¶</a></p>
-<p id="section-5-12">The proxy MUST only forward non-tunnelled packets from the client that are QUIC
+requests with CLOSE_TARGET_CID capsule.<a href="#section-5-12" class="pilcrow">¶</a></p>
+<p id="section-5-13">The proxy MUST only forward non-tunnelled packets from the client that are QUIC
 short header packets (based on the Header Form bit) and have mapped Virtual Target
 Connection IDs. Packets sent by the client that are forwarded SHOULD be
-considered as activity for restarting QUIC's Idle Timeout <span>[<a href="#QUIC" class="cite xref">QUIC</a>]</span>.<a href="#section-5-12" class="pilcrow">¶</a></p>
+considered as activity for restarting QUIC's Idle Timeout <span>[<a href="#QUIC" class="cite xref">QUIC</a>]</span>.<a href="#section-5-13" class="pilcrow">¶</a></p>
 <div id="removing-mapping-state">
 <section id="section-5.1">
         <h3 id="name-removing-mapping-state">
@@ -2056,18 +2091,161 @@ on the proxy itself.<a href="#section-5.3-3" class="pilcrow">¶</a></p>
 </div>
 </section>
 </div>
-<div id="example">
+<div id="packet-transforms">
 <section id="section-6">
-      <h2 id="name-example">
-<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-example" class="section-name selfRef">Example</a>
+      <h2 id="name-packet-transforms">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-packet-transforms" class="section-name selfRef">Packet Transforms</a>
       </h2>
-<p id="section-6-1">Consider a client that is establishing a new QUIC connection through the proxy.
-It has selected a Client Connection ID of 0x31323334. In order to inform a proxy
+<p id="section-6-1">A packet transform is the procedure applied to encode packets as they are sent
+on the link between the client and proxy, along with the inverse decode step applied
+on receipt. Simple transforms can be modeled as a function as follows:<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2">Inputs:<a href="#section-6-2" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6-3">
+<li id="section-6-3.1">
+          <p id="section-6-3.1.1">A QUIC short header packet (after Connection ID remapping).<a href="#section-6-3.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-6-3.2">
+          <p id="section-6-3.2.1">The mode (encode or decode).<a href="#section-6-3.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-6-3.3">
+          <p id="section-6-3.3.1">The direction (client-to-proxy or proxy-to-client).<a href="#section-6-3.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-6-3.4">
+          <p id="section-6-3.4.1">Any configuration information negotiated at startup.<a href="#section-6-3.4.1" class="pilcrow">¶</a></p>
+</li>
+      </ol>
+<p id="section-6-4">Output:<a href="#section-6-4" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6-5.1">
+          <p id="section-6-5.1.1">A UDP payload that conforms to the QUIC invariants <span>[<a href="#RFC8999" class="cite xref">RFC8999</a>]</span> and does not
+modify the Connection ID.<a href="#section-6-5.1.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-6-6">More complex transform behaviors could have internal state, but no such transforms
+are presented here.<a href="#section-6-6" class="pilcrow">¶</a></p>
+<p id="section-6-7">Packet transforms are identified by an IANA-registered name, and negotiated in
+the HTTP headers (see <a href="#client-behavior" class="auto internal xref">Section 4</a>).  This document defines two initial
+transforms: the <code>identity</code> transform and the <code>scramble</code> transform.<a href="#section-6-7" class="pilcrow">¶</a></p>
+<div id="identity-transform">
+<section id="section-6.1">
+        <h3 id="name-the-identify-transform">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-the-identify-transform" class="section-name selfRef">The identify transform</a>
+        </h3>
+<p id="section-6.1-1">The <code>identity</code> transform does not modify the packet in any way.  When this transform
+is in use, a global passive adversary can trivially correlate pairs of packets
+that crossed the forwarder, providing a compact proof that a specific client
+was communicating to a specific target.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.1-2">The <code>identity</code> transform is identified by the value "identity" <a href="#iana-transforms" class="auto internal xref">Section 10.3</a>.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.1-3">Use of this transform is NOT RECOMMENDED if the <code>scramble</code> transform is supported
+by both the client and the proxy. Implementations MAY choose to not implement or
+support the <code>identity</code> transform, depending on the use cases and privacy requirements of
+the deployment.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="scramble-transform">
+<section id="section-6.2">
+        <h3 id="name-the-scramble-transform">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-the-scramble-transform" class="section-name selfRef">The scramble transform</a>
+        </h3>
+<p id="section-6.2-1">The <code>scramble</code> transform implements length-preserving unauthenticated
+re-encryption of QUIC packets while preserving the QUIC invariants.  When
+the <code>scramble</code> transform is in use, a global passive adversary cannot simply compare the packet
+contents on both sides of the proxy
+to link the client and target.  However, the <code>scramble</code> transform does not defend against
+analysis of packet sizes and timing, nor does it protect privacy against an
+active attacker.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.2-2">Deployments that implement the version of the <code>scramble</code> transform defined in this
+document MUST use the value "scramble-dt". The finalized version is expected
+to use the reserved value "scramble" <a href="#iana-transforms" class="auto internal xref">Section 10.3</a>.<a href="#section-6.2-2" class="pilcrow">¶</a></p>
+<p id="section-6.2-3">The <code>scramble</code> transform is initialized using a 32-byte random symmetric key.
+When offering or selecting this transform, the client and server each
+generate the key that they will use to encrypt scrambled packets and MUST add it to the
+Proxy-QUIC-Transform header in an <code>sf-binary</code> parameter named "scramble-key".
+If either side receives a <code>scramble</code> transform without the "scramble-key" parameter,
+forwarding mode MUST be disabled.<a href="#section-6.2-3" class="pilcrow">¶</a></p>
+<p id="section-6.2-4">This transform relies on the AES-128 block cipher, which is represented by the
+syntax <code>AES-ECB(key, plaintext_block)</code> as in <span>[<a href="#RFC9001" class="cite xref">RFC9001</a>]</span>.  The corresponding
+decryption operation is written here as <code>AES-ECB-inv(key, ciphertext_block)</code>.
+It also uses AES in Counter Mode (<span>[<a href="#SP800-38A" class="cite xref">SP800-38A</a>]</span>, Section 6.5), which is
+represented by the syntax <code>AES-CTR(key, iv, input)</code> for encryption and
+decryption (which are identical).  In this syntax, <code>iv</code> is an array of 16 bytes
+containing the initial counter block.  The counter is incremented by the
+standard incrementing function (<span>[<a href="#SP800-38A" class="cite xref">SP800-38A</a>]</span>, Appendix B.1) on the full block
+width.<a href="#section-6.2-4" class="pilcrow">¶</a></p>
+<p id="section-6.2-5">In brief, the transform applies AES in counter mode (AES-CTR) using an
+initialization vector drawn from the packet, then encrypts the initialization
+vector with AES-ECB. The detailed procedure is as follows:<a href="#section-6.2-5" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.2-6">
+<li id="section-6.2-6.1">
+            <p id="section-6.2-6.1.1">Let <code>k1, k2 = scramble_key[:16], scramble_key[16:32]</code>.<a href="#section-6.2-6.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.2-6.2">
+            <p id="section-6.2-6.2.1">Let <code>L</code> be the Connection ID length.<a href="#section-6.2-6.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.2-6.3">
+            <p id="section-6.2-6.3.1">Let <code>cid = packet[1:L+1]</code>, i.e., the Connection ID.<a href="#section-6.2-6.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.2-6.4">
+            <p id="section-6.2-6.4.1">Let <code>iv = packet[L+1:L+17]</code>, i.e., the 16 bytes following the Connection ID.<a href="#section-6.2-6.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.2-6.5">
+            <p id="section-6.2-6.5.1">Let <code>ctr_input = packet[0] | packet[L+17:]</code>.<a href="#section-6.2-6.5.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.2-6.6">
+            <p id="section-6.2-6.6.1">Let <code>ctr_output = AES-CTR(k1, iv, ctr_input)</code>.<a href="#section-6.2-6.6.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.2-6.7">
+            <p id="section-6.2-6.7.1">Let <code>header = ctr_output[0] &amp; 0x7F</code>.  This ensures that the Header Form bit
+is zero, as required by the QUIC invariants (<span>[<a href="#RFC8999" class="cite xref">RFC8999</a>]</span>, Section 5.2).<a href="#section-6.2-6.7.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.2-6.8">
+            <p id="section-6.2-6.8.1">Encrypt <code>iv</code> with the block cipher: <code>encrypted_iv = AES-ECB(k2, iv)</code>.<a href="#section-6.2-6.8.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.2-6.9">
+            <p id="section-6.2-6.9.1">Produce the output packet as:<br>
+              <code>header | cid | encrypted_iv | ctr_output[1:]</code>.<a href="#section-6.2-6.9.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+<p id="section-6.2-7">The inverse transform operates as follows:<a href="#section-6.2-7" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.2-8">
+<li id="section-6.2-8.1">
+            <p id="section-6.2-8.1.1">Decrypt the AES-CTR initialization vector:<br>
+              <code>iv = AES-ECB-inv(k2, packet[L+1:L+17])</code>.<a href="#section-6.2-8.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.2-8.2">
+            <p id="section-6.2-8.2.1">Compute the other variables exactly as in the forward transform.
+(AES-CTR encryption and decryption are identical.)<a href="#section-6.2-8.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.2-8.3">
+            <p id="section-6.2-8.3.1">Produce the output: <code>header | cid | iv | ctr_output[1:]</code>.<a href="#section-6.2-8.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+<p id="section-6.2-9">The encryption keys used in this procedure do not depend on the packet contents,
+so each party only needs to perform AES initialization once for each connection.<a href="#section-6.2-9" class="pilcrow">¶</a></p>
+<p id="section-6.2-10">NOTE: The security of this arrangement relies on every short-header QUIC packet
+containing a distinct 16 bytes following the Connection ID.  This is true
+for the original ciphersuites of QUICv1, but it is not guaranteed by the QUIC
+Invariants. Future ciphersuites and QUIC versions could in principle produce
+packets that are too short or repeat the values at this location. When using the
+<code>scramble</code> transform, clients MUST NOT offer any configuration that could
+cause the client or target to violate this requirement.<a href="#section-6.2-10" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="example">
+<section id="section-7">
+      <h2 id="name-example">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-example" class="section-name selfRef">Example</a>
+      </h2>
+<p id="section-7-1">Consider a client that is establishing a new QUIC connection through the proxy.
+In this example, the client prefers the <code>scramble</code> transform, but also offers the <code>identity</code>
+transform. It has selected a Client Connection ID of 0x31323334. In order to inform a proxy
 of the new QUIC Client Connection ID, the client also sends a
-REGISTER_CLIENT_CID capsule.<a href="#section-6-1" class="pilcrow">¶</a></p>
-<p id="section-6-2">The client will also send the initial QUIC packet with the Long Header form in
-an HTTP datagram.<a href="#section-6-2" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-6-3">
+REGISTER_CLIENT_CID capsule.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-2">The client will also send the initial QUIC packet with the Long Header form in
+an HTTP datagram.<a href="#section-7-2" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-7-3">
 <pre>
 Client                                             Server
 
@@ -2077,7 +2255,8 @@ STREAM(44): HEADERS             --------&gt;
   :scheme = https
   :path = /target.example.com/443/
   :authority = proxy.example.org
-  proxy-quic-forwarding = ?1
+  proxy-quic-forwarding = ?1; accept-transform=scramble,identity; \
+      scramble-key=:abc...789=:
   capsule-protocol = ?1
 
 STREAM(44): DATA                --------&gt;
@@ -2093,7 +2272,9 @@ DATAGRAM                        --------&gt;
 
            &lt;--------  STREAM(44): HEADERS
                         :status = 200
-                        proxy-quic-forwarding = ?1
+                        proxy-quic-forwarding = ?1; \
+                            transform=scramble; \
+                            scramble-key=:ABC...321=:
                         capsule-protocol = ?1
 
            &lt;--------  STREAM(44): DATA
@@ -2119,19 +2300,23 @@ DATAGRAM                        --------&gt;
            &lt;--------  UDP Datagram
                         Payload = Forwarded QUIC SH packet
 
-</pre><a href="#section-6-3" class="pilcrow">¶</a>
+</pre><a href="#section-7-3" class="pilcrow">¶</a>
 </div>
-<p id="section-6-4">Immediately after sending the REGISTER_CLIENT_CID capsule, the client may
+<p id="section-7-4">Immediately after sending the REGISTER_CLIENT_CID capsule, the client may
 receive forwarded mode packets from the proxy with a Virtual Client
 Connection ID of 0x62646668 which it will replace with the real Client
 Connection ID of 0x31323334. All forwarded mode packets sent by the proxy
 will have been modified to contain the Virtual Client Connection ID instead
-of the Client Connection ID.<a href="#section-6-4" class="pilcrow">¶</a></p>
-<p id="section-6-5">Once the client learns which Connection ID has been selected by the target
+of the Client Connection ID, and processed by the negotiated "scramble"
+packet transform. However, in the unlikely event that a forwarded packet
+arrives before the proxy's HTTP response, the client will not know which
+transform the proxy selected. In this case, the client will have to ignore
+the packet or buffer it until the HTTP response is received.<a href="#section-7-4" class="pilcrow">¶</a></p>
+<p id="section-7-5">Once the client learns which Connection ID has been selected by the target
 server, it can send a new request to the proxy to establish a mapping for
 forwarding. In this case, that ID is 0x61626364. The client sends the
-following capsule:<a href="#section-6-5" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-6-6">
+following capsule:<a href="#section-7-5" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-7-6">
 <pre>
 STREAM(44): DATA                --------&gt;
   Capsule Type = REGISTER_TARGET_CID
@@ -2148,74 +2333,120 @@ STREAM(44): DATA                --------&gt;
 UDP Datagram                     --------&gt;
   Payload = Forwarded QUIC SH packet
 
-</pre><a href="#section-6-6" class="pilcrow">¶</a>
+</pre><a href="#section-7-6" class="pilcrow">¶</a>
 </div>
-<p id="section-6-7">Upon receiving an ACK_TARGET_CID capsule, the client starts sending Short Header
+<p id="section-7-7">Upon receiving an ACK_TARGET_CID capsule, the client starts sending Short Header
 packets with a Destination Connection ID of 0x123412341234 directly to the proxy
 (not tunnelled), and these are rewritten by the proxy to have the Destination
 Connection ID 0x61626364 prior to being forwarded directly to the target. In the
 reverse direction, Short Header packets from the target with a Destination
 Connection ID of 0x31323334 are modified to replace the Destination Connection
 ID with the Virtual Client Connection ID of 0x62646668 and forwarded directly to
-the client.<a href="#section-6-7" class="pilcrow">¶</a></p>
+the client.<a href="#section-7-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="packet-size-considerations">
-<section id="section-7">
+<section id="section-8">
       <h2 id="name-packet-size-considerations">
-<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-packet-size-considerations" class="section-name selfRef">Packet Size Considerations</a>
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-packet-size-considerations" class="section-name selfRef">Packet Size Considerations</a>
       </h2>
-<p id="section-7-1">Since Initial QUIC packets must be at least 1200 bytes in length, the HTTP
+<p id="section-8-1">Since Initial QUIC packets must be at least 1200 bytes in length, the HTTP
 Datagram frames that are used for a QUIC-aware proxy MUST be able to carry at least
-1200 bytes.<a href="#section-7-1" class="pilcrow">¶</a></p>
-<p id="section-7-2">Additionally, clients that connect to a proxy for purpose of proxying QUIC
+1200 bytes.<a href="#section-8-1" class="pilcrow">¶</a></p>
+<p id="section-8-2">Additionally, clients that connect to a proxy for purpose of proxying QUIC
 SHOULD start their connection with a larger packet size than 1200 bytes, to
 account for the overhead of tunnelling an Initial QUIC packet within an
 HTTP Datagram frame. If the client does not begin with a larger packet size than
 1200 bytes, it will need to perform Path MTU (Maximum Transmission Unit)
 discovery to discover a larger path size prior to sending any tunnelled Initial
-QUIC packets.<a href="#section-7-2" class="pilcrow">¶</a></p>
-<p id="section-7-3">Once a proxied QUIC connections moves into forwarded mode, the client SHOULD
-initiate Path MTU discovery to increase its end-to-end MTU.<a href="#section-7-3" class="pilcrow">¶</a></p>
+QUIC packets.<a href="#section-8-2" class="pilcrow">¶</a></p>
+<p id="section-8-3">Once a proxied QUIC connections moves into forwarded mode, the client SHOULD
+initiate Path MTU discovery to increase its end-to-end MTU.<a href="#section-8-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security">
-<section id="section-8">
+<section id="section-9">
       <h2 id="name-security-considerations">
-<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-8-1">Proxies that support this extension SHOULD provide protections to rate-limit
+<p id="section-9-1">Proxies that support this extension SHOULD provide protections to rate-limit
 or restrict clients from opening an excessive number of proxied connections, so
-as to limit abuse or use of proxies to launch Denial-of-Service attacks.<a href="#section-8-1" class="pilcrow">¶</a></p>
-<p id="section-8-2">Sending QUIC packets by forwarding through a proxy without tunnelling exposes
-some QUIC header metadata to onlookers, and can be used to correlate packet
-flows if an attacker is able to see traffic on both sides of the proxy.
-Tunnelled packets have similar inference problems. An attacker on both sides
-of the proxy can use the size of ingress and egress packets to correlate packets
-belonging to the same connection. (Absent client-side padding, tunnelled packets
-will typically have a fixed amount of overhead that is removed before their
-HTTP Datagram contents are written to the target.)<a href="#section-8-2" class="pilcrow">¶</a></p>
-<p id="section-8-3">Since proxies that forward QUIC packets do not perform any cryptographic
-integrity check, it is possible that these packets are either malformed,
-replays, or otherwise malicious. This may result in proxy targets rate limiting
-or decreasing the reputation of a given proxy.<a href="#section-8-3" class="pilcrow">¶</a></p>
+as to limit abuse or use of proxies to launch Denial-of-Service attacks.<a href="#section-9-1" class="pilcrow">¶</a></p>
+<p id="section-9-2">Sending QUIC packets by forwarding through a proxy without tunnelling exposes
+clients to additional information exposure and deanonymization attacks which
+need to be carefully considered. Analysis should consider both passive and
+active attackers which may be global or localized to the network paths used
+on one side of the proxy. The following sections highlight deanonymization risks with
+using forwarded mode.<a href="#section-9-2" class="pilcrow">¶</a></p>
+<div id="passive-attacks">
+<section id="section-9.1">
+        <h3 id="name-passive-attacks">
+<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-passive-attacks" class="section-name selfRef">Passive Attacks</a>
+        </h3>
+<p id="section-9.1-1">A passive attacker aims to deanonymize a client by correlating traffic across
+both sides of the proxy. When using forwarded mode with the <code>identity</code> packet
+transform (see <a href="#identity-transform" class="auto internal xref">Section 6.1</a>), such correlation is trivial by matching
+a subset of QUIC packet bytes as packets enter the proxy on one side and exit
+on the other. Packet transforms such as <code>scramble</code> mitigate this by
+cryptographically preventing such byte comparisons
+(see <a href="#scramble-transform" class="auto internal xref">Section 6.2</a>).<a href="#section-9.1-1" class="pilcrow">¶</a></p>
+<p id="section-9.1-2">Regardless of which packet transform is used, both tunnelled and forwarded mode
+are still vulnerable to size and timing attacks, without the addition of techniques that go beyond the analysis
+in this document, such as padding and adding chaff packets.  Such techniques could be supported
+in future packet transforms, subject to additional security analysis.<a href="#section-9.1-2" class="pilcrow">¶</a></p>
+<p id="section-9.1-3">Unlike tunnelled mode where packets are fully encapsulated in the client-to-proxy
+connection, clients using forwarded mode to access multiple target servers
+over the same client-to-proxy connection expose the number of target servers
+they are communicating with on each connection to passive attackers that can
+observe the client-to-proxy traffic. This additional metadata revealed on each
+packet simplifies size and timing attacks.<a href="#section-9.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="active-attacks">
+<section id="section-9.2">
+        <h3 id="name-active-attacks">
+<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-active-attacks" class="section-name selfRef">Active Attacks</a>
+        </h3>
+<p id="section-9.2-1">An active attacker is an adversary that can inject, modify, drop, and view
+packets in the network. Some active attacks have different effects between
+forwarded mode and tunnelled mode, but active attacks can be used to correlate
+flows in either mode.<a href="#section-9.2-1" class="pilcrow">¶</a></p>
+<p id="section-9.2-2">Both tunnelled mode and forwarded mode (regardless of packet transform) are
+vulnerable to packet injection in the target-to-client direction. An attacker
+can inject a burst of packets with a known QUIC Connection ID and see which
+Connection ID is used for the corresponding burst on the proxy-to-client network path.<a href="#section-9.2-2" class="pilcrow">¶</a></p>
+<p id="section-9.2-3">Packet injection with a known QUIC Connection ID can also happen in the
+client-to-proxy direction, which only affects forwarded mode since
+tunnelled mode sends packets within an authenticated and integrity protected
+QUIC connection to the proxy (see <span>[<a href="#RFC9001" class="cite xref">RFC9001</a>]</span>). None of the packet transforms
+defined in this document provide integrity protection. Even if a packet
+transform did provide integrity protection, attackers can inject replayed
+packets. Protection against replayed packets is similarly provided by QUIC in
+tunnelled mode, but not provided by any of the forwarded mode packet transforms
+defined in this document.<a href="#section-9.2-3" class="pilcrow">¶</a></p>
+<p id="section-9.2-4">An active attacker can modify packets in the client-to-proxy direction, which
+would cause a tunnelling proxy to silently drop packets, while a forwarding proxy
+would forward the packets. In this way, forwarded mode is less vulnerable to
+flow recognition based on corrupting a portion of packets in a burst.<a href="#section-9.2-4" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="iana">
-<section id="section-9">
+<section id="section-10">
       <h2 id="name-iana-considerations">
-<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
 <div id="iana-header">
-<section id="section-9.1">
+<section id="section-10.1">
         <h3 id="name-http-header">
-<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-http-header" class="section-name selfRef">HTTP Header</a>
+<a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-http-header" class="section-name selfRef">HTTP Header</a>
         </h3>
-<p id="section-9.1-1">This document registers the "Proxy-QUIC-Forwarding" header in the "Hypertext Transfer
-Protocol (HTTP) Field Name Registry" &lt;<span><a href="https://www.iana.org/assignments/http-fields">https://www.iana.org/assignments/http-fields</a></span>&gt;.<a href="#section-9.1-1" class="pilcrow">¶</a></p>
+<p id="section-10.1-1">This document registers the "Proxy-QUIC-Forwarding" header in the "Hypertext Transfer
+Protocol (HTTP) Field Name Registry" &lt;<span><a href="https://www.iana.org/assignments/http-fields">https://www.iana.org/assignments/http-fields</a></span>&gt;.<a href="#section-10.1-1" class="pilcrow">¶</a></p>
 <span id="name-registered-http-header"></span><div id="iana-header-type-table">
 <figure id="figure-4">
-          <div class="alignLeft art-text artwork" id="section-9.1-2.1">
+          <div class="alignLeft art-text artwork" id="section-10.1-2.1">
 <pre>
     +-----------------------+----------+--------+---------------+
     | Header Field Name     | Protocol | Status |   Reference   |
@@ -2230,18 +2461,97 @@ Protocol (HTTP) Field Name Registry" &lt;<span><a href="https://www.iana.org/ass
 </div>
 </section>
 </div>
-<div id="iana-capsule-types">
-<section id="section-9.2">
-        <h3 id="name-capsule-types">
-<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-capsule-types" class="section-name selfRef">Capsule Types</a>
+<div id="proxy-quic-forwarding-parameter-names">
+<section id="section-10.2">
+        <h3 id="name-proxy-quic-forwarding-param">
+<a href="#section-10.2" class="section-number selfRef">10.2. </a><a href="#name-proxy-quic-forwarding-param" class="section-name selfRef">Proxy QUIC Forwarding Parameter Names</a>
         </h3>
-<p id="section-9.2-1">This document registers six new values in the "HTTP Capsule Types"
-registry established by <span>[<a href="#HTTP-DGRAM" class="cite xref">HTTP-DGRAM</a>]</span>. Note that the codepoints below
-will be replaced with lower values before publication.<a href="#section-9.2-1" class="pilcrow">¶</a></p>
-<span id="name-registered-capsule-types"></span><div id="iana-capsule-type-table">
+<p id="section-10.2-1">This document establishes a new registry, "Proxy QUIC Forwarding Parameter Names",
+for parameter names to use with the <code>Proxy-QUIC-Forwarding</code> header field,
+in &lt;<span><a href="https://www.iana.org/assignments/masque/masque.xhtml">https://www.iana.org/assignments/masque/masque.xhtml</a></span>&gt;.
+Registrations in this registry are assigned using the
+Specification Required policy (Section 4.6 of [IANA-POLICY]).<a href="#section-10.2-1" class="pilcrow">¶</a></p>
+<span id="name-initial-proxy-quic-forwardi"></span><div id="iana-parameter-names-table">
+<figure id="figure-5">
+          <div class="alignLeft art-text artwork" id="section-10.2-2.1">
+<pre>
+    +-----------------------+-------------------------------------+---------------+--------------------------------+
+    | Parameter Name        | Description                         | Reference     | Notes                          |
+    +-----------------------+-------------------------------------+---------------+--------------------------------+
+    | accept-transform      | contains supported transforms       | This document | Section {{client-behavior}}    |
+    +-----------------------+-------------------------------------+---------------+--------------------------------+
+    | transform             | indicates selected transforms       | This document | Section {{proxy-behavior}}     |
+    +-----------------------+-------------------------------------+---------------+--------------------------------+
+    | scramble-key          | contains key for scramble transform | This document | Section {{scramble-transform}} |
+    +-----------------------+-------------------------------------+---------------+--------------------------------+
+</pre>
+</div>
+<figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
+<a href="#name-initial-proxy-quic-forwardi" class="selfRef">Initial Proxy QUIC Forwarding Parameter Names</a>
+          </figcaption></figure>
+</div>
+</section>
+</div>
+<div id="iana-transforms">
+<section id="section-10.3">
+        <h3 id="name-packet-transform-names">
+<a href="#section-10.3" class="section-number selfRef">10.3. </a><a href="#name-packet-transform-names" class="section-name selfRef">Packet Transform Names</a>
+        </h3>
+<p id="section-10.3-1">This document establishes a new registry for packet transform names
+in &lt;<span><a href="https://www.iana.org/assignments/masque/masque.xhtml">https://www.iana.org/assignments/masque/masque.xhtml</a></span>&gt;
+and defines two initial transforms: "identity" and "scramble".
+Prior to finalization, deployments that implement the version of
+the <code>scramble</code> transform defined in this document should use the value
+"scramble-dt". Once the design team proposal is adopted and a new draft is submitted,
+the wire identifier will become "scramble-XX" where XX is the draft number.
+Registrations in this registry are assigned using the
+Specification Required policy (Section 4.6 of [IANA-POLICY]).<a href="#section-10.3-1" class="pilcrow">¶</a></p>
+<span id="name-initial-packet-transform-na"></span><div id="iana-packet-transforms-table">
 <table class="center" id="table-1">
           <caption>
 <a href="#table-1" class="selfRef">Table 1</a>:
+<a href="#name-initial-packet-transform-na" class="selfRef">Initial Packet Transform Names</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Transform Name</th>
+              <th class="text-left" rowspan="1" colspan="1">Description</th>
+              <th class="text-left" rowspan="1" colspan="1">Specification</th>
+              <th class="text-left" rowspan="1" colspan="1">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">identity</td>
+              <td class="text-left" rowspan="1" colspan="1">no transformation</td>
+              <td class="text-left" rowspan="1" colspan="1">This Document</td>
+              <td class="text-left" rowspan="1" colspan="1">Section <a href="#identity-transform" class="auto internal xref">Section 6.1</a>
+</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">scramble</td>
+              <td class="text-left" rowspan="1" colspan="1">Reserved (will be used for final version)</td>
+              <td class="text-left" rowspan="1" colspan="1">This Document</td>
+              <td class="text-left" rowspan="1" colspan="1">Section <a href="#scramble-transform" class="auto internal xref">Section 6.2</a>
+</td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+</section>
+</div>
+<div id="iana-capsule-types">
+<section id="section-10.4">
+        <h3 id="name-capsule-types">
+<a href="#section-10.4" class="section-number selfRef">10.4. </a><a href="#name-capsule-types" class="section-name selfRef">Capsule Types</a>
+        </h3>
+<p id="section-10.4-1">This document registers six new values in the "HTTP Capsule Types"
+registry established by <span>[<a href="#HTTP-DGRAM" class="cite xref">HTTP-DGRAM</a>]</span>. Note that the codepoints below
+will be replaced with lower values before publication.<a href="#section-10.4-1" class="pilcrow">¶</a></p>
+<span id="name-registered-capsule-types"></span><div id="iana-capsule-type-table">
+<table class="center" id="table-2">
+          <caption>
+<a href="#table-2" class="selfRef">Table 2</a>:
 <a href="#name-registered-capsule-types" class="selfRef">Registered Capsule Types</a>
           </caption>
 <thead>
@@ -2278,31 +2588,31 @@ will be replaced with lower values before publication.<a href="#section-9.2-1" c
           </tbody>
         </table>
 </div>
-<p id="section-9.2-3">All of these new entries use the following values for these fields:<a href="#section-9.2-3" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlCompact dlParallel" id="section-9.2-4">
-          <dt id="section-9.2-4.1">Status:</dt>
-          <dd style="margin-left: 1.5em" id="section-9.2-4.2">
-            <p id="section-9.2-4.2.1">provisional (permanent when this document is published)<a href="#section-9.2-4.2.1" class="pilcrow">¶</a></p>
+<p id="section-10.4-3">All of these new entries use the following values for these fields:<a href="#section-10.4-3" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlCompact dlParallel" id="section-10.4-4">
+          <dt id="section-10.4-4.1">Status:</dt>
+          <dd style="margin-left: 1.5em" id="section-10.4-4.2">
+            <p id="section-10.4-4.2.1">provisional (permanent when this document is published)<a href="#section-10.4-4.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-9.2-4.3">Reference:</dt>
-          <dd style="margin-left: 1.5em" id="section-9.2-4.4">
-            <p id="section-9.2-4.4.1">This document<a href="#section-9.2-4.4.1" class="pilcrow">¶</a></p>
+<dt id="section-10.4-4.3">Reference:</dt>
+          <dd style="margin-left: 1.5em" id="section-10.4-4.4">
+            <p id="section-10.4-4.4.1">This document<a href="#section-10.4-4.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-9.2-4.5">Change Controller:</dt>
-          <dd style="margin-left: 1.5em" id="section-9.2-4.6">
-            <p id="section-9.2-4.6.1">IETF<a href="#section-9.2-4.6.1" class="pilcrow">¶</a></p>
+<dt id="section-10.4-4.5">Change Controller:</dt>
+          <dd style="margin-left: 1.5em" id="section-10.4-4.6">
+            <p id="section-10.4-4.6.1">IETF<a href="#section-10.4-4.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-9.2-4.7">Contact:</dt>
-          <dd style="margin-left: 1.5em" id="section-9.2-4.8">
-            <p id="section-9.2-4.8.1">masque@ietf.org<a href="#section-9.2-4.8.1" class="pilcrow">¶</a></p>
+<dt id="section-10.4-4.7">Contact:</dt>
+          <dd style="margin-left: 1.5em" id="section-10.4-4.8">
+            <p id="section-10.4-4.8.1">masque@ietf.org<a href="#section-10.4-4.8.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-9.2-4.9">Notes:</dt>
-          <dd style="margin-left: 1.5em" id="section-9.2-4.10">
-            <p id="section-9.2-4.10.1">None<a href="#section-9.2-4.10.1" class="pilcrow">¶</a></p>
+<dt id="section-10.4-4.9">Notes:</dt>
+          <dd style="margin-left: 1.5em" id="section-10.4-4.10">
+            <p id="section-10.4-4.10.1">None<a href="#section-10.4-4.10.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
@@ -2310,14 +2620,14 @@ will be replaced with lower values before publication.<a href="#section-9.2-1" c
 </div>
 </section>
 </div>
-<section id="section-10">
+<section id="section-11">
       <h2 id="name-references">
-<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-references" class="section-name selfRef">References</a>
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
 <div id="sec-normative-references">
-<section id="section-10.1">
+<section id="section-11.1">
         <h3 id="name-normative-references">
-<a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+<a href="#section-11.1" class="section-number selfRef">11.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
         </h3>
 <dl class="references">
 <dt id="CONNECT-UDP">[CONNECT-UDP]</dt>
@@ -2357,16 +2667,20 @@ will be replaced with lower values before publication.<a href="#section-9.2-1" c
 <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8941">[RFC8941]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Nottingham, M.</span> and <span class="refAuthor">P. Kamp</span>, <span class="refTitle">"Structured Field Values for HTTP"</span>, <span class="seriesInfo">RFC 8941</span>, <span class="seriesInfo">DOI 10.17487/RFC8941</span>, <time datetime="2021-02" class="refDate">February 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8941">https://www.rfc-editor.org/rfc/rfc8941</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="SP800-38A">[SP800-38A]</dt>
+      <dd>
+<span class="refAuthor">Dworkin, M.</span>, <span class="refTitle">"Recommendation for Block Cipher Modes of Operation: Methods and Techniques"</span>, <time datetime="2001-12-01" class="refDate">1 December 2001</time>, <span>&lt;<a href="https://nvlpubs.nist.gov/nistpubs/legacy/sp/nistspecialpublication800-38a.pdf">https://nvlpubs.nist.gov/nistpubs/legacy/sp/nistspecialpublication800-38a.pdf</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
 </div>
 <div id="sec-informative-references">
-<section id="section-10.2">
+<section id="section-11.2">
         <h3 id="name-informative-references">
-<a href="#section-10.2" class="section-number selfRef">10.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+<a href="#section-11.2" class="section-number selfRef">11.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
         </h3>
 <dl class="references">
 <dt id="ECN-TUNNEL">[ECN-TUNNEL]</dt>
@@ -2374,8 +2688,16 @@ will be replaced with lower values before publication.<a href="#section-9.2-1" c
 <span class="refAuthor">Briscoe, B.</span>, <span class="refTitle">"Tunnelling of Explicit Congestion Notification"</span>, <span class="seriesInfo">RFC 6040</span>, <span class="seriesInfo">DOI 10.17487/RFC6040</span>, <time datetime="2010-11" class="refDate">November 2010</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6040">https://www.rfc-editor.org/rfc/rfc6040</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="QUIC-LB">[QUIC-LB]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Duke, M.</span>, <span class="refAuthor">Banks, N.</span>, and <span class="refAuthor">C. Huitema</span>, <span class="refTitle">"QUIC-LB: Generating Routable QUIC Connection IDs"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-load-balancers-19</span>, <time datetime="2024-02-05" class="refDate">5 February 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-load-balancers-19">https://datatracker.ietf.org/doc/html/draft-ietf-quic-load-balancers-19</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8999">[RFC8999]</dt>
+        <dd>
+<span class="refAuthor">Thomson, M.</span>, <span class="refTitle">"Version-Independent Properties of QUIC"</span>, <span class="seriesInfo">RFC 8999</span>, <span class="seriesInfo">DOI 10.17487/RFC8999</span>, <time datetime="2021-05" class="refDate">May 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8999">https://www.rfc-editor.org/rfc/rfc8999</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9001">[RFC9001]</dt>
+      <dd>
+<span class="refAuthor">Thomson, M., Ed.</span> and <span class="refAuthor">S. Turner, Ed.</span>, <span class="refTitle">"Using TLS to Secure QUIC"</span>, <span class="seriesInfo">RFC 9001</span>, <span class="seriesInfo">DOI 10.17487/RFC9001</span>, <time datetime="2021-05" class="refDate">May 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9001">https://www.rfc-editor.org/rfc/rfc9001</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
