@@ -29,17 +29,17 @@ HTTP/3 proxy rather than being re-encapsulated and re-encrypted.
 <meta content="draft-ietf-masque-quic-proxy-latest" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.21.0
-    Python 3.11.9
+    Python 3.12.3
     ConfigArgParse 1.7
     google-i18n-address 3.1.0
     intervaltree 3.1.0
-    Jinja2 3.1.2
-    lxml 4.9.3
-    platformdirs 4.2.1
+    Jinja2 3.1.4
+    lxml 4.9.4
+    platformdirs 4.2.2
     pycountry 22.3.5
     PyYAML 6.0.1
     requests 2.31.0
-    setuptools 68.2.2
+    setuptools 69.5.1
     six 1.16.0
     wcwidth 0.2.13
 -->
@@ -1040,11 +1040,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">QUIC Proxy</td>
-<td class="right">May 2024</td>
+<td class="right">June 2024</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Pauly, et al.</td>
-<td class="center">Expires 8 November 2024</td>
+<td class="center">Expires 22 December 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1057,12 +1057,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-masque-quic-proxy-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-05-07" class="published">7 May 2024</time>
+<time datetime="2024-06-20" class="published">20 June 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Experimental</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-11-08">8 November 2024</time></dd>
+<dd class="expires"><time datetime="2024-12-22">22 December 2024</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1124,7 +1124,7 @@ HTTP/3 proxy rather than being re-encapsulated and re-encrypted.<a href="#sectio
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 8 November 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 22 December 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1417,7 +1417,7 @@ the target.<a href="#section-1.2-2.9.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-1.2-2.10">
             <p id="section-1.2-2.10.1">Virtual Client Connection ID: a fake QUIC Connection ID that is chosen by the
-client that the proxy MUST use when sending QUIC packets in forwarded mode.<a href="#section-1.2-2.10.1" class="pilcrow">¶</a></p>
+proxy that the proxy MUST use when sending QUIC packets in forwarded mode.<a href="#section-1.2-2.10.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-1.2-2.11">
             <p id="section-1.2-2.11.1">Virtual Target Connection ID: a fake QUIC Connection ID that is chosen by the
@@ -1435,8 +1435,7 @@ client-proxy link.<a href="#section-1.2-2.12.1" class="pilcrow">¶</a></p>
         <h3 id="name-virtual-connection-ids">
 <a href="#section-1.3" class="section-number selfRef">1.3. </a><a href="#name-virtual-connection-ids" class="section-name selfRef">Virtual Connection IDs</a>
         </h3>
-<p id="section-1.3-1">QUIC allows each endpoint of a connection to choose the connection IDs it
-receives with. Servers receiving QUIC packets can employ load balancing
+<p id="section-1.3-1">Servers receiving QUIC packets can employ load balancing
 strategies such as those described in <span>[<a href="#QUIC-LB" class="cite xref">QUIC-LB</a>]</span>
 that encode routing information in
 the connection ID. When operating in forwarded mode, clients send QUIC packets
@@ -1449,12 +1448,21 @@ replaces the Virtual Target Connection ID with the Target Connection ID prior to
 forwarding the packet to the Target.<a href="#section-1.3-1" class="pilcrow">¶</a></p>
 <p id="section-1.3-2">Similarly, QUIC requires that connection IDs aren't reused over multiple network
 paths to avoid linkability. The Virtual Client Connection ID is a connection ID
-chosen by the Client that the Proxy uses when sending forwarded mode packets.
+chosen by the Proxy that the Proxy uses when sending forwarded mode packets.
 The Proxy replaces the Client Connection ID with the Virtual Client Connection
 ID prior to forwarding the packet to the Client. Clients take advantage of this
 to avoid linkability when migrating a client to proxy network path. The Virtual
 Client Connection ID allows the connection ID bytes to change on the wire
-without requiring the connection IDs on the client to target connection change.<a href="#section-1.3-2" class="pilcrow">¶</a></p>
+without requiring the connection IDs on the client to target connection change.
+To reduce the likelihood of connection ID conflicts, the proxy SHOULD choose a
+Virtual Client Connection ID that is at least as long as the Client Connection
+ID. Similarly, clients multiplexing connections on the same UDP socket SHOULD
+choose a Client Connection ID that's sufficiently long to reduce the likelihood
+of a conflict with the proxy-chosen Virtual Client Connection ID. The Virtual
+Client Connection ID MUST either be constructed such that it is unpredictable to
+the client or to guarantee no conflicts among all proxies sharing an IP address
+and port. See <a href="#security" class="auto internal xref">Section 9</a> for more discussion on Virtual Client Connection ID
+construction.<a href="#section-1.3-2" class="pilcrow">¶</a></p>
 <p id="section-1.3-3">Clients and Proxies not implementing forwarded mode do not need to consider
 Virtual Connection IDs since all Client&lt;-&gt;Target datagrams will be encapsulated
 within the Client&lt;-&gt;Proxy connection.<a href="#section-1.3-3" class="pilcrow">¶</a></p>
@@ -1628,8 +1636,8 @@ to signal the addition and removal of Client and Target Connection IDs.<a href="
 using HTTP Datagrams with the context ID set to zero as defined in
 <span>[<a href="#CONNECT-UDP" class="cite xref">CONNECT-UDP</a>]</span>.<a href="#section-3-2" class="pilcrow">¶</a></p>
 <p id="section-3-3">The capsules used for QUIC-aware proxying allow a client to register connection
-IDs with the proxy, and for the proxy to acknowledge or reject the connection
-ID mappings.<a href="#section-3-3" class="pilcrow">¶</a></p>
+IDs with the proxy, and for the client and proxy to acknowledge or reject the
+connection ID mappings.<a href="#section-3-3" class="pilcrow">¶</a></p>
 <p id="section-3-4">The REGISTER_CLIENT_CID and REGISTER_TARGET_CID capsule types (see
 <a href="#iana-capsule-types" class="auto internal xref">Section 10.4</a> for the capsule type values) allow a client to inform
 the proxy about a new Client Connection ID or a new Target Connection ID,
@@ -1637,23 +1645,34 @@ respectively. These capsule types MUST only be sent by a client.<a href="#sectio
 <p id="section-3-5">The ACK_CLIENT_CID and ACK_TARGET_CID capsule types (see <a href="#iana-capsule-types" class="auto internal xref">Section 10.4</a>
 for the capsule type values) are sent by the proxy to the client to indicate
 that a mapping was successfully created for a registered connection ID as well
-as provide the Virtual Target Connection ID that may be used in forwarded mode.
+as provide the Virtual Connection IDs that may be used in forwarded mode.
 These capsule types MUST only be sent by a proxy.<a href="#section-3-5" class="pilcrow">¶</a></p>
-<p id="section-3-6">The CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsule types (see
+<p id="section-3-6">The ACK_CLIENT_VCID capsule type MUST only be sent by the client and only when
+forwarding mode is enabled. It is sent by the client to the proxy in response to
+an ACK_CLIENT_CID capsule to indicate that the client is ready to receive
+forwarded mode packets with the specified virtual connection ID. The proxy MUST
+NOT send forwarded mode packets to the client prior to receiving this
+acknowledgement. This capsule also contains a Stateless Reset Token the client
+may respond with when receiving forwarded mode packets with the specified
+virtual connection ID.<a href="#section-3-6" class="pilcrow">¶</a></p>
+<p id="section-3-7">The CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsule types (see
 <a href="#iana-capsule-types" class="auto internal xref">Section 10.4</a> for the capsule type values) allow either a client
 or a proxy to remove a mapping for a connection ID. These capsule types
 MAY be sent by either a client or the proxy. If a proxy sends a
 CLOSE_CLIENT_CID without having sent an ACK_CLIENT_CID, or if a proxy
 sends a CLOSE_TARGET_CID without having sent an ACK_TARGET_CID,
-it is rejecting a Connection ID registration.<a href="#section-3-6" class="pilcrow">¶</a></p>
-<p id="section-3-7">ACK_CLIENT_CID, CLOSE_CLIENT_CID, and CLOSE_TARGET_CID capsule types are
-formatted as follows:<a href="#section-3-7" class="pilcrow">¶</a></p>
+it is rejecting a Connection ID registration. Similarly, if a client sends
+CLOSE_CLIENT_CID without having sent an ACK_CLIENT_VCID capsule, the client is
+either rejecting the proxy-chosen Virtual Client Connection ID or no longer
+needs the connection ID registered.<a href="#section-3-7" class="pilcrow">¶</a></p>
+<p id="section-3-8">REGISTER_CLIENT_CID, CLOSE_CLIENT_CID, and CLOSE_TARGET_CID capsule types are
+formatted as follows:<a href="#section-3-8" class="pilcrow">¶</a></p>
 <span id="name-connection-id-capsule-forma"></span><div id="fig-capsule-cid">
 <figure id="figure-1">
-        <div class="alignLeft art-text artwork" id="section-3-8.1">
+        <div class="alignLeft art-text artwork" id="section-3-9.1">
 <pre>
 Connection ID Capsule {
-  Type (i) = 0xffe402, 0xffe404, 0xffe405
+  Type (i) = 0xffe500, 0xffe505, 0xffe506
   Length (i),
   Connection ID (0..2040),
 }
@@ -1663,24 +1682,24 @@ Connection ID Capsule {
 <a href="#name-connection-id-capsule-forma" class="selfRef">Connection ID Capsule Format</a>
         </figcaption></figure>
 </div>
-<span class="break"></span><dl class="dlParallel" id="section-3-9">
-        <dt id="section-3-9.1">Connection ID:</dt>
-        <dd style="margin-left: 1.5em" id="section-3-9.2">
-          <p id="section-3-9.2.1">A connection ID being acknowledged, which is between 0 and 255 bytes in
+<span class="break"></span><dl class="dlParallel" id="section-3-10">
+        <dt id="section-3-10.1">Connection ID:</dt>
+        <dd style="margin-left: 1.5em" id="section-3-10.2">
+          <p id="section-3-10.2.1">A connection ID being registered or closed, which is between 0 and 255 bytes in
 length. The length of the connection ID is implied by the length of the
 capsule. Note that in QUICv1, the length of the Connection ID is limited
-to 20 bytes, but QUIC invariants allow up to 255 bytes.<a href="#section-3-9.2.1" class="pilcrow">¶</a></p>
+to 20 bytes, but QUIC invariants allow up to 255 bytes.<a href="#section-3-10.2.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
-<p id="section-3-10">The REGISTER_TARGET_CID capsule includes the target-provided connection ID
-and Stateless Reset Token.<a href="#section-3-10" class="pilcrow">¶</a></p>
+<p id="section-3-11">The REGISTER_TARGET_CID capsule includes the target-provided connection ID
+and Stateless Reset Token.<a href="#section-3-11" class="pilcrow">¶</a></p>
 <span id="name-register-target-connection-"></span><div id="fig-capsule-register-target-cid">
 <figure id="figure-2">
-        <div class="alignLeft art-text artwork" id="section-3-11.1">
+        <div class="alignLeft art-text artwork" id="section-3-12.1">
 <pre>
 Register Target Connection ID Capsule {
-  Type (i) = 0xffe401
+  Type (i) = 0xffe501
   Length (i),
   Connection ID Length (i)
   Connection ID (0..2040),
@@ -1693,40 +1712,40 @@ Register Target Connection ID Capsule {
 <a href="#name-register-target-connection-" class="selfRef">Register Target Connection ID Capsule Format</a>
         </figcaption></figure>
 </div>
-<span class="break"></span><dl class="dlParallel" id="section-3-12">
-        <dt id="section-3-12.1">Connection ID Length</dt>
-        <dd style="margin-left: 1.5em" id="section-3-12.2">
-          <p id="section-3-12.2.1">The length of the connection ID being registered, which is between 0 and
+<span class="break"></span><dl class="dlParallel" id="section-3-13">
+        <dt id="section-3-13.1">Connection ID Length</dt>
+        <dd style="margin-left: 1.5em" id="section-3-13.2">
+          <p id="section-3-13.2.1">The length of the connection ID being registered, which is between 0 and
 255. Note that in QUICv1, the length of the Connection ID is limited to 20
-bytes, but QUIC invariants allow up to 255 bytes.<a href="#section-3-12.2.1" class="pilcrow">¶</a></p>
+bytes, but QUIC invariants allow up to 255 bytes.<a href="#section-3-13.2.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-3-12.3">Connection ID</dt>
-        <dd style="margin-left: 1.5em" id="section-3-12.4">
-          <p id="section-3-12.4.1">A connection ID being registered whose length is equal to Connection ID
-Length. This is the real Target or Client Connection ID.<a href="#section-3-12.4.1" class="pilcrow">¶</a></p>
+<dt id="section-3-13.3">Connection ID</dt>
+        <dd style="margin-left: 1.5em" id="section-3-13.4">
+          <p id="section-3-13.4.1">A connection ID being registered whose length is equal to Connection ID
+Length. This is the real Target Connection ID.<a href="#section-3-13.4.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-3-12.5">Stateless Reset Token Length</dt>
-        <dd style="margin-left: 1.5em" id="section-3-12.6">
-          <p id="section-3-12.6.1">The length of the target-provided Stateless Reset Token.<a href="#section-3-12.6.1" class="pilcrow">¶</a></p>
+<dt id="section-3-13.5">Stateless Reset Token Length</dt>
+        <dd style="margin-left: 1.5em" id="section-3-13.6">
+          <p id="section-3-13.6.1">The length of the target-provided Stateless Reset Token.<a href="#section-3-13.6.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-3-12.7">Stateless Reset Token</dt>
-        <dd style="margin-left: 1.5em" id="section-3-12.8">
-          <p id="section-3-12.8.1">The target-provided Stateless Reset token allowing the proxy to correctly
-recognize Stateless Reset packets to be tunnelled to the client.<a href="#section-3-12.8.1" class="pilcrow">¶</a></p>
+<dt id="section-3-13.7">Stateless Reset Token</dt>
+        <dd style="margin-left: 1.5em" id="section-3-13.8">
+          <p id="section-3-13.8.1">The target-provided Stateless Reset token allowing the proxy to correctly
+recognize Stateless Reset packets to be tunnelled to the client.<a href="#section-3-13.8.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
-<p id="section-3-13">The REGISTER_CLIENT_CID and ACK_TARGET_CID capsule types include a Virtual
-Connection ID and Stateless Reset Token.<a href="#section-3-13" class="pilcrow">¶</a></p>
-<span id="name-virtual-connection-id-capsu"></span><div id="fig-capsule-virtual-cid">
+<p id="section-3-14">The ACK_TARGET_CID capsule type includes a Virtual Connection ID and Stateless
+Reset Token.<a href="#section-3-14" class="pilcrow">¶</a></p>
+<span id="name-acknowledge-target-connecti"></span><div id="fig-capsule-ack-target-cid">
 <figure id="figure-3">
-        <div class="alignLeft art-text artwork" id="section-3-14.1">
+        <div class="alignLeft art-text artwork" id="section-3-15.1">
 <pre>
-Virtual Connection ID Capsule {
-  Type (i) = 0xffe400, 0xffe403
+Acknowledge Target Connection ID Capsule {
+  Type (i) = 0xffe504
   Length (i)
   Connection ID Length (i)
   Connection ID (0..2040),
@@ -1738,53 +1757,165 @@ Virtual Connection ID Capsule {
 </pre>
 </div>
 <figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
-<a href="#name-virtual-connection-id-capsu" class="selfRef">Virtual Connection ID Capsule Format</a>
+<a href="#name-acknowledge-target-connecti" class="selfRef">Acknowledge Target Connection ID Capsule Format</a>
         </figcaption></figure>
 </div>
-<span class="break"></span><dl class="dlParallel" id="section-3-15">
-        <dt id="section-3-15.1">Connection ID Length</dt>
-        <dd style="margin-left: 1.5em" id="section-3-15.2">
-          <p id="section-3-15.2.1">The length of the connection ID being registered or acknowledged, which
+<span class="break"></span><dl class="dlParallel" id="section-3-16">
+        <dt id="section-3-16.1">Connection ID Length</dt>
+        <dd style="margin-left: 1.5em" id="section-3-16.2">
+          <p id="section-3-16.2.1">The length of the connection ID being acknowledged, which
 is between 0 and 255. Note that in QUICv1, the length of the Connection ID
-is limited to 20 bytes, but QUIC invariants allow up to 255 bytes.<a href="#section-3-15.2.1" class="pilcrow">¶</a></p>
+is limited to 20 bytes, but QUIC invariants allow up to 255 bytes.<a href="#section-3-16.2.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-3-15.3">Connection ID</dt>
-        <dd style="margin-left: 1.5em" id="section-3-15.4">
-          <p id="section-3-15.4.1">A connection ID being registered or acknowledged whose length is equal to
-Connection ID Length. This is the real Target or Client Connection ID.<a href="#section-3-15.4.1" class="pilcrow">¶</a></p>
+<dt id="section-3-16.3">Connection ID</dt>
+        <dd style="margin-left: 1.5em" id="section-3-16.4">
+          <p id="section-3-16.4.1">A connection ID being acknowledged whose length is equal to
+Connection ID Length. This is the real Target Connection ID.<a href="#section-3-16.4.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-3-15.5">Virtual Connection ID Length</dt>
-        <dd style="margin-left: 1.5em" id="section-3-15.6">
-          <p id="section-3-15.6.1">The length of the virtual connection ID being provided. This MUST be a valid
-connection ID length for the QUIC version used in the client&lt;-&gt;proxy QUIC
+<dt id="section-3-16.5">Virtual Connection ID Length</dt>
+        <dd style="margin-left: 1.5em" id="section-3-16.6">
+          <p id="section-3-16.6.1">The length of the virtual target connection ID being provided. This MUST be a
+valid connection ID length for the QUIC version used in the client&lt;-&gt;proxy QUIC
 connection. When forwarded mode is not negotiated, the length MUST be zero.
 The Virtual Connection ID Length and Connection ID Length SHOULD be equal
-when possible to avoid the need to resize packets during replacement.<a href="#section-3-15.6.1" class="pilcrow">¶</a></p>
+when possible to avoid the need to resize packets during replacement.<a href="#section-3-16.6.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-3-15.7">Virtual Connection ID</dt>
-        <dd style="margin-left: 1.5em" id="section-3-15.8">
-          <p id="section-3-15.8.1">The peer-chosen connection ID that the sender of forwarded mode packets MUST
-use when sending. The endpoint rewrites forwarded mode packets to contain the
-correct Connection ID prior to sending them.<a href="#section-3-15.8.1" class="pilcrow">¶</a></p>
+<dt id="section-3-16.7">Virtual Connection ID</dt>
+        <dd style="margin-left: 1.5em" id="section-3-16.8">
+          <p id="section-3-16.8.1">The proxy-chosen connection ID that the client MUST use when sending in
+forwarding mode. The proxy rewrites forwarded mode packets to contain the
+correct Target Connection ID prior to sending them.<a href="#section-3-16.8.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-3-15.9">Stateless Reset Token Length</dt>
-        <dd style="margin-left: 1.5em" id="section-3-15.10">
-          <p id="section-3-15.10.1">The length of the stateless reset token that may be sent by the client or
-proxy in response to forwarded mode packets in order to reset the
-Client&lt;-&gt;Target QUIC connection. When forwarded mode is not negotiated, the
-length MUST be zero. Proxies or Clients choosing not to support stateless
-resets MAY set the length to zero. Clients or Proxies receiving a zero-length
-stateless reset token MUST ignore it.<a href="#section-3-15.10.1" class="pilcrow">¶</a></p>
+<dt id="section-3-16.9">Stateless Reset Token Length</dt>
+        <dd style="margin-left: 1.5em" id="section-3-16.10">
+          <p id="section-3-16.10.1">The length of the Stateless Reset Token sent by the proxy in response to
+forwarded mode packets in order to reset the Client&lt;-&gt;Target QUIC connection.
+When forwarded mode is not negotiated, the length MUST be zero. Proxies choosing
+not to support stateless resets MAY set the length to zero. Clients receiving a
+zero-length stateless reset token MUST ignore it.<a href="#section-3-16.10.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-3-15.11">Stateless Reset Token</dt>
-        <dd style="margin-left: 1.5em" id="section-3-15.12">
-          <p id="section-3-15.12.1">A Stateless Reset Token allowing reset of the Client&lt;-&gt;Target connection in
-response to Client&lt;-&gt;Target forwarded mode packets.<a href="#section-3-15.12.1" class="pilcrow">¶</a></p>
+<dt id="section-3-16.11">Stateless Reset Token</dt>
+        <dd style="margin-left: 1.5em" id="section-3-16.12">
+          <p id="section-3-16.12.1">A Stateless Reset Token allowing reset of the Client&lt;-&gt;Target connection in
+response to Client-&gt;Target forwarded mode packets.<a href="#section-3-16.12.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+<p id="section-3-17">The ACK_CLIENT_CID capsule type includes a Virtual Connection ID.<a href="#section-3-17" class="pilcrow">¶</a></p>
+<span id="name-acknowledge-client-connecti"></span><div id="fig-capsule-ack-client-cid">
+<figure id="figure-4">
+        <div class="alignLeft art-text artwork" id="section-3-18.1">
+<pre>
+Acknowledge Client Connection ID Capsule {
+  Type (i) = 0xffe502
+  Length (i)
+  Connection ID Length (i)
+  Connection ID (0..2040),
+  Virtual Connection ID Length (i)
+  Virtual Connection ID (0..2040),
+}
+</pre>
+</div>
+<figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
+<a href="#name-acknowledge-client-connecti" class="selfRef">Acknowledge Client Connection ID Capsule Format</a>
+        </figcaption></figure>
+</div>
+<span class="break"></span><dl class="dlParallel" id="section-3-19">
+        <dt id="section-3-19.1">Connection ID Length</dt>
+        <dd style="margin-left: 1.5em" id="section-3-19.2">
+          <p id="section-3-19.2.1">The length of the connection ID being acknowledged, which
+is between 0 and 255. Note that in QUICv1, the length of the Connection ID
+is limited to 20 bytes, but QUIC invariants allow up to 255 bytes.<a href="#section-3-19.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-3-19.3">Connection ID</dt>
+        <dd style="margin-left: 1.5em" id="section-3-19.4">
+          <p id="section-3-19.4.1">A connection ID being acknowledged whose length is equal to
+Connection ID Length. This is the real Cilent Connection ID.<a href="#section-3-19.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-3-19.5">Virtual Connection ID Length</dt>
+        <dd style="margin-left: 1.5em" id="section-3-19.6">
+          <p id="section-3-19.6.1">The length of the virtual client connection ID being provided. This MUST be a
+valid connection ID length for the QUIC version used in the client&lt;-&gt;proxy QUIC
+connection. When forwarded mode is not negotiated, the length MUST be zero.
+The Virtual Connection ID Length and Connection ID Length SHOULD be equal
+when possible to avoid the need to resize packets during replacement. The
+Virtual Client Connection ID Length SHOULD be at least as large as the
+Connection ID to reduce the likelihood of connection ID conflicts.<a href="#section-3-19.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-3-19.7">Virtual Connection ID</dt>
+        <dd style="margin-left: 1.5em" id="section-3-19.8">
+          <p id="section-3-19.8.1">The proxy-chosen connection ID that the proxy MUST use when sending in
+forwarding mode. The proxy rewrites forwarded mode packets to contain the
+correct Virtual Client Connection ID prior to sending them to the client.<a href="#section-3-19.8.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+<p id="section-3-20">The ACK_CLIENT_VCID capsule type includes a Stateless Reset Token.<a href="#section-3-20" class="pilcrow">¶</a></p>
+<span id="name-acknowledge-virtual-client-"></span><div id="fig-capsule-ack-virtual-client-cid">
+<figure id="figure-5">
+        <div class="alignLeft art-text artwork" id="section-3-21.1">
+<pre>
+Acknowledge Virtual Client Connection ID Capsule {
+  Type (i) = 0xffe503
+  Length (i)
+  Connection ID Length (i)
+  Connection ID (0..2040),
+  Virtual Connection ID Length (i)
+  Virtual Connection ID (0..2040),
+  Stateless Reset Token Length (i),
+  Stateless Reset Token (..),
+}
+</pre>
+</div>
+<figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
+<a href="#name-acknowledge-virtual-client-" class="selfRef">Acknowledge Virtual Client Connection ID Capsule Format</a>
+        </figcaption></figure>
+</div>
+<span class="break"></span><dl class="dlParallel" id="section-3-22">
+        <dt id="section-3-22.1">Connection ID Length</dt>
+        <dd style="margin-left: 1.5em" id="section-3-22.2">
+          <p id="section-3-22.2.1">The length of the connection ID being acknowledged, which
+is between 0 and 255. Note that in QUICv1, the length of the Connection ID
+is limited to 20 bytes, but QUIC invariants allow up to 255 bytes.<a href="#section-3-22.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-3-22.3">Connection ID</dt>
+        <dd style="margin-left: 1.5em" id="section-3-22.4">
+          <p id="section-3-22.4.1">A connection ID being acknowledged whose length is equal to
+Connection ID Length. This is the real Cilent Connection ID.<a href="#section-3-22.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-3-22.5">Virtual Connection ID Length</dt>
+        <dd style="margin-left: 1.5em" id="section-3-22.6">
+          <p id="section-3-22.6.1">The length of the virtual client connection ID being acknowledged.<a href="#section-3-22.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-3-22.7">Virtual Connection ID</dt>
+        <dd style="margin-left: 1.5em" id="section-3-22.8">
+          <p id="section-3-22.8.1">The proxy-chosen virtual connection ID being acknowledged whose length is
+equal to Virtual Connection ID Length.<a href="#section-3-22.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-3-22.9">Stateless Reset Token Length</dt>
+        <dd style="margin-left: 1.5em" id="section-3-22.10">
+          <p id="section-3-22.10.1">The length of the Stateless Reset Token that may be sent by the client in
+response to forwarded mode packets to reset the Client&lt;-&gt;Target connection.
+Clients choosing not to support stateless resets MAY set the length to zero.
+Proxies receiving a zero-length stateless reset token MUST ignore it.<a href="#section-3-22.10.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-3-22.11">Stateless Reset Token</dt>
+        <dd style="margin-left: 1.5em" id="section-3-22.12">
+          <p id="section-3-22.12.1">A Stateless Reset Token allowing reset of the Target-&gt;Client forwarding rule
+in response to Target-&gt;Client forwarded mode packets.<a href="#section-3-22.12.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
@@ -1820,15 +1951,18 @@ does not support this extension.<a href="#section-4-5" class="pilcrow">¶</a></p
 <p id="section-4-6">The client sends a REGISTER_CLIENT_CID capsule whenever it advertises a new
 Client Connection ID to the target, and a REGISTER_TARGET_CID capsule when
 it has received a new Target Connection ID for the target. In order to change
-the connection ID bytes on the wire, a client can update a previously advertised Virtual Client
-Connection ID by sending a new REGISTER_CLIENT_CID with the same Connection ID,
-but a different Virtual Connection ID. Similarly, the client may solicit a new
-Virtual Target Connection ID by sending a REGISTER_TARGET_CID capsule with
-a previously registered Target Connection ID. Clients are responsible for
-changing Virtual Connection IDs when the HTTP stream's network path changes to
-avoid linkability across network paths. Note that initial
-REGISTER_CLIENT_CID capsules MAY be sent prior to receiving an HTTP response
-from the proxy.<a href="#section-4-6" class="pilcrow">¶</a></p>
+the connection ID bytes on the wire, a client can solicit new virtual connection
+IDs by re-registering the same connection IDs. The client may solicit a new
+Virtual Target Connection ID by sending a REGISTER_TARGET_CID capsule with a
+previously registered Target Connection ID. Similarly, the client may solicit a
+new Virtual Client Connection ID by sending a REGISTER_CLIENT_CID with a
+previously registered Client Connection ID. The client MUST acknowledge the new
+Virtual Client Connection ID with an ACK_CLIENT_VCID capsule or close the
+registration. The proxy MUST NOT send in forwarded mode until ACK_CLIENT_VCID
+has been received. Clients are responsible for changing Virtual Connection IDs
+when the HTTP stream's network path changes to avoid linkability across network
+paths. Note that initial REGISTER_CLIENT_CID capsules MAY be sent prior to
+receiving an HTTP response from the proxy.<a href="#section-4-6" class="pilcrow">¶</a></p>
 <div id="new-proxied-connection-setup">
 <section id="section-4.1">
         <h3 id="name-new-proxied-connection-setu">
@@ -1836,13 +1970,16 @@ from the proxy.<a href="#section-4-6" class="pilcrow">¶</a></p>
         </h3>
 <p id="section-4.1-1">To initiate QUIC-aware proxying, the client sends a REGISTER_CLIENT_CID
 capsule containing the initial Client Connection ID that the client has
-advertised to the target as well as a Virtual Connection ID that the proxy MUST
-use when sending forwarded mode packets. If forwarded mode is not supported,
-the Virtual Connection ID Length MUST be zero.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+advertised to the target.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
 <p id="section-4.1-2">If the mapping is created successfully, the client will receive a
 ACK_CLIENT_CID capsule that contains the same Client Connection ID that was
-requested.<a href="#section-4.1-2" class="pilcrow">¶</a></p>
-<p id="section-4.1-3">Since clients are always aware whether or not they are using a QUIC proxy,
+requested as well as a Virtual Client Connection ID that the client MUST use
+when sending forwarding mode packets, assuming forwarding mode is supported.<a href="#section-4.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.1-3">If forwarding mode is supported, the client MUST respond with an
+ACK_CLIENT_VCID to signal to the proxy that it may start sending forwarded mode
+packets. If forwarding mode is not supported, an ACK_CLIENT_VCID capsule MUST
+NOT be sent.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
+<p id="section-4.1-4">Since clients are always aware whether or not they are using a QUIC proxy,
 clients are expected to cooperate with proxies in selecting Client Connection
 IDs. A proxy detects a conflict when it is not able to create a unique mapping
 using the Client Connection ID (<a href="#conflicts" class="auto internal xref">Section 2.4</a>). It can reject requests that
@@ -1850,12 +1987,12 @@ would cause a conflict and indicate this to the client by replying with a
 CLOSE_CLIENT_CID capsule. In order to avoid conflicts, clients SHOULD select
 Client Connection IDs of at least 8 bytes in length with unpredictable values.
 A client also SHOULD NOT select a Client Connection ID that matches the ID used
-for the QUIC connection to the proxy, as this inherently creates a conflict.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
-<p id="section-4.1-4">If the rejection indicated a conflict due to the Client Connection ID, the
+for the QUIC connection to the proxy, as this inherently creates a conflict.<a href="#section-4.1-4" class="pilcrow">¶</a></p>
+<p id="section-4.1-5">If the rejection indicated a conflict due to the Client Connection ID, the
 client MUST select a new Connection ID before sending a new request, and
 generate a new packet. For example, if a client is sending a QUIC Initial
 packet and chooses a Connection ID that conflicts with an existing mapping
-to the same target server, it will need to generate a new QUIC Initial.<a href="#section-4.1-4" class="pilcrow">¶</a></p>
+to the same target server, it will need to generate a new QUIC Initial.<a href="#section-4.1-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="adding-new-client-connection-ids">
@@ -1867,10 +2004,13 @@ to the same target server, it will need to generate a new QUIC Initial.<a href="
 communicate its chosen connection IDs to its peer before the peer can start
 using them. In QUICv1, this is performed using the NEW_CONNECTION_ID frame.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
 <p id="section-4.2-2">Prior to informing the target of a new chosen client connection ID, the client
-MUST send a REGISTER_CLIENT_CID capsule request containing the new Client
-Connection ID and Virtual Client Connection ID.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
+MUST send a REGISTER_CLIENT_CID capsule to the proxy containing the new Client
+Connection ID.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
 <p id="section-4.2-3">The client should only inform the target of the new Client Connection ID once an
 ACK_CLIENT_CID capsule is received that contains the echoed connection ID.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+<p id="section-4.2-4">If forwarding mode is enabled, the client MUST reply to the ACK_CLIENT_CID with
+an ACK_CLIENT_VCID capsule with the real and virtual connection IDs along with
+an optional Stateless Reset Token.<a href="#section-4.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sending-with-forwarded-mode">
@@ -1919,13 +2059,13 @@ Connection IDs of different lengths than the corresponding Connection IDs.<a hre
 <p id="section-4.4-1">If the client has indicated support for forwarded mode with the "Proxy-QUIC-Forwarding"
 header, the proxy MAY use forwarded mode for any Client Connection ID for which
 it has a valid mapping.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
-<p id="section-4.4-2">Once a client has sent "Proxy-QUIC-Forwarding" with a value of "?1", it MUST be
+<p id="section-4.4-2">Once a client has sent an ACK_CLIENT_VCID capsule to the proxy, it MUST be
 prepared to receive forwarded short header packets on the socket between itself
-and the proxy for any Virtual Client Connection ID that it has registered with a
-REGISTER_CLIENT_CID capsule. The client uses the Destination Connection ID field
-of the received packet to determine if the packet was originated by the proxy,
-or merely forwarded from the target. The client replaces the Virtual Client
-Connection ID with the real Client Connection ID before processing the packet further.<a href="#section-4.4-2" class="pilcrow">¶</a></p>
+and the proxy for the specified Virtual Client Connection ID.<a href="#section-4.4-2" class="pilcrow">¶</a></p>
+<p id="section-4.4-3">The client uses the Destination Connection ID field of the received packet to
+determine if the packet was originated by the proxy, or merely forwarded from
+the target. The client replaces the Virtual Client Connection ID with the real
+Client Connection ID before processing the packet further.<a href="#section-4.4-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="connection-maintenance-in-forwarded-mode">
@@ -1988,17 +2128,20 @@ the traffic. Any packets received on a target-facing socket used for proxying
 QUIC that does not correspond to a known Connection ID MUST be dropped.<a href="#section-5-8" class="pilcrow">¶</a></p>
 <p id="section-5-9">When the proxy recieves a REGISTER_CLIENT_CID capsule, it is receiving a
 request to be able to route traffic matching the Client Connection ID back to
-the client using the Virtual Client Connection ID. If the pair of this Client
-Connection ID and the selected target-facing socket does not create a conflict,
-the proxy creates the mapping and responds with a ACK_CLIENT_CID capsule. After
-this point, any packets received by the proxy from the target-facing socket that
-match the Client Connection ID can to be sent to the client after the proxy has
-replaced the Connection ID with the Virtual Client Connection ID. The proxy MUST
-use tunnelled mode (HTTP Datagram frames) for any long header packets. The proxy
-SHOULD forward directly to the client for any matching short header packets if
-forwarding is supported by the client, but the proxy MAY tunnel these packets in
-HTTP Datagram frames instead. If the mapping would create a conflict, the proxy
-responds with a CLOSE_CLIENT_CID capsule.<a href="#section-5-9" class="pilcrow">¶</a></p>
+the client using. If the pair of this Client Connection ID and the selected
+target-facing socket does not create a conflict, the proxy creates the mapping
+and responds with an ACK_CLIENT_CID capsule. If forwarding mode is enabled, the
+capsule contains a proxy-chosen Virtual Client Connection ID. If forwarding mode
+is enabled, and after receiving an ACK_CLIENT_VCID capsule from the client, any
+packets received by the proxy from the target-facing socket that match the
+Client Connection ID can to be sent to the client after the proxy has replaced
+the Connection ID with the Virtual Client Connection ID. If forwarding mode is
+not supported, the proxy MUST NOT send a Virtual Client Connection ID by setting
+the length to zero. The proxy MUST use tunnelled mode (HTTP Datagram frames) for
+any long header packets. The proxy SHOULD forward directly to the client for any
+matching short header packets if forwarding is supported by the client, but the
+proxy MAY tunnel these packets in HTTP Datagram frames instead. If the mapping
+would create a conflict, the proxy responds with a CLOSE_CLIENT_CID capsule.<a href="#section-5-9" class="pilcrow">¶</a></p>
 <p id="section-5-10">When the proxy recieves a REGISTER_TARGET_CID capsule, it is receiving a
 request to allow the client to forward packets to the target. The proxy
 generates a Virtual Target Connection ID for the client to use when sending
@@ -2012,21 +2155,12 @@ forward any short header packets received on the client-facing socket that use
 the Virtual Target Connection ID using the correct target-facing socket after
 first rewriting the Virtual Target Connection ID to be the correct Target
 Connection ID.<a href="#section-5-10" class="pilcrow">¶</a></p>
-<p id="section-5-11">A proxy that supports forwarded mode but chooses not to support rewriting the
-Virtual Target Connection ID to the Target Connection ID may opt to simply let
-them be equal. If the proxy does wish to choose a Virtual Target Connection ID,
-it MUST be able to replace the Virtual Target Connection ID with the Target
-Connection ID and correctly handle length differences between the two.
-Regardless of whether or not the proxy chooses to support rewriting of the
-Virtual Target Connection ID, it MUST be able to support rewriting the Client
-Connection ID to the Virtual Client Connection ID.<a href="#section-5-11" class="pilcrow">¶</a></p>
-<p id="section-5-12">If the proxy does not support forwarded mode, or does not allow forwarded mode
-for a particular client or authority by policy, it can reject all REGISTER_TARGET_CID
-requests with CLOSE_TARGET_CID capsule.<a href="#section-5-12" class="pilcrow">¶</a></p>
-<p id="section-5-13">The proxy MUST only forward non-tunnelled packets from the client that are QUIC
+<p id="section-5-11">Proxies MUST choose unpredictable Virtual Target and Client Connection IDs to
+avoid forwarding loop attacks.<a href="#section-5-11" class="pilcrow">¶</a></p>
+<p id="section-5-12">The proxy MUST only forward non-tunnelled packets from the client that are QUIC
 short header packets (based on the Header Form bit) and have mapped Virtual Target
 Connection IDs. Packets sent by the client that are forwarded SHOULD be
-considered as activity for restarting QUIC's Idle Timeout <span>[<a href="#QUIC" class="cite xref">QUIC</a>]</span>.<a href="#section-5-13" class="pilcrow">¶</a></p>
+considered as activity for restarting QUIC's Idle Timeout <span>[<a href="#QUIC" class="cite xref">QUIC</a>]</span>.<a href="#section-5-12" class="pilcrow">¶</a></p>
 <div id="removing-mapping-state">
 <section id="section-5.1">
         <h3 id="name-removing-mapping-state">
@@ -2064,9 +2198,9 @@ packets with the same connection ID bytes over multiple network paths. After
 initiating active migration, clients are no longer able to send forwarded mode
 packets since the proxy will have removed forwarding rules. Clients can proceed with
 tunnelled mode or can request new forwarding rules via REGISTER_CLIENT_CID and
-REGISTER_TARGET_CID capsules. Each of these capsules will contain new virtual
-connection IDs to prevent packets with the same connection ID bytes being used
-over multiple network paths. Note that the Client Connection ID and Target
+REGISTER_TARGET_CID capsules. Each of the acknowledging capsules will contain new
+virtual connection IDs to prevent packets with the same connection ID bytes being
+used over multiple network paths. Note that the Client Connection ID and Target
 Connection ID can stay the same while the Virtual Target Connection ID and
 Virtual Client Connection ID change.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
 </section>
@@ -2262,7 +2396,6 @@ STREAM(44): HEADERS             --------&gt;
 STREAM(44): DATA                --------&gt;
   Capsule Type = REGISTER_CLIENT_CID
   Connection ID = 0x31323334
-  Virtual CID = 0x62646668
   Stateless Reset Token = Token
 
 DATAGRAM                        --------&gt;
@@ -2280,7 +2413,27 @@ DATAGRAM                        --------&gt;
            &lt;--------  STREAM(44): DATA
                         Capsule Type = ACK_CLIENT_CID
                         Connection ID = 0x31323334
-
+                        Virtual CID = 0x62646668
+</pre><a href="#section-7-3" class="pilcrow">¶</a>
+</div>
+<p id="section-7-4">The proxy has acknowledged the Client Connection ID and provided a Virtual
+Client Connection ID. Even if there were Short Header packets to send, the proxy
+cannot send forwarded mode packets because the client hasn't acknowledged the
+Virtual Client Connection ID.<a href="#section-7-4" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-7-5">
+<pre>
+STREAM(44): DATA                --------&gt;
+  Capsule Type = ACK_CLIENT_VCID
+  Connection ID = 0x31323334
+  Virtual CID = 0x62646668
+  Stateless Reset Token = Token
+</pre><a href="#section-7-5" class="pilcrow">¶</a>
+</div>
+<p id="section-7-6">The client acknowledges the Virtual Client Connection ID. The proxy still
+doesn't have any Short Header Packets to send, but, if it did, it would be able
+to send with forwarded mode.<a href="#section-7-6" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-7-7">
+<pre>
 /* Wait for target server to respond to UDP packet. */
 
            &lt;--------  DATAGRAM
@@ -2300,23 +2453,22 @@ DATAGRAM                        --------&gt;
            &lt;--------  UDP Datagram
                         Payload = Forwarded QUIC SH packet
 
-</pre><a href="#section-7-3" class="pilcrow">¶</a>
+</pre><a href="#section-7-7" class="pilcrow">¶</a>
 </div>
-<p id="section-7-4">Immediately after sending the REGISTER_CLIENT_CID capsule, the client may
-receive forwarded mode packets from the proxy with a Virtual Client
-Connection ID of 0x62646668 which it will replace with the real Client
+<p id="section-7-8">The client may receive forwarded mode packets from the proxy with a Virtual
+Client Connection ID of 0x62646668 which it will replace with the real Client
 Connection ID of 0x31323334. All forwarded mode packets sent by the proxy
 will have been modified to contain the Virtual Client Connection ID instead
 of the Client Connection ID, and processed by the negotiated "scramble"
 packet transform. However, in the unlikely event that a forwarded packet
 arrives before the proxy's HTTP response, the client will not know which
 transform the proxy selected. In this case, the client will have to ignore
-the packet or buffer it until the HTTP response is received.<a href="#section-7-4" class="pilcrow">¶</a></p>
-<p id="section-7-5">Once the client learns which Connection ID has been selected by the target
+the packet or buffer it until the HTTP response is received.<a href="#section-7-8" class="pilcrow">¶</a></p>
+<p id="section-7-9">Once the client learns which Connection ID has been selected by the target
 server, it can send a new request to the proxy to establish a mapping for
 forwarding. In this case, that ID is 0x61626364. The client sends the
-following capsule:<a href="#section-7-5" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-7-6">
+following capsule:<a href="#section-7-9" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-7-10">
 <pre>
 STREAM(44): DATA                --------&gt;
   Capsule Type = REGISTER_TARGET_CID
@@ -2333,16 +2485,16 @@ STREAM(44): DATA                --------&gt;
 UDP Datagram                     --------&gt;
   Payload = Forwarded QUIC SH packet
 
-</pre><a href="#section-7-6" class="pilcrow">¶</a>
+</pre><a href="#section-7-10" class="pilcrow">¶</a>
 </div>
-<p id="section-7-7">Upon receiving an ACK_TARGET_CID capsule, the client starts sending Short Header
+<p id="section-7-11">Upon receiving an ACK_TARGET_CID capsule, the client starts sending Short Header
 packets with a Destination Connection ID of 0x123412341234 directly to the proxy
 (not tunnelled), and these are rewritten by the proxy to have the Destination
 Connection ID 0x61626364 prior to being forwarded directly to the target. In the
 reverse direction, Short Header packets from the target with a Destination
 Connection ID of 0x31323334 are modified to replace the Destination Connection
 ID with the Virtual Client Connection ID of 0x62646668 and forwarded directly to
-the client.<a href="#section-7-7" class="pilcrow">¶</a></p>
+the client.<a href="#section-7-11" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="packet-size-considerations">
@@ -2428,6 +2580,11 @@ defined in this document.<a href="#section-9.2-3" class="pilcrow">¶</a></p>
 would cause a tunnelling proxy to silently drop packets, while a forwarding proxy
 would forward the packets. In this way, forwarded mode is less vulnerable to
 flow recognition based on corrupting a portion of packets in a burst.<a href="#section-9.2-4" class="pilcrow">¶</a></p>
+<p id="section-9.2-5">Chaining of proxies using forwarded mode introduces the risk of forwarding loop
+attacks. Preventing Virtual Client Connection ID conflicts across proxies
+sharing an IP address and port mitigates one such forwarding loop attack.
+Conflicts can be avoided by partitioning the Virtual Client Connection ID space
+across proxies, using sufficiently long and random values, or by other means.<a href="#section-9.2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2445,7 +2602,7 @@ flow recognition based on corrupting a portion of packets in a burst.<a href="#s
 <p id="section-10.1-1">This document registers the "Proxy-QUIC-Forwarding" header in the "Hypertext Transfer
 Protocol (HTTP) Field Name Registry" &lt;<span><a href="https://www.iana.org/assignments/http-fields">https://www.iana.org/assignments/http-fields</a></span>&gt;.<a href="#section-10.1-1" class="pilcrow">¶</a></p>
 <span id="name-registered-http-header"></span><div id="iana-header-type-table">
-<figure id="figure-4">
+<figure id="figure-6">
           <div class="alignLeft art-text artwork" id="section-10.1-2.1">
 <pre>
     +-----------------------+----------+--------+---------------+
@@ -2455,7 +2612,7 @@ Protocol (HTTP) Field Name Registry" &lt;<span><a href="https://www.iana.org/ass
     +-----------------------+----------+--------+---------------+
 </pre>
 </div>
-<figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
+<figcaption><a href="#figure-6" class="selfRef">Figure 6</a>:
 <a href="#name-registered-http-header" class="selfRef">Registered HTTP Header</a>
           </figcaption></figure>
 </div>
@@ -2472,7 +2629,7 @@ in &lt;<span><a href="https://www.iana.org/assignments/masque/masque.xhtml">http
 Registrations in this registry are assigned using the
 Specification Required policy (Section 4.6 of [IANA-POLICY]).<a href="#section-10.2-1" class="pilcrow">¶</a></p>
 <span id="name-initial-proxy-quic-forwardi"></span><div id="iana-parameter-names-table">
-<figure id="figure-5">
+<figure id="figure-7">
           <div class="alignLeft art-text artwork" id="section-10.2-2.1">
 <pre>
     +-----------------------+-------------------------------------+---------------+--------------------------------+
@@ -2486,7 +2643,7 @@ Specification Required policy (Section 4.6 of [IANA-POLICY]).<a href="#section-1
     +-----------------------+-------------------------------------+---------------+--------------------------------+
 </pre>
 </div>
-<figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
+<figcaption><a href="#figure-7" class="selfRef">Figure 7</a>:
 <a href="#name-initial-proxy-quic-forwardi" class="selfRef">Initial Proxy QUIC Forwarding Parameter Names</a>
           </figcaption></figure>
 </div>
@@ -2558,32 +2715,44 @@ will be replaced with lower values before publication.<a href="#section-10.4-1" 
             <tr>
               <th class="text-left" rowspan="1" colspan="1">Capule Type</th>
               <th class="text-left" rowspan="1" colspan="1">Value</th>
+              <th class="text-left" rowspan="1" colspan="1">Specification</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">REGISTER_CLIENT_CID</td>
-              <td class="text-left" rowspan="1" colspan="1">0xffe400</td>
+              <td class="text-left" rowspan="1" colspan="1">0xffe500</td>
+              <td class="text-left" rowspan="1" colspan="1">This Document</td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">REGISTER_TARGET_CID</td>
-              <td class="text-left" rowspan="1" colspan="1">0xffe401</td>
+              <td class="text-left" rowspan="1" colspan="1">0xffe501</td>
+              <td class="text-left" rowspan="1" colspan="1">This Document</td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">ACK_CLIENT_CID</td>
-              <td class="text-left" rowspan="1" colspan="1">0xffe402</td>
+              <td class="text-left" rowspan="1" colspan="1">0xffe502</td>
+              <td class="text-left" rowspan="1" colspan="1">This Document</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">ACK_CLIENT_VCID</td>
+              <td class="text-left" rowspan="1" colspan="1">0xffe503</td>
+              <td class="text-left" rowspan="1" colspan="1">This Document</td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">ACK_TARGET_CID</td>
-              <td class="text-left" rowspan="1" colspan="1">0xffe403</td>
+              <td class="text-left" rowspan="1" colspan="1">0xffe504</td>
+              <td class="text-left" rowspan="1" colspan="1">This Document</td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">CLOSE_CLIENT_CID</td>
-              <td class="text-left" rowspan="1" colspan="1">0xffe404</td>
+              <td class="text-left" rowspan="1" colspan="1">0xffe505</td>
+              <td class="text-left" rowspan="1" colspan="1">This Document</td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">CLOSE_TARGET_CID</td>
-              <td class="text-left" rowspan="1" colspan="1">0xffe405</td>
+              <td class="text-left" rowspan="1" colspan="1">0xffe506</td>
+              <td class="text-left" rowspan="1" colspan="1">This Document</td>
             </tr>
           </tbody>
         </table>
