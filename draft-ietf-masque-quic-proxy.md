@@ -307,7 +307,7 @@ the mappings between VCIDs, CIDs, and 4-tuples are unique. Specifically,
 in order to route packets sent by the client, the proxy needs to be able
 to observe the VCID and the client-to-proxy 4-tuple, and map them
 to a specific target CID and proxy-to-target 4-tuple. In order to route
-packets send by a target, the proxy needs to be able to observe the client
+packets sent by a target, the proxy needs to be able to observe the client
 CID and the proxy-to-target 4-tuple, and map them to a specific VCID
 and client-to-proxy 4-tuple. Since proxies choose the VCID values, they
 can ensure that the VCIDs are distinguishable.
@@ -317,8 +317,7 @@ strategies such as those described in {{?QUIC-LB=I-D.ietf-quic-load-balancers}}
 that encode routing information in the connection ID. When operating in
 forwarded mode, clients send QUIC packets destined for the target directly
 to the proxy. Since these packets are generated using the target CID,
-load balancers would not be able to route packets to the correct proxy if the
-packets were sent with the target CID. The target VCID
+load balancers may not have the necessary information to route packets to the correct proxy. The target VCID
 is a VCID chosen by the proxy that the client uses when sending
 forwarded mode packets. The proxy replaces the target VCID
 with the target CID prior to forwarding the packet to the target.
@@ -457,8 +456,8 @@ set the header field value to "?0", or omit the header entirely.
 
 Connection ID awareness relies on using capsules {{HTTP-CAPSULES}} to
 signal addition and removal of Connection IDs. Clients send capsules
-to let proxies know when new Connection IDs on the client-to-target
-QUIC connection are changed. Proxies send capsules to acknowledge or
+to let proxies know when Connection IDs on the client-to-target
+QUIC connection are changing. Proxies send capsules to acknowledge or
 reject these Connection IDs, and in forwarded mode to let clients know
 about Virtual Connection IDs to use on the client-to-proxy link.
 
