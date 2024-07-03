@@ -713,9 +713,9 @@ to 20 bytes, but QUIC invariants allow up to 255 bytes.
 ## Detecting Conflicts {#conflicts}
 
 In order to be able to route packets correctly in both tunnelled and forwarded
-mode, proxies check for conflicts before creating a new mapping. If a conflict
-is detected, the proxy will reject the client's request, as described in
-{{proxy-behavior}}.
+mode, proxies check for conflicts before creating a new CID mapping. If a conflict
+is detected, the proxy will reject the client's request using a CLOSE_CLIENT_CID
+or CLOSE_TARGET_CID capsule.
 
 Two 4-tuples conflict if and only if all members of the 4-tuple (local IP
 address, local UDP port, remote IP address, and remote UDP port) are identical.
