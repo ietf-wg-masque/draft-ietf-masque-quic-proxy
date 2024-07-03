@@ -197,15 +197,15 @@ a main motivation for enabling forwarded mode), each subsequent proxy
 is just treated as a target by the preceding proxy.
 
 ~~~ aasvg
-   +--------+              +-----------+              +--------+   
-   |        |              |           |              |        |   
-   | Client +--------------+   Proxy   +--------------+ Target |   
-   |        |              |           |              |        |   
-   +--------+              +-----------+              +--------+  
+   +--------+              +-----------+              +--------+
+   |        |              |           |              |        |
+   | Client +--------------+   Proxy   +--------------+ Target |
+   |        |              |           |              |        |
+   +--------+              +-----------+              +--------+
      
        <----------- Client-to-target connection ----------->
-       
-       
+
+
        <-- Client-to-proxy -->       <-- Proxy-to-target -->
               4-tuple                        4-tuple
 ~~~
@@ -243,13 +243,13 @@ correct client based on CID `AAAA1111` or `BBBB1111`.
 ~~~ aasvg
        <---------- Client A-to-target connection ---------->
        AAAA1111                                     AAAA2222
-   +--------+              +-----------+   
-   | Client +--------------+           +   
-   |   A    |              |           |   
-   +--------+              |           |              +--------+   
-                           |           |   Shared     |        |   
-                           |   Proxy   +--------------+ Target |   
-                           |           |   4-tuple    |        |  
+   +--------+              +-----------+
+   | Client +--------------+           +
+   |   A    |              |           |
+   +--------+              |           |              +--------+
+                           |           |   Shared     |        |
+                           |   Proxy   +--------------+ Target |
+                           |           |   4-tuple    |        |
    +--------+              |           |              +--------+
    | Client |              |           |
    |   B    +--------------+           |
@@ -282,22 +282,22 @@ be `AAAABBBB` for the client's VCID and `BBBBAAAA` for the proxy's VCID that
 it uses to forward to the target.
 
 ~~~ aasvg
-   +--------+              +-----------+              +--------+   
-   |        |              |           |              |        |   
-   | Client +--------------+   Proxy   +--------------+ Target |   
-   |        |              |           |              |        |   
-   +--------+              +-----------+              +--------+  
-     
+   +--------+              +-----------+              +--------+
+   |        |              |           |              |        |
+   | Client +--------------+   Proxy   +--------------+ Target |
+   |        |              |           |              |        |
+   +--------+              +-----------+              +--------+
+
        CCCC0000       0000CCCC
        <-- Client-to-proxy -->
-              connection      
- 
+              connection
+
        CCCC1111                                     1111CCCC
        <----------- Client-to-target connection ----------->
 
   AAAABBBB (CCCC1111)   BBBBAAAA (1111CCCC)
        <-- Client-to-proxy -->
-                VCIDs      
+                VCIDs
 ~~~
 {: #vcid-diagram title="Diagram of VCIDs in forwarded mode"}
 
@@ -458,7 +458,7 @@ set the header field value to "?0", or omit the header entirely.
 Connection ID awareness relies on using capsules {{HTTP-CAPSULES}} to
 signal addition and removal of Connection IDs. Clients send capsules
 to let proxies know when new Connection IDs on the client-to-target
-QUIC connection are changed. Proxies send capsules to acknowledge or 
+QUIC connection are changed. Proxies send capsules to acknowledge or
 reject these Connection IDs, and in forwarded mode to let clients know
 about Virtual Connection IDs to use on the client-to-proxy link.
 
@@ -472,7 +472,7 @@ the proxy about a new client CID or a new target CID,
 respectively. These capsule types MUST only be sent by a client.
 
 The ACK_CLIENT_CID ({{capsule-ack-client}}) and ACK_TARGET_CID
-({{capsule-ack-target}}) capsule types are sent by the proxy to the client 
+({{capsule-ack-target}}) capsule types are sent by the proxy to the client
 to indicate that a mapping was successfully created for a registered
 connection ID as well as optionally provide the Virtual Connection IDs that can be
 used in forwarded mode. These capsule types MUST only be sent by a proxy.
@@ -509,7 +509,7 @@ Register CID Capsule {
   Connection ID (0..2040),
 }
 ~~~
-{: #fig-capsule-cid title="Register CID Capsule Format"}
+{: #fig-capsule-register-client-cid title="Register CID Capsule Format"}
 
 Connection ID:
 : A connection ID being registered, which is between 0 and 255 bytes in
@@ -702,7 +702,7 @@ Close CID Capsule {
   Connection ID (0..2040),
 }
 ~~~
-{: #fig-capsule-cid title="Close CID Capsule Format"}
+{: #fig-capsule-close-cid title="Close CID Capsule Format"}
 
 Connection ID:
 : A connection ID being closed, which is between 0 and 255 bytes in
@@ -976,7 +976,7 @@ More complex transform behaviors could have internal state, but no such transfor
 are presented here.
 
 Packet transforms are identified by an IANA-registered name, and negotiated in
-the HTTP headers (see {{client-behavior}}).  This document defines two initial
+the HTTP headers (see {{forwarding-header}}).  This document defines two initial
 transforms: the `identity` transform and the `scramble` transform.
 
 ### The identify transform {#identity-transform}
@@ -1395,9 +1395,9 @@ Specification Required policy (Section 4.6 of [IANA-POLICY]).
     +-----------------------+-------------------------------------+---------------+--------------------------------+
     | Parameter Name        | Description                         | Reference     | Notes                          |
     +-----------------------+-------------------------------------+---------------+--------------------------------+
-    | accept-transform      | contains supported transforms       | This document | Section {{client-behavior}}    |
+    | accept-transform      | contains supported transforms       | This document | Section {{forwarding-header}}  |
     +-----------------------+-------------------------------------+---------------+--------------------------------+
-    | transform             | indicates selected transforms       | This document | Section {{proxy-behavior}}     |
+    | transform             | indicates selected transforms       | This document | Section {{forwarding-header}}  |
     +-----------------------+-------------------------------------+---------------+--------------------------------+
     | scramble-key          | contains key for scramble transform | This document | Section {{scramble-transform}} |
     +-----------------------+-------------------------------------+---------------+--------------------------------+
