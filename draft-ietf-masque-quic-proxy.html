@@ -9,13 +9,13 @@
 <meta content="Eric Rosenberg" name="author">
 <meta content="David Schinazi" name="author">
 <meta content="
-       This document defines an extension to UDP Proxying over HTTP
-that adds specific optimizations for proxied QUIC connections. This extension
-allows a proxy to reuse UDP 4-tuples for multiple connections. It also defines a
-mode of proxying in which QUIC short header packets can be forwarded using an
-HTTP/3 proxy rather than being re-encapsulated and re-encrypted. 
+       This document extends UDP Proxying over HTTP to add optimizations for proxied
+QUIC connections. Specifically, it allows a proxy to reuse UDP 4-tuples for multiple
+proxied connections, and adds a mode of proxying in which QUIC short header packets
+can be forwarded and transformed through a HTTP/3 proxy rather than being fully
+re-encapsulated and re-encrypted. 
     " name="description">
-<meta content="xml2rfc 3.21.0" name="generator">
+<meta content="xml2rfc 3.22.0" name="generator">
 <meta content="quic" name="keyword">
 <meta content="http" name="keyword">
 <meta content="datagram" name="keyword">
@@ -28,7 +28,7 @@ HTTP/3 proxy rather than being re-encapsulated and re-encrypted.
 <meta content="http-ng" name="keyword">
 <meta content="draft-ietf-masque-quic-proxy-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.21.0
+  xml2rfc 3.22.0
     Python 3.12.3
     ConfigArgParse 1.7
     google-i18n-address 3.1.0
@@ -38,9 +38,8 @@ HTTP/3 proxy rather than being re-encapsulated and re-encrypted.
     platformdirs 4.2.2
     pycountry 22.3.5
     PyYAML 6.0.1
-    requests 2.31.0
+    requests 2.32.3
     setuptools 69.5.1
-    six 1.16.0
     wcwidth 0.2.13
 -->
 <link href="draft-ietf-masque-quic-proxy.xml" rel="alternate" type="application/rfc+xml">
@@ -1040,11 +1039,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">QUIC Proxy</td>
-<td class="right">June 2024</td>
+<td class="right">July 2024</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Pauly, et al.</td>
-<td class="center">Expires 22 December 2024</td>
+<td class="center">Expires 4 January 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1057,12 +1056,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-masque-quic-proxy-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-06-20" class="published">20 June 2024</time>
+<time datetime="2024-07-03" class="published">3 July 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Experimental</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-12-22">22 December 2024</time></dd>
+<dd class="expires"><time datetime="2025-01-04">4 January 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1083,11 +1082,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <h1 id="title">QUIC-Aware Proxying Using HTTP</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">This document defines an extension to UDP Proxying over HTTP
-that adds specific optimizations for proxied QUIC connections. This extension
-allows a proxy to reuse UDP 4-tuples for multiple connections. It also defines a
-mode of proxying in which QUIC short header packets can be forwarded using an
-HTTP/3 proxy rather than being re-encapsulated and re-encrypted.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">This document extends UDP Proxying over HTTP to add optimizations for proxied
+QUIC connections. Specifically, it allows a proxy to reuse UDP 4-tuples for multiple
+proxied connections, and adds a mode of proxying in which QUIC short header packets
+can be forwarded and transformed through a HTTP/3 proxy rather than being fully
+re-encapsulated and re-encrypted.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1124,7 +1123,7 @@ HTTP/3 proxy rather than being re-encapsulated and re-encrypted.<a href="#sectio
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 22 December 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 4 January 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1303,64 +1302,74 @@ defines a way to send datagrams through an HTTP proxy, where UDP is used to comm
 between the proxy and a target server. This can be used to proxy QUIC
 connections <span>[<a href="#QUIC" class="cite xref">QUIC</a>]</span>, since QUIC runs over UDP datagrams.<a href="#section-1-1" class="pilcrow">¶</a></p>
 <p id="section-1-2">This document uses the term "target" to refer to the server that a client is
-accessing via a proxy. This target may be an origin hosting content, or another
-proxy.<a href="#section-1-2" class="pilcrow">¶</a></p>
+accessing via a proxy. This target may be an origin server hosting content, or
+another proxy for cases where proxies are chained together.<a href="#section-1-2" class="pilcrow">¶</a></p>
 <p id="section-1-3">This document extends the UDP proxying protocol to add signalling about QUIC
 Connection IDs. QUIC Connection IDs are used to identify QUIC connections in
-scenarios where there is not a strict bidirectional mapping between one QUIC
-connection and one UDP 4-tuple (pairs of IP addresses and ports). A proxy that
-is aware of Connection IDs can reuse UDP 4-tuples between itself and a target
-for multiple proxied QUIC connections.<a href="#section-1-3" class="pilcrow">¶</a></p>
-<p id="section-1-4">Awareness of Connection IDs also allows a proxy to avoid re-encapsulation and
-re-encryption of proxied QUIC packets once a connection has been established.
-When this functionality is present, the proxy can support two modes for handling
-QUIC packets:<a href="#section-1-4" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-1-5">
-<li id="section-1-5.1">
-          <p id="section-1-5.1.1">Tunnelled, in which client &lt;-&gt; target QUIC packets are encapsulated inside
-client &lt;-&gt; proxy QUIC packets. These packets use multiple layers of encryption
-and congestion control. QUIC long header packets MUST use this mode. QUIC short
-header packets MAY use this mode. This is the default mode for UDP proxying.<a href="#section-1-5.1.1" class="pilcrow">¶</a></p>
+scenarios where there is not a strict one-to-one mapping between QUIC
+connections and UDP 4-tuples (pairs of IP addresses and ports).<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">Once a proxy is aware of QUIC Connection IDs, it can reuse UDP 4-tuples between
+itself and a target for multiple proxied QUIC connections.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-5">For proxies that are themselves running on HTTP/3 <span>[<a href="#HTTP3" class="cite xref">HTTP3</a>]</span>, and thus
+are accessed by clients over QUIC, QUIC Connection IDs can be used to treat
+packets differently on the link between clients and proxies. New QUIC Connection IDs
+can be assigned to perform transformations to the packets that allow for efficient
+forwarding of packets that don't require full re-encapsulation and re-encryption
+of proxied QUIC packets within datagrams inside the QUIC connection between
+clients and proxies.<a href="#section-1-5" class="pilcrow">¶</a></p>
+<p id="section-1-6">This document defines two modes for proxying QUIC connections, "tunnelled" and
+"forwarded":<a href="#section-1-6" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-1-7">
+<li id="section-1-7.1">
+          <p id="section-1-7.1.1">Tunnelled is the default mode for UDP proxying, defined in <span>[<a href="#CONNECT-UDP" class="cite xref">CONNECT-UDP</a>]</span>.
+In this mode, packets in QUIC connection between the client and target are
+encapsulated inside the QUIC connection between the client and proxy.
+These packets use multiple layers of encryption and congestion control.<a href="#section-1-7.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-1-5.2">
-          <p id="section-1-5.2.1">Forwarded, in which client &lt;-&gt; target QUIC packets are sent separately over the
-client &lt;-&gt; proxy UDP socket, using a special-purpose transform instead of full
-QUIC encapsulation. This mode MUST only be used for QUIC short header packets.<a href="#section-1-5.2.1" class="pilcrow">¶</a></p>
+        <li id="section-1-7.2">
+          <p id="section-1-7.2.1">Forwarded is the mode of proxying added by this document. In this mode,
+packets in the QUIC connection between the client and target are sent with dedicated
+QUIC Connection IDs between the client and proxy, and use special-purpose
+tranforms instead of full re-encapsulation and re-encryption.<a href="#section-1-7.2.1" class="pilcrow">¶</a></p>
 </li>
       </ol>
-<p id="section-1-6">Forwarded mode is defined as an optimization to reduce CPU and memory cost to clients and
-proxies, as well as avoiding MTU overhead for packets on the wire. This makes it
-suitable for deployment situations that otherwise relied on cleartext TCP
+<p id="section-1-8">QUIC long header packets between clients and targets MUST be proxied in tunnelled
+mode. QUIC short header packets between clients and targets MAY be proxied in
+forwarded mode, subject to negotiation between a client and a proxy.<a href="#section-1-8" class="pilcrow">¶</a></p>
+<p id="section-1-9">Forwarded mode is an optimization to reduce CPU and memory cost to clients and
+proxies and avoid encapsulation overhead for packets on the wire that reduce
+the effective MTU (Maximum Transmission Unit). This makes it suitable for
+deployment situations that otherwise relied on cleartext TCP
 proxies, which cannot support QUIC and have inferior security and privacy
-properties.<a href="#section-1-6" class="pilcrow">¶</a></p>
-<p id="section-1-7">The properties provided by the forwarded mode are as follows:<a href="#section-1-7" class="pilcrow">¶</a></p>
+properties.<a href="#section-1-9" class="pilcrow">¶</a></p>
+<p id="section-1-10">The properties provided by the forwarded mode are as follows:<a href="#section-1-10" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-1-8.1">
-          <p id="section-1-8.1.1">All packets sent between the client and the target traverse through the proxy
-device.<a href="#section-1-8.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-1-11.1">
+          <p id="section-1-11.1.1">All packets sent between the client and the target traverse through the proxy
+device.<a href="#section-1-11.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-1-8.2">
-          <p id="section-1-8.2.1">The target server cannot know the IP address of the client solely based on the
-proxied packets the target receives.<a href="#section-1-8.2.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-1-11.2">
+          <p id="section-1-11.2.1">The target server cannot know the IP address of the client solely based on the
+proxied packets the target receives.<a href="#section-1-11.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-1-8.3">
-          <p id="section-1-8.3.1">Observers of either or both of the client &lt;-&gt; proxy link and the proxy &lt;-&gt;
-target are not able to learn more about the client &lt;-&gt; target communication than
-if no proxy was used.<a href="#section-1-8.3.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-1-11.3">
+          <p id="section-1-11.3.1">Observers of either or both of the links between client and proxy and between
+proxy and target are not able to learn more about the client-to-target
+communication than if no proxy was used.<a href="#section-1-11.3.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-1-9">Forwarded mode does not prevent correlation of client &lt;-&gt; proxy and proxy &lt;-&gt;
-target packets by an entity that can observe both links. The precise risks
-depend on the negotiated transform (<a href="#packet-transforms" class="auto internal xref">Section 6</a>). See <a href="#security" class="auto internal xref">Section 9</a> for
-further discussion.<a href="#section-1-9" class="pilcrow">¶</a></p>
-<p id="section-1-10">Both clients and proxies can unilaterally choose to disable forwarded mode for
-any client &lt;-&gt; target connection.<a href="#section-1-10" class="pilcrow">¶</a></p>
-<p id="section-1-11">The forwarded mode of this extension is only defined for HTTP/3
-<span>[<a href="#HTTP3" class="cite xref">HTTP3</a>]</span> and not any earlier versions of HTTP.<a href="#section-1-11" class="pilcrow">¶</a></p>
-<p id="section-1-12">QUIC proxies only need to understand the Header Form bit, and the connection ID
-fields from packets in client &lt;-&gt; target QUIC connections. Since these fields
-are all in the QUIC invariants header <span>[<a href="#INVARIANTS" class="cite xref">INVARIANTS</a>]</span>,
-QUIC proxies can proxy all versions of QUIC.<a href="#section-1-12" class="pilcrow">¶</a></p>
+<p id="section-1-12">Forwarded mode does not prevent correlation of packets on the link between
+client and proxy and the link between proxy and target by an entity that
+can observe both links. The precise risks depend on the negotiated transform
+(<a href="#packet-transforms" class="auto internal xref">Section 6</a>). See <a href="#security" class="auto internal xref">Section 9</a> for further discussion.<a href="#section-1-12" class="pilcrow">¶</a></p>
+<p id="section-1-13">Both clients and proxies can unilaterally choose to disable forwarded mode for
+any client-to-target connection.<a href="#section-1-13" class="pilcrow">¶</a></p>
+<p id="section-1-14">The forwarded mode of proxying is only defined for HTTP/3 <span>[<a href="#HTTP3" class="cite xref">HTTP3</a>]</span> and not
+any earlier versions of HTTP.<a href="#section-1-14" class="pilcrow">¶</a></p>
+<p id="section-1-15">QUIC proxies only need to understand the Header Form bit, and the connection ID
+fields from packets in client-to-target QUIC connections. Since these fields
+are all in the QUIC invariants header <span>[<a href="#INVARIANTS" class="cite xref">INVARIANTS</a>]</span>, QUIC proxies can
+proxy all versions of QUIC.<a href="#section-1-15" class="pilcrow">¶</a></p>
 <div id="conventions">
 <section id="section-1.1">
         <h3 id="name-conventions-and-definitions">
