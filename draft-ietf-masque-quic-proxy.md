@@ -113,7 +113,7 @@ encapsulated inside the QUIC connection between the client and proxy.
 These packets use multiple layers of encryption and congestion control.
 
 2. Forwarded is the mode of proxying added by this document. In this mode,
-packets in QUIC connection between the client and target are sent with dedicated
+packets in the QUIC connection between the client and target are sent with dedicated
 QUIC Connection IDs between the client and proxy, and use special-purpose
 tranforms instead of full re-encapsulation and re-encryption.
 
