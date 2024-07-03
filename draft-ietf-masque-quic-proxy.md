@@ -69,11 +69,11 @@ normative:
 
 --- abstract
 
-This document defines an extension to UDP Proxying over HTTP
-that adds specific optimizations for proxied QUIC connections. This extension
-allows a proxy to reuse UDP 4-tuples for multiple connections. It also defines a
-mode of proxying in which QUIC short header packets can be forwarded using an
-HTTP/3 proxy rather than being re-encapsulated and re-encrypted.
+This document extends UDP Proxying over HTTP to add optimizations for proxied
+QUIC connections. Specifically, it allows a proxy to reuse UDP 4-tuples for multiple
+proxied connections, and adds a mode of proxying in which QUIC short header packets
+can be forwarded and transformed through a HTTP/3 proxy rather than being fully
+re-encapsulated and re-encrypted.
 
 --- middle
 
@@ -85,33 +85,46 @@ between the proxy and a target server. This can be used to proxy QUIC
 connections {{!QUIC=RFC9000}}, since QUIC runs over UDP datagrams.
 
 This document uses the term "target" to refer to the server that a client is
-accessing via a proxy. This target may be an origin hosting content, or another
-proxy.
+accessing via a proxy. This target may be an origin server hosting content, or
+another proxy for cases where proxies are chained together.
 
 This document extends the UDP proxying protocol to add signalling about QUIC
 Connection IDs. QUIC Connection IDs are used to identify QUIC connections in
-scenarios where there is not a strict bidirectional mapping between one QUIC
-connection and one UDP 4-tuple (pairs of IP addresses and ports). A proxy that
-is aware of Connection IDs can reuse UDP 4-tuples between itself and a target
-for multiple proxied QUIC connections.
+scenarios where there is not a strict one-to-one mapping between QUIC
+connections and UDP 4-tuples (pairs of IP addresses and ports).
 
-Awareness of Connection IDs also allows a proxy to avoid re-encapsulation and
-re-encryption of proxied QUIC packets once a connection has been established.
-When this functionality is present, the proxy can support two modes for handling
-QUIC packets:
+Once a proxy is aware of QUIC Connection IDs, it can reuse UDP 4-tuples between
+itself and a target for multiple proxied QUIC connections.
 
-1. Tunnelled, in which client <-> target QUIC packets are encapsulated inside
-client <-> proxy QUIC packets. These packets use multiple layers of encryption
-and congestion control. QUIC long header packets MUST use this mode. QUIC short
-header packets MAY use this mode. This is the default mode for UDP proxying.
+For proxies that are themselves running on HTTP/3 {{!HTTP3=RFC9114}}, and thus
+are accessed by clients over QUIC, QUIC Connection IDs can be used to treat
+packets differently on the link between clients and proxies. New QUIC Connection IDs
+can be assigned to perform transformations to the packets that allow for efficient
+forwarding of packets that don't require full re-encapsulation and re-encryption
+of proxied QUIC packets within datagrams inside the QUIC connection between
+clients and proxies.
 
-2. Forwarded, in which client <-> target QUIC packets are sent separately over the
-client <-> proxy UDP socket, using a special-purpose transform instead of full
-QUIC encapsulation. This mode MUST only be used for QUIC short header packets.
+This document defines two modes for proxying QUIC connections, "tunnelled" and
+"forwarded":
 
-Forwarded mode is defined as an optimization to reduce CPU and memory cost to clients and
-proxies, as well as avoiding MTU overhead for packets on the wire. This makes it
-suitable for deployment situations that otherwise relied on cleartext TCP
+1. Tunnelled is the default mode for UDP proxying, defined in {{CONNECT-UDP}}.
+In this mode, packets in QUIC connection between the client and target are
+encapsulated inside the QUIC connection between the client and proxy.
+These packets use multiple layers of encryption and congestion control.
+
+2. Forwarded is the mode of proxying added by this document. In this mode,
+packets in the QUIC connection between the client and target are sent with dedicated
+QUIC Connection IDs between the client and proxy, and use special-purpose
+tranforms instead of full re-encapsulation and re-encryption.
+
+QUIC long header packets between clients and targets MUST be proxied in tunnelled
+mode. QUIC short header packets between clients and targets MAY be proxied in
+forwarded mode, subject to negotiation between a client and a proxy.
+
+Forwarded mode is an optimization to reduce CPU and memory cost to clients and
+proxies and avoid encapsulation overhead for packets on the wire that reduce
+the effective MTU (Maximum Transmission Unit). This makes it suitable for
+deployment situations that otherwise relied on cleartext TCP
 proxies, which cannot support QUIC and have inferior security and privacy
 properties.
 
@@ -121,25 +134,25 @@ The properties provided by the forwarded mode are as follows:
 device.
 - The target server cannot know the IP address of the client solely based on the
 proxied packets the target receives.
-- Observers of either or both of the client <-> proxy link and the proxy <->
-target are not able to learn more about the client <-> target communication than
-if no proxy was used.
+- Observers of either or both of the links between client and proxy and between
+proxy and target are not able to learn more about the client-to-target
+communication than if no proxy was used.
 
-Forwarded mode does not prevent correlation of client <-> proxy and proxy <->
-target packets by an entity that can observe both links. The precise risks
-depend on the negotiated transform ({{packet-transforms}}). See {{security}} for
-further discussion.
+Forwarded mode does not prevent correlation of packets on the link between
+client and proxy and the link between proxy and target by an entity that
+can observe both links. The precise risks depend on the negotiated transform
+({{packet-transforms}}). See {{security}} for further discussion.
 
 Both clients and proxies can unilaterally choose to disable forwarded mode for
-any client <-> target connection.
+any client-to-target connection.
 
-The forwarded mode of this extension is only defined for HTTP/3
-{{!HTTP3=RFC9114}} and not any earlier versions of HTTP.
+The forwarded mode of proxying is only defined for HTTP/3 {{HTTP3}} and not
+any earlier versions of HTTP.
 
 QUIC proxies only need to understand the Header Form bit, and the connection ID
-fields from packets in client <-> target QUIC connections. Since these fields
-are all in the QUIC invariants header {{!INVARIANTS=RFC8999}},
-QUIC proxies can proxy all versions of QUIC.
+fields from packets in client-to-target QUIC connections. Since these fields
+are all in the QUIC invariants header {{!INVARIANTS=RFC8999}}, QUIC proxies can
+proxy all versions of QUIC.
 
 ## Conventions and Definitions {#conventions}
 
