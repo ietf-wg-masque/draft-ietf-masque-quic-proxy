@@ -5,9 +5,9 @@
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
 Intended status: Experimental                                 Apple Inc.
-Expires: 2 January 2025                                      D. Schinazi
+Expires: 4 January 2025                                      D. Schinazi
                                                               Google LLC
-                                                             1 July 2024
+                                                             3 July 2024
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 2 January 2025.
+   This Internet-Draft will expire on 4 January 2025.
 
 Copyright Notice
 
@@ -154,7 +154,7 @@ Table of Contents
        of encryption and congestion control.
 
    2.  Forwarded is the mode of proxying added by this document.  In
-       this mode, packets in QUIC connection between the client and
+       this mode, packets in the QUIC connection between the client and
        target are sent with dedicated QUIC Connection IDs between the
        client and proxy, and use special-purpose tranforms instead of
        full re-encapsulation and re-encryption.
