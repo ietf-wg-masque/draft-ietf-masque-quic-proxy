@@ -202,7 +202,7 @@ is just treated as a target by the preceding proxy.
    | Client +--------------+   Proxy   +--------------+ Target |
    |        |              |           |              |        |
    +--------+              +-----------+              +--------+
-     
+
        <----------- Client-to-target connection ----------->
 
 
