@@ -373,8 +373,8 @@ about CIDs and VCIDs.
 
 For QUIC-aware proxying without forwarded mode, the steps are as follows:
 
-1. The client sends the `REGISTER_CLIENT_CID` capsule as soon as it starts
-sending packets to the target that define that CID.
+1. The client sends the `REGISTER_CLIENT_CID` capsule once it selects a
+CID that it will use for receiving packets from a target.
 
 1. The proxy sends the `ACK_CLIENT_CID` capsule to acknowledge that CID,
 with no associated client VCID; alternatively, the proxy can send the
@@ -394,8 +394,8 @@ exchanges at any time.
 
 For QUIC-aware proxying with forwarded mode, the steps are as follows:
 
-1. The client sends the `REGISTER_CLIENT_CID` capsule as soon as it starts
-sending packets to the target that define that CID.
+1. The client sends the `REGISTER_CLIENT_CID` capsule once it selects a
+CID that it will use for receiving packets from a target.
 
 1. The proxy sends the `ACK_CLIENT_CID` capsule to acknowledge that CID,
 with a client VCID; alternatively, the proxy can send the
