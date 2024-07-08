@@ -1770,8 +1770,8 @@ about CIDs and VCIDs.<a href="#section-2.3-5" class="pilcrow">¶</a></p>
 <p id="section-2.3-6">For QUIC-aware proxying without forwarded mode, the steps are as follows:<a href="#section-2.3-6" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-2.3-7">
 <li id="section-2.3-7.1">
-            <p id="section-2.3-7.1.1">The client sends the <code>REGISTER_CLIENT_CID</code> capsule as soon as it starts
-sending packets to the target that define that CID.<a href="#section-2.3-7.1.1" class="pilcrow">¶</a></p>
+            <p id="section-2.3-7.1.1">The client sends the <code>REGISTER_CLIENT_CID</code> capsule once it selects a
+CID that it will use for receiving packets from a target.<a href="#section-2.3-7.1.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-2.3-7.2">
             <p id="section-2.3-7.2.1">The proxy sends the <code>ACK_CLIENT_CID</code> capsule to acknowledge that CID,
@@ -1797,8 +1797,8 @@ exchanges at any time.<a href="#section-2.3-7.5.1" class="pilcrow">¶</a></p>
 <p id="section-2.3-8">For QUIC-aware proxying with forwarded mode, the steps are as follows:<a href="#section-2.3-8" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-2.3-9">
 <li id="section-2.3-9.1">
-            <p id="section-2.3-9.1.1">The client sends the <code>REGISTER_CLIENT_CID</code> capsule as soon as it starts
-sending packets to the target that define that CID.<a href="#section-2.3-9.1.1" class="pilcrow">¶</a></p>
+            <p id="section-2.3-9.1.1">The client sends the <code>REGISTER_CLIENT_CID</code> capsule once it selects a
+CID that it will use for receiving packets from a target.<a href="#section-2.3-9.1.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-2.3-9.2">
             <p id="section-2.3-9.2.1">The proxy sends the <code>ACK_CLIENT_CID</code> capsule to acknowledge that CID,
