@@ -1043,7 +1043,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Pauly, et al.</td>
-<td class="center">Expires 4 January 2025</td>
+<td class="center">Expires 9 January 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1056,12 +1056,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-masque-quic-proxy-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-07-03" class="published">3 July 2024</time>
+<time datetime="2024-07-08" class="published">8 July 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Experimental</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-01-04">4 January 2025</time></dd>
+<dd class="expires"><time datetime="2025-01-09">9 January 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1123,7 +1123,7 @@ re-encapsulated and re-encrypted.<a href="#section-abstract-1" class="pilcrow">�
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 4 January 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 9 January 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1552,11 +1552,11 @@ or the "target CID"<a href="#section-2.1-2.3.1" class="pilcrow">¶</a></p>
 simultaneously, each client coming from a different IP address and port.
 Each client makes a request to proxy a UDP flow to "target.example.net" on
 port 443. If the proxy knows that client A's connection to the target
-has negotiated a client CID <code>AAAA1111</code> and a target CID <code>AAAA2222</code>, and client B's
-connection to the target has negotiated a client CID <code>BBBB1111</code> and a target CID
-<code>BBBB2222</code>, then the proxy would be able to use the same proxy-to-target 4-tuple
+has negotiated a client CID <code>AAAA0000</code> and a target CID <code>0000AAAA</code>, and client B's
+connection to the target has negotiated a client CID <code>BBBB0000</code> and a target CID
+<code>0000BBBB</code>, then the proxy would be able to use the same proxy-to-target 4-tuple
 for both connections, because it can route packets from the target to the
-correct client based on CID <code>AAAA1111</code> or <code>BBBB1111</code>.<a href="#section-2.1-3" class="pilcrow">¶</a></p>
+correct client based on CID <code>AAAA0000</code> or <code>BBBB0000</code>.<a href="#section-2.1-3" class="pilcrow">¶</a></p>
 <span id="name-example-of-sharing-a-proxy-"></span><div id="sharing-tuple-diagram">
 <figure id="figure-2">
           <div id="section-2.1-4.1">
@@ -1593,8 +1593,8 @@ correct client based on CID <code>AAAA1111</code> or <code>BBBB1111</code>.<a hr
                   <text x="156" y="36">Client</text>
                   <text x="232" y="36">A-to-target</text>
                   <text x="324" y="36">connection</text>
-                  <text x="68" y="52">AAAA1111</text>
-                  <text x="428" y="52">AAAA2222</text>
+                  <text x="68" y="52">AAAA0000</text>
+                  <text x="428" y="52">0000AAAA</text>
                   <text x="44" y="84">Client</text>
                   <text x="40" y="100">A</text>
                   <text x="348" y="132">Shared</text>
@@ -1603,8 +1603,8 @@ correct client based on CID <code>AAAA1111</code> or <code>BBBB1111</code>.<a hr
                   <text x="352" y="164">4-tuple</text>
                   <text x="44" y="196">Client</text>
                   <text x="40" y="212">B</text>
-                  <text x="68" y="244">BBBB1111</text>
-                  <text x="428" y="244">BBBB2222</text>
+                  <text x="68" y="244">BBBB0000</text>
+                  <text x="428" y="244">0000BBBB</text>
                   <text x="156" y="260">Client</text>
                   <text x="232" y="260">B-to-target</text>
                   <text x="324" y="260">connection</text>
@@ -1638,7 +1638,7 @@ through the proxy, and the client-to-target QUIC connection has <code>CCCC1111</
 as the client CID and <code>1111CCCC</code> as the target CID. In order to use
 forwarded mode, the proxy assigns VCIDs to use on the client-to-proxy link
 to represent the client-to-target connection. In this case, the VCIDs could
-be <code>AAAABBBB</code> for the client's VCID and <code>BBBBAAAA</code> for the proxy's VCID that
+be <code>CCCC2222</code> for the client's VCID and <code>2222CCCC</code> for the proxy's VCID that
 it uses to forward to the target.<a href="#section-2.2-2" class="pilcrow">¶</a></p>
 <span id="name-diagram-of-vcids-in-forward"></span><div id="vcid-diagram">
 <figure id="figure-3">
@@ -1683,9 +1683,9 @@ it uses to forward to the target.<a href="#section-2.2-2" class="pilcrow">¶</a>
                   <text x="436" y="196">1111CCCC</text>
                   <text x="212" y="212">Client-to-target</text>
                   <text x="324" y="212">connection</text>
-                  <text x="36" y="244">AAAABBBB</text>
+                  <text x="36" y="244">CCCC2222</text>
                   <text x="116" y="244">(CCCC1111)</text>
-                  <text x="212" y="244">BBBBAAAA</text>
+                  <text x="212" y="244">2222CCCC</text>
                   <text x="292" y="244">(1111CCCC)</text>
                   <text x="136" y="260">Client-to-proxy</text>
                   <text x="136" y="276">VCIDs</text>
