@@ -234,15 +234,15 @@ For example, consider a proxy using HTTP/3 that has two clients (A and B) connec
 simultaneously, each client coming from a different IP address and port.
 Each client makes a request to proxy a UDP flow to "target.example.net" on
 port 443. If the proxy knows that client A's connection to the target
-has negotiated a client CID `AAAA1111` and a target CID `AAAA2222`, and client B's
-connection to the target has negotiated a client CID `BBBB1111` and a target CID
-`BBBB2222`, then the proxy would be able to use the same proxy-to-target 4-tuple
+has negotiated a client CID `AAAA0000` and a target CID `0000AAAA`, and client B's
+connection to the target has negotiated a client CID `BBBB0000` and a target CID
+`0000BBBB`, then the proxy would be able to use the same proxy-to-target 4-tuple
 for both connections, because it can route packets from the target to the
-correct client based on CID `AAAA1111` or `BBBB1111`.
+correct client based on CID `AAAA0000` or `BBBB0000`.
 
 ~~~ aasvg
        <---------- Client A-to-target connection ---------->
-       AAAA1111                                     AAAA2222
+       AAAA0000                                     0000AAAA
    +--------+              +-----------+
    | Client +--------------+           +
    |   A    |              |           |
@@ -254,7 +254,7 @@ correct client based on CID `AAAA1111` or `BBBB1111`.
    | Client |              |           |
    |   B    +--------------+           |
    +--------+              +-----------+
-       BBBB1111                                     BBBB2222
+       BBBB0000                                     0000BBBB
        <---------- Client B-to-target connection ---------->
 ~~~
 {: #sharing-tuple-diagram title="Example of sharing a proxy-to-target 4-tuple"}
@@ -278,7 +278,7 @@ through the proxy, and the client-to-target QUIC connection has `CCCC1111`
 as the client CID and `1111CCCC` as the target CID. In order to use
 forwarded mode, the proxy assigns VCIDs to use on the client-to-proxy link
 to represent the client-to-target connection. In this case, the VCIDs could
-be `AAAABBBB` for the client's VCID and `BBBBAAAA` for the proxy's VCID that
+be `CCCC2222` for the client's VCID and `2222CCCC` for the proxy's VCID that
 it uses to forward to the target.
 
 ~~~ aasvg
@@ -295,7 +295,7 @@ it uses to forward to the target.
        CCCC1111                                     1111CCCC
        <----------- Client-to-target connection ----------->
 
-  AAAABBBB (CCCC1111)   BBBBAAAA (1111CCCC)
+  CCCC2222 (CCCC1111)   2222CCCC (1111CCCC)
        <-- Client-to-proxy -->
                 VCIDs
 ~~~
