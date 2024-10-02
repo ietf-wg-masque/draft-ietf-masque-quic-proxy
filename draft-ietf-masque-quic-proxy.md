@@ -330,7 +330,7 @@ forwarding the packet to the client. Clients take advantage of this
 to avoid linkability when migrating a client to proxy network path. The Virtual
 client CID allows the connection ID bytes to change on the wire
 without requiring the connection IDs on the client to target connection change.
-To reduce the likelihood of connection ID conflicts, the proxy SHOULD choose a
+To reduce the likelihood of connection ID conflicts, the proxy MUST choose a
 client VCID that is at least as long as the original client CID. Similarly,
 clients multiplexing connections on the same UDP 4-tuple SHOULD
 choose a client CID that's sufficiently long to reduce the likelihood
@@ -583,7 +583,7 @@ valid connection ID length for the QUIC version used in the client-to-proxy QUIC
 connection. When forwarded mode is not negotiated, the length MUST be zero.
 The Virtual Connection ID Length and Connection ID Length SHOULD be equal
 when possible to avoid the need to resize packets during replacement. The
-client VCID Length SHOULD be at least as large as the
+client VCID Length MUST be at least as large as the
 Connection ID to reduce the likelihood of connection ID conflicts.
 
 Virtual Connection ID
