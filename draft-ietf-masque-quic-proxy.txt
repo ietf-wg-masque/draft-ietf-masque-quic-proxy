@@ -5,9 +5,9 @@
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
 Intended status: Experimental                                 Apple Inc.
-Expires: 9 January 2025                                      D. Schinazi
+Expires: 20 April 2025                                       D. Schinazi
                                                               Google LLC
-                                                             8 July 2024
+                                                         17 October 2024
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 9 January 2025.
+   This Internet-Draft will expire on 20 April 2025.
 
 Copyright Notice
 
@@ -405,15 +405,14 @@ Table of Contents
    to proxy network path.  The Virtual client CID allows the connection
    ID bytes to change on the wire without requiring the connection IDs
    on the client to target connection change.  To reduce the likelihood
-   of connection ID conflicts, the proxy SHOULD choose a client VCID
-   that is at least as long as the original client CID.  Similarly,
-   clients multiplexing connections on the same UDP 4-tuple SHOULD
-   choose a client CID that's sufficiently long to reduce the likelihood
-   of a conflict with the proxy-chosen client VCID.  The client VCID
-   MUST either be constructed such that it is unpredictable to the
-   client or to guarantee no conflicts among all proxies sharing an IP
-   address and port.  See Section 8 for more discussion on client VCID
-   construction.
+   of connection ID conflicts, the proxy MUST choose a client VCID that
+   is at least as long as the original client CID.  Similarly, clients
+   multiplexing connections on the same UDP 4-tuple SHOULD choose a
+   client CID that's sufficiently long to reduce the likelihood of a
+   conflict with the proxy-chosen client VCID.  The client VCID MUST
+   either be constructed such that it is unpredictable to the client or
+   to guarantee no conflicts among all proxies sharing an IP address and
+   port.  See Section 8 for more discussion on client VCID construction.
 
    Clients and Proxies not implementing forwarded mode do not need to
    consider VCIDs since all client-to-target datagrams will be
@@ -661,8 +660,8 @@ Table of Contents
       forwarded mode is not negotiated, the length MUST be zero.  The
       Virtual Connection ID Length and Connection ID Length SHOULD be
       equal when possible to avoid the need to resize packets during
-      replacement.  The client VCID Length SHOULD be at least as large
-      as the Connection ID to reduce the likelihood of connection ID
+      replacement.  The client VCID Length MUST be at least as large as
+      the Connection ID to reduce the likelihood of connection ID
       conflicts.
 
    Virtual Connection ID  The proxy-chosen connection ID that the proxy
