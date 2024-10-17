@@ -513,32 +513,22 @@ registrations. The initial maximum is 1, allowing the client to send 2 registrat
 one with sequence number 0 and another with sequence number 1. A proxy MUST NOT
 send a MAX_CONNECTION_IDS capsule with a value less than 1. Clients receiving a
 MAX_CONNECTION_IDS capsule with a value less than 1 MUST reset the stream with
-TODO error code.
+H3_DATAGRAM_ERROR error code.
 
 ## REGISTER_CLIENT_CID {#capsule-reg-client}
 
-The REGISTER_CLIENT_CID capsule has type `0xffe600` and is sent by the client.
-It contains a single connection ID that is the client-provided connection
-on the client-to-target QUIC connection.
+The REGISTER_CLIENT_CID capsule is sent by the client and contains a single
+connection ID that is the client-provided connection ID on the client-to-target QUIC
+connection.
 
 ~~~
 Register CID Capsule {
-  Type (i) = 0xffe600
+  Type (i) = see {{iana}} for the value of the capsule type
   Length (i),
-  Sequence Number (i),
-  Connection ID Length (i)
   Connection ID (0..2040),
 }
 ~~~
 {: #fig-capsule-register-client-cid title="Register CID Capsule Format"}
-
-Sequence Number
-: The sequence number assigned to this registration by the sender.
-
-Connection ID Length
-: The length of the connection ID being registered, which is between 0 and
-255. Note that in QUICv1, the length of the Connection ID is limited to 20
-bytes, but QUIC invariants allow up to 255 bytes.
 
 Connection ID:
 : A connection ID being registered, which is between 0 and 255 bytes in
@@ -548,15 +538,14 @@ to 20 bytes, but QUIC invariants allow up to 255 bytes.
 
 ## REGISTER_TARGET_CID {#capsule-reg-target}
 
-The REGISTER_TARGET_CID capsule has type `0xffe601` and is sent by the client.
-It includes the target-provided connection ID on the client-to-target QUIC
-connection, and the corresponding Stateless Reset Token.
+The REGISTER_TARGET_CID capsule is sent by the client and includes the
+target-provided connection ID on the client-to-target QUIC connection, and
+the corresponding Stateless Reset Token.
 
 ~~~
 Register Target CID Capsule {
-  Type (i) = 0xffe601
+  Type (i) = see {{iana}} for the value of the capsule type
   Length (i),
-  Sequence Number (i),
   Connection ID Length (i)
   Connection ID (0..2040),
   Stateless Reset Token Length (i),
@@ -564,9 +553,6 @@ Register Target CID Capsule {
 }
 ~~~
 {: #fig-capsule-register-target-cid title="Register Target CID Capsule Format"}
-
-Sequence Number
-: The sequence number assigned to this registration by the sender.
 
 Connection ID Length
 : The length of the connection ID being registered, which is between 0 and
@@ -586,13 +572,13 @@ recognize Stateless Reset packets to be tunnelled to the client.
 
 ## ACK_CLIENT_CID {#capsule-ack-client}
 
-The ACK_CLIENT_CID capsule has type `0xffe602` and is sent by the proxy in
+The ACK_CLIENT_CID capsule is sent by the proxy in
 response to a REGISTER_CLIENT_CID capsule. It optionally assigns a Virtual
 Connection ID when forwarded mode is supported.
 
 ~~~
 Acknowledge Client CID Capsule {
-  Type (i) = 0xffe602
+  Type (i) = see {{iana}} for the value of the capsule type
   Length (i)
   Connection ID Length (i)
   Connection ID (0..2040),
@@ -627,13 +613,13 @@ correct client VCID prior to sending them to the client.
 
 ## ACK_TARGET_CID {#capsule-ack-target}
 
-The ACK_TARGET_CID capsule has type `0xffe604` and is sent by the proxy in
+The ACK_TARGET_CID capsule is sent by the proxy in
 response to a REGISTER_TARGET_CID capsule. It optionally assigns a Virtual
 Connection ID and Stateless Reset Token if forwarded mode is enabled.
 
 ~~~
 Acknowledge Target CID Capsule {
-  Type (i) = 0xffe604
+  Type (i) = see {{iana}} for the value of the capsule type
   Length (i)
   Connection ID Length (i)
   Connection ID (0..2040),
@@ -679,12 +665,12 @@ response to client-to-target forwarded mode packets.
 
 ## ACK_CLIENT_VCID {#capsule-ack-virtual}
 
-The ACK_CLIENT_VCID capsule type has type `0xffe603` and is sent by the client in
+The ACK_CLIENT_VCID capsule type is sent by the client in
 response to an ACK_TARGET_CID capsule that contains a virtual connection ID.
 
 ~~~
 Acknowledge Client VCID Capsule {
-  Type (i) = 0xffe603
+  Type (i) = see {{iana}} for the value of the capsule type
   Length (i)
   Connection ID Length (i)
   Connection ID (0..2040),
@@ -724,13 +710,12 @@ in response to target-to-client forwarded mode packets.
 
 ## CLOSE_CLIENT_CID and CLOSE_TARGET_CID {#capsule-close}
 
-CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsule types have types `0xffe605` and
-`0xffe606`, respectively, and include a single connection ID to close. They
+CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsule types include a single connection ID to close. They
 can be sent by either clients or proxies.
 
 ~~~
 Close CID Capsule {
-  Type (i) = 0xffe605, 0xffe606
+  Type (i) = see {{iana}} for the values of the capsule types
   Length (i),
   Connection ID (0..2040),
 }
@@ -745,12 +730,12 @@ to 20 bytes, but QUIC invariants allow up to 255 bytes.
 
 ## MAX_CONNECTION_IDS {#capsule-max-cids}
 
-The MAX_CONNECTION_IDS capsule has type `0xffe607` and is sent by the proxy
+The MAX_CONNECTION_IDS capsule is sent by the proxy
 to permit additional connection ID registrations.
 
 ~~~
 Maximum Connection IDs Capsule {
-  Type (i) = 0xffe607
+  Type (i) = see {{iana}} for the value of the capsule type
   Length (i)
   Maximum Sequence Number (i)
 }
@@ -793,7 +778,7 @@ The client sends a REGISTER_CLIENT_CID capsule whenever it advertises a new
 client CID to the target, and a REGISTER_TARGET_CID capsule when
 it has received a new target CID for the target. In order to change
 the connection ID bytes on the wire, a client can solicit new virtual connection
-IDs by re-registering the same connection IDs with their original sequence numbers. The client may solicit a new
+IDs by re-registering the same connection IDs. The client may solicit a new
 target VCID by sending a REGISTER_TARGET_CID capsule with a
 previously registered target CID. Similarly, the client may solicit a
 new client VCID by sending a REGISTER_CLIENT_CID with a
@@ -804,6 +789,19 @@ has been received. Clients are responsible for changing Virtual Connection IDs
 when the HTTP stream's network path changes to avoid linkability across network
 paths. Note that initial REGISTER_CLIENT_CID capsules MAY be sent prior to
 receiving an HTTP response from the proxy.
+
+Connection ID registrations are subject to a proxy-advertised limit. Each registration
+has a corresponding sequence number. The client MUST NOT send a registration
+capsule with a sequence number greater than what the proxy advertises via the
+MAX_CONNECTION_IDS capsule. The initial MAX_CONNECTION_IDS value is 1, allowing both
+sequence numbers 0 and 1 for a total of two registrations without receiving a
+MAX_CONNECTION_IDS capsule from the proxy.
+
+Clients which cannot register new connection IDs within a reasonable timeout due to
+the MAX_CONNECTION_IDS limit SHOULD abort the proxied connection by resetting the HTTP
+stream with error code NO_ERROR. This may happen, for example, if the target server
+sends a NEW_CONNECTION_ID frame with Sequence Number and Retire Prior To equal to the
+same value.
 
 ### New Proxied Connection Setup
 
@@ -1231,7 +1229,6 @@ STREAM(44): HEADERS             -------->
 
 STREAM(44): DATA                -------->
   Capsule Type = REGISTER_CLIENT_CID
-  Sequence Number = 0
   Connection ID = 0x31323334
   Stateless Reset Token = Token
 
@@ -1318,7 +1315,6 @@ following capsule:
 ~~~
 STREAM(44): DATA                -------->
   Capsule Type = REGISTER_TARGET_CID
-  Sequence Number = 1
   Connection ID = 0x61626364
 
            <--------  STREAM(44): DATA
