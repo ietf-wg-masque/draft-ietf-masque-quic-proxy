@@ -5,9 +5,9 @@
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
 Intended status: Experimental                                 Apple Inc.
-Expires: 20 April 2025                                       D. Schinazi
+Expires: 22 April 2025                                       D. Schinazi
                                                               Google LLC
-                                                         17 October 2024
+                                                         19 October 2024
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 20 April 2025.
+   This Internet-Draft will expire on 22 April 2025.
 
 Copyright Notice
 
@@ -87,12 +87,13 @@ Table of Contents
      4.4.  ACK_TARGET_CID
      4.5.  ACK_CLIENT_VCID
      4.6.  CLOSE_CLIENT_CID and CLOSE_TARGET_CID
-     4.7.  Detecting Conflicts
-     4.8.  Client Considerations
-       4.8.1.  New Proxied Connection Setup
-       4.8.2.  Adding New Client Connection IDs
-     4.9.  Proxy Considerations
-       4.9.1.  Closing Proxy State
+     4.7.  MAX_CONNECTION_IDS
+     4.8.  Detecting Conflicts
+     4.9.  Client Considerations
+       4.9.1.  New Proxied Connection Setup
+       4.9.2.  Adding New Client Connection IDs
+     4.10. Proxy Considerations
+       4.10.1.  Closing Proxy State
    5.  Using Forwarded Mode
      5.1.  Sending With Forwarded Mode
      5.2.  Receiving With Forwarded Mode
@@ -331,7 +332,7 @@ Table of Contents
 
    In order to share a proxy-to-target 4-tuple between multiple proxied
    connections, the proxy MUST guarantee that the client CIDs do not
-   conflict.  See Section 4.7 for more discussion of handlng CID
+   conflict.  See Section 4.8 for more discussion of handlng CID
    conflicts.
 
 2.2.  Virtual Connection IDs
@@ -461,7 +462,11 @@ Table of Contents
        send the CLOSE_TARGET_CID if it detects a conflict with another
        CID.
 
-   5.  Whenever a client or target stops uses a particular CID, the
+   5.  The proxy sends the MAX_CONNECTION_IDS capsule to allow
+       additional registration of new connection IDs via future
+       REGISTER_CLIENT_CID and REGISTER_TARGET_CID capsules.
+
+   6.  Whenever a client or target stops uses a particular CID, the
        client sends a CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsule.  The
        client can also initiate new REGISTER_CLIENT_CID or
        REGISTER_TARGET_CID exchanges at any time.
@@ -489,7 +494,11 @@ Table of Contents
        the client receives the target VCID, it can start sending
        forwarded packets using the target VCID.
 
-   6.  Whenever a client or target stops uses a particular CID, the
+   6.  The proxy sends the MAX_CONNECTION_IDS capsule to allow
+       additional registration of new connection IDs via future
+       REGISTER_CLIENT_CID and REGISTER_TARGET_CID capsules.
+
+   7.  Whenever a client or target stops uses a particular CID, the
        client sends a CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsule.  The
        client can also initiate new REGISTER_CLIENT_CID or
        REGISTER_TARGET_CID exchanges at any time.
@@ -546,7 +555,11 @@ Table of Contents
    The REGISTER_CLIENT_CID (Section 4.1) and REGISTER_TARGET_CID
    (Section 4.2) capsule types allow a client to inform the proxy about
    a new client CID or a new target CID, respectively.  These capsule
-   types MUST only be sent by a client.
+   types MUST only be sent by a client.  These capsule types share a
+   sequence number space which allows the proxy to limit the number of
+   active registrations.  The first registration (of either client CID
+   or target CID) has sequence number 0, and subsequent registrations
+   increment the sequence number by 1.
 
    The ACK_CLIENT_CID (Section 4.3) and ACK_TARGET_CID (Section 4.4)
    capsule types are sent by the proxy to the client to indicate that a
@@ -575,14 +588,24 @@ Table of Contents
    ACK_CLIENT_VCID capsule, the client is either rejecting the proxy-
    chosen client VCID or no longer needs the connection ID registered.
 
+   The MAX_CONNECTION_IDS capsule type Section 4.7 MUST only be sent by
+   the proxy.  It indicates to the client the maximum permitted sequence
+   number for connection ID registrations.  This allows the proxy to
+   limit the number of active registrations.  The initial maximum is 1,
+   allowing the client to send 2 registrations, one with sequence number
+   0 and another with sequence number 1.  A proxy MUST NOT send a
+   MAX_CONNECTION_IDS capsule with a value less than 1.  Clients
+   receiving a MAX_CONNECTION_IDS capsule with a value less than 1 MUST
+   reset the stream with H3_DATAGRAM_ERROR error code.
+
 4.1.  REGISTER_CLIENT_CID
 
-   The REGISTER_CLIENT_CID capsule has type 0xffe500 and is sent by the
-   client.  It contains a single connection ID that is the client-
-   provided connection on the client-to-target QUIC connection.
+   The REGISTER_CLIENT_CID capsule is sent by the client and contains a
+   single connection ID that is the client-provided connection ID on the
+   client-to-target QUIC connection.
 
    Register CID Capsule {
-     Type (i) = 0xffe500
+     Type (i) = see {{iana}} for the value of the capsule type
      Length (i),
      Connection ID (0..2040),
    }
@@ -597,13 +620,12 @@ Table of Contents
 
 4.2.  REGISTER_TARGET_CID
 
-   The REGISTER_TARGET_CID capsule has type 0xffe501 and is sent by the
-   client.  It includes the target-provided connection ID on the client-
-   to-target QUIC connection, and the corresponding Stateless Reset
-   Token.
+   The REGISTER_TARGET_CID capsule is sent by the client and includes
+   the target-provided connection ID on the client-to-target QUIC
+   connection, and the corresponding Stateless Reset Token.
 
    Register Target CID Capsule {
-     Type (i) = 0xffe501
+     Type (i) = see {{iana}} for the value of the capsule type
      Length (i),
      Connection ID Length (i)
      Connection ID (0..2040),
@@ -630,12 +652,12 @@ Table of Contents
 
 4.3.  ACK_CLIENT_CID
 
-   The ACK_CLIENT_CID capsule has type 0xffe502 and is sent by the proxy
-   in response to a REGISTER_CLIENT_CID capsule.  It optionally assigns
-   a Virtual Connection ID when forwarded mode is supported.
+   The ACK_CLIENT_CID capsule is sent by the proxy in response to a
+   REGISTER_CLIENT_CID capsule.  It optionally assigns a Virtual
+   Connection ID when forwarded mode is supported.
 
    Acknowledge Client CID Capsule {
-     Type (i) = 0xffe502
+     Type (i) = see {{iana}} for the value of the capsule type
      Length (i)
      Connection ID Length (i)
      Connection ID (0..2040),
@@ -671,13 +693,12 @@ Table of Contents
 
 4.4.  ACK_TARGET_CID
 
-   The ACK_TARGET_CID capsule has type 0xffe504 and is sent by the proxy
-   in response to a REGISTER_TARGET_CID capsule.  It optionally assigns
-   a Virtual Connection ID and Stateless Reset Token if forwarded mode
-   is enabled.
+   The ACK_TARGET_CID capsule is sent by the proxy in response to a
+   REGISTER_TARGET_CID capsule.  It optionally assigns a Virtual
+   Connection ID and Stateless Reset Token if forwarded mode is enabled.
 
    Acknowledge Target CID Capsule {
-     Type (i) = 0xffe504
+     Type (i) = see {{iana}} for the value of the capsule type
      Length (i)
      Connection ID Length (i)
      Connection ID (0..2040),
@@ -724,12 +745,11 @@ Table of Contents
 
 4.5.  ACK_CLIENT_VCID
 
-   The ACK_CLIENT_VCID capsule type has type 0xffe503 and is sent by the
-   client in response to an ACK_TARGET_CID capsule that contains a
-   virtual connection ID.
+   The ACK_CLIENT_VCID capsule type is sent by the client in response to
+   an ACK_TARGET_CID capsule that contains a virtual connection ID.
 
    Acknowledge Client VCID Capsule {
-     Type (i) = 0xffe503
+     Type (i) = see {{iana}} for the value of the capsule type
      Length (i)
      Connection ID Length (i)
      Connection ID (0..2040),
@@ -770,12 +790,12 @@ Table of Contents
 
 4.6.  CLOSE_CLIENT_CID and CLOSE_TARGET_CID
 
-   CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsule types have types
-   0xffe505 and 0xffe506, respectively, and include a single connection
-   ID to close.  They can be sent by either clients or proxies.
+   CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsule types include a single
+   connection ID to close.  They can be sent by either clients or
+   proxies.
 
    Close CID Capsule {
-     Type (i) = 0xffe505, 0xffe506
+     Type (i) = see {{iana}} for the values of the capsule types
      Length (i),
      Connection ID (0..2040),
    }
@@ -788,7 +808,23 @@ Table of Contents
       the Connection ID is limited to 20 bytes, but QUIC invariants
       allow up to 255 bytes.
 
-4.7.  Detecting Conflicts
+4.7.  MAX_CONNECTION_IDS
+
+   The MAX_CONNECTION_IDS capsule is sent by the proxy to permit
+   additional connection ID registrations.
+
+   Maximum Connection IDs Capsule {
+     Type (i) = see {{iana}} for the value of the capsule type
+     Length (i)
+     Maximum Sequence Number (i)
+   }
+
+              Figure 10: Maximum Connection IDs Capsule Format
+
+   Maximum Sequence Number  The maximum permitted sequence number for
+      connection ID registrations.  This MUST NOT be less than 1.
+
+4.8.  Detecting Conflicts
 
    In order to be able to route packets correctly in both tunnelled and
    forwarded mode, proxies check for conflicts before creating a new CID
@@ -818,7 +854,7 @@ Table of Contents
    all requests for very short Connection IDs as conflicts, in
    anticipation of future conflicts.
 
-4.8.  Client Considerations
+4.9.  Client Considerations
 
    The client sends a REGISTER_CLIENT_CID capsule whenever it advertises
    a new client CID to the target, and a REGISTER_TARGET_CID capsule
@@ -837,7 +873,22 @@ Table of Contents
    paths.  Note that initial REGISTER_CLIENT_CID capsules MAY be sent
    prior to receiving an HTTP response from the proxy.
 
-4.8.1.  New Proxied Connection Setup
+   Connection ID registrations are subject to a proxy-advertised limit.
+   Each registration has a corresponding sequence number.  The client
+   MUST NOT send a registration capsule with a sequence number greater
+   than what the proxy advertises via the MAX_CONNECTION_IDS capsule.
+   The initial MAX_CONNECTION_IDS value is 1, allowing both sequence
+   numbers 0 and 1 for a total of two registrations without receiving a
+   MAX_CONNECTION_IDS capsule from the proxy.
+
+   Clients that cannot register new connection IDs within a reasonable
+   time due to the MAX_CONNECTION_IDS limit SHOULD abort the proxied
+   connection by resetting the HTTP stream with error code NO_ERROR.
+   This may happen, for example, if the target server sends a
+   NEW_CONNECTION_ID frame with Sequence Number and Retire Prior To
+   equal to the same value.
+
+4.9.1.  New Proxied Connection Setup
 
    To initiate QUIC-aware proxying, the client sends a
    REGISTER_CLIENT_CID capsule containing the initial client CID that
@@ -856,7 +907,7 @@ Table of Contents
    Since clients are always aware whether or not they are using a QUIC
    proxy, clients are expected to cooperate with proxies in selecting
    client CIDs.  A proxy detects a conflict when it is not able to
-   create a unique mapping using the client CID (Section 4.7).  It can
+   create a unique mapping using the client CID (Section 4.8).  It can
    reject requests that would cause a conflict and indicate this to the
    client by replying with a CLOSE_CLIENT_CID capsule.  In order to
    avoid conflicts, clients SHOULD select client CIDs of at least 8
@@ -871,7 +922,7 @@ Table of Contents
    an existing mapping to the same target server, it will need to
    generate a new QUIC Initial.
 
-4.8.2.  Adding New Client Connection IDs
+4.9.2.  Adding New Client Connection IDs
 
    Since QUIC connection IDs are chosen by the receiver, an endpoint
    needs to communicate its chosen connection IDs to its peer before the
@@ -890,7 +941,7 @@ Table of Contents
    ACK_CLIENT_CID with an ACK_CLIENT_VCID capsule with the real and
    virtual connection IDs along with an optional Stateless Reset Token.
 
-4.9.  Proxy Considerations
+4.10.  Proxy Considerations
 
    The proxy MUST reply to each REGISTER_CLIENT_CID capsule with either
    an ACK_CLIENT_CID or CLOSE_CLIENT_CID capsule containing the
@@ -965,7 +1016,11 @@ Table of Contents
    forwarded SHOULD be considered as activity for restarting QUIC's Idle
    Timeout [QUIC].
 
-4.9.1.  Closing Proxy State
+   In order to permit the client to change client-to-target connection
+   IDs, the proxy SHOULD send MAX_CONNECTION_IDS capsules allowing the
+   client additional connection ID registrations.
+
+4.10.1.  Closing Proxy State
 
    For any registration capsule for which the proxy has sent an
    acknowledgement, any mappings last until either endpoint sends a
@@ -1318,6 +1373,10 @@ Table of Contents
      Connection ID = 0x31323334
      Stateless Reset Token = Token
 
+              <--------  STREAM(44): DATA
+                           Capsule Type = MAX_CONNECTION_IDS
+                           Maximum Sequence Number = 3
+
    DATAGRAM                        -------->
      Quarter Stream ID = 11
      Context ID = 0
@@ -1339,6 +1398,10 @@ Table of Contents
    Even if there were Short Header packets to send, the proxy cannot
    send forwarded mode packets because the client hasn't acknowledged
    the client VCID.
+
+   The proxy indicates to the client that it will allow connection ID
+   registrations with sequence numbers 0-3, allowing for registrations
+   beyond the initial maximum of 1.
 
    STREAM(44): DATA                -------->
      Capsule Type = ACK_CLIENT_VCID
@@ -1518,7 +1581,7 @@ Table of Contents
        | Proxy-QUIC-Forwarding |   http   |  exp   | This document |
        +-----------------------+----------+--------+---------------+
 
-                     Figure 10: Registered HTTP Header
+                     Figure 11: Registered HTTP Header
 
 9.2.  Proxy QUIC Forwarding Parameter Names
 
@@ -1539,7 +1602,7 @@ Table of Contents
     | scramble-key          | contains key for scramble transform | This document | Section {{scramble-transform}} |
     +-----------------------+-------------------------------------+---------------+--------------------------------+
 
-       Figure 11: Initial Proxy QUIC Forwarding Parameter Names
+       Figure 12: Initial Proxy QUIC Forwarding Parameter Names
 
 9.3.  Packet Transform Names
 
@@ -1576,19 +1639,21 @@ Table of Contents
             +=====================+==========+===============+
             | Capule Type         | Value    | Specification |
             +=====================+==========+===============+
-            | REGISTER_CLIENT_CID | 0xffe500 | This Document |
+            | REGISTER_CLIENT_CID | 0xffe600 | This Document |
             +---------------------+----------+---------------+
-            | REGISTER_TARGET_CID | 0xffe501 | This Document |
+            | REGISTER_TARGET_CID | 0xffe601 | This Document |
             +---------------------+----------+---------------+
-            | ACK_CLIENT_CID      | 0xffe502 | This Document |
+            | ACK_CLIENT_CID      | 0xffe602 | This Document |
             +---------------------+----------+---------------+
-            | ACK_CLIENT_VCID     | 0xffe503 | This Document |
+            | ACK_CLIENT_VCID     | 0xffe603 | This Document |
             +---------------------+----------+---------------+
-            | ACK_TARGET_CID      | 0xffe504 | This Document |
+            | ACK_TARGET_CID      | 0xffe604 | This Document |
             +---------------------+----------+---------------+
-            | CLOSE_CLIENT_CID    | 0xffe505 | This Document |
+            | CLOSE_CLIENT_CID    | 0xffe605 | This Document |
             +---------------------+----------+---------------+
-            | CLOSE_TARGET_CID    | 0xffe506 | This Document |
+            | CLOSE_TARGET_CID    | 0xffe606 | This Document |
+            +---------------------+----------+---------------+
+            | MAX_CONNECTION_IDS  | 0xffe607 | This Document |
             +---------------------+----------+---------------+
 
                     Table 2: Registered Capsule Types
