@@ -478,8 +478,9 @@ The REGISTER_CLIENT_CID ({{capsule-reg-client}}) and REGISTER_TARGET_CID
 the proxy about a new client CID or a new target CID,
 respectively. These capsule types MUST only be sent by a client. These capsule
 types share a sequence number space which allows the proxy to limit the
-number of active registrations. The first registration has sequence number 0
-and subsequent registrations increment the sequence number by 1.
+number of active registrations. The first registration (of either client CID or target CID)
+has sequence number 0, and subsequent registrations increment the sequence number
+by 1.
 
 The ACK_CLIENT_CID ({{capsule-ack-client}}) and ACK_TARGET_CID
 ({{capsule-ack-target}}) capsule types are sent by the proxy to the client
@@ -797,7 +798,7 @@ MAX_CONNECTION_IDS capsule. The initial MAX_CONNECTION_IDS value is 1, allowing 
 sequence numbers 0 and 1 for a total of two registrations without receiving a
 MAX_CONNECTION_IDS capsule from the proxy.
 
-Clients which cannot register new connection IDs within a reasonable timeout due to
+Clients that cannot register new connection IDs within a reasonable time due to
 the MAX_CONNECTION_IDS limit SHOULD abort the proxied connection by resetting the HTTP
 stream with error code NO_ERROR. This may happen, for example, if the target server
 sends a NEW_CONNECTION_ID frame with Sequence Number and Retire Prior To equal to the
