@@ -5,9 +5,9 @@
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
 Intended status: Experimental                                 Apple Inc.
-Expires: 22 April 2025                                       D. Schinazi
+Expires: 7 May 2025                                          D. Schinazi
                                                               Google LLC
-                                                         19 October 2024
+                                                         3 November 2024
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 22 April 2025.
+   This Internet-Draft will expire on 7 May 2025.
 
 Copyright Notice
 
@@ -111,7 +111,7 @@ Table of Contents
      8.1.  Passive Attacks
      8.2.  Active Attacks
    9.  IANA Considerations
-     9.1.  HTTP Header
+     9.1.  HTTP Header Field
      9.2.  Proxy QUIC Forwarding Parameter Names
      9.3.  Packet Transform Names
      9.4.  Capsule Types
@@ -1569,19 +1569,19 @@ Table of Contents
 
 9.  IANA Considerations
 
-9.1.  HTTP Header
+9.1.  HTTP Header Field
 
-   This document registers the "Proxy-QUIC-Forwarding" header in the
-   "Hypertext Transfer Protocol (HTTP) Field Name Registry"
+   This document registers the "Proxy-QUIC-Forwarding" header field in
+   the "Hypertext Transfer Protocol (HTTP) Field Name Registry"
    <https://www.iana.org/assignments/http-fields>.
 
-       +-----------------------+----------+--------+---------------+
-       | Header Field Name     | Protocol | Status |   Reference   |
-       +-----------------------+----------+--------+---------------+
-       | Proxy-QUIC-Forwarding |   http   |  exp   | This document |
-       +-----------------------+----------+--------+---------------+
+    +-----------------------+-----------+-----------------+---------------+----------+
+    |      Field Name       |  Status   | Structured Type |   Reference   | Comments |
+    +-----------------------+-----------+-----------------+---------------+----------+
+    | Proxy-QUIC-Forwarding | permanent |      Item       | This document |   None   |
+    +-----------------------+-----------+-----------------+---------------+----------+
 
-                     Figure 11: Registered HTTP Header
+               Figure 11: Registered HTTP Header Field
 
 9.2.  Proxy QUIC Forwarding Parameter Names
 
