@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-11-03T00:38:42.907422+00:00",
+  "timestamp": "2024-11-05T00:34:39.632882+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -2079,13 +2079,15 @@
       "state": "OPEN",
       "author": "huitema",
       "authorAssociation": "NONE",
-      "assignees": [],
+      "assignees": [
+        "tfpauly"
+      ],
       "labels": [
-        "Discuss"
+        "Ready for Text"
       ],
       "body": "I am wondering what is supposed to happen if the server sends a \"preferred address\" parameter. My understanding of the draft is that all packets produced by the client are sent to the IP address and port specified in the CONNECT-UDP request. It follows that if the client wants to heed the \"preferred address\" parameter, it should set up a new proxy connection for that. Is that a correct understanding? Should we explain that in the draft?",
       "createdAt": "2024-07-14T20:11:39Z",
-      "updatedAt": "2024-07-20T18:38:35Z",
+      "updatedAt": "2024-11-03T13:21:38Z",
       "closedAt": null,
       "comments": [
         {
@@ -2150,6 +2152,13 @@
           "body": "Yes, one will have to run the path challenge at least in tunneled mode. After that one can optimize the forwarding when the CIDs for the E2E path is properly known. ",
           "createdAt": "2024-07-20T18:38:34Z",
           "updatedAt": "2024-07-20T18:38:34Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "At 120 we said that we should just do a new connect-udp request, and have some text that describes the case. The one case that could be suboptimal is that the client might not know which address was used originally, so if the preferred address is the same as the original, the client might unnecessarily make a new proxy connection (unless if gets a proxy-status header back to tell what the next hop is). This can be described. ",
+          "createdAt": "2024-11-03T13:21:30Z",
+          "updatedAt": "2024-11-03T13:21:30Z"
         }
       ]
     },
