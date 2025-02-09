@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-02-06T00:35:33.961270+00:00",
+  "timestamp": "2025-02-09T00:37:54.489133+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -30,7 +30,7 @@
       "id": "MDU6SXNzdWU2NTAyNTM5NjQ=",
       "title": "Consider packet replay/injection attacks",
       "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/1",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "tfpauly",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -40,9 +40,17 @@
       "labels": [],
       "body": "When forwarding for a given CID, the proxy can very simply process a packet without doing any decryption. However, this means the packet may not be valid (it could be a replay, or a packet injected by someone spoofing the IP addresses and CID).\r\n\r\nSince the proxy is acting effectively as a router, this *might* be acceptable. However:\r\n- When the target/origin receives bogus or duplicate QUIC packets, it may be forced to rate-limit traffic from the proxy that forwarded the bad traffic\r\n- The proxy is being made to do work of forwarding packets. If that is more expensive than something that could be done simply to validate the packet (signed hash of the packet, say), then it may be preferable to do some validation.",
       "createdAt": "2020-07-02T23:30:43Z",
-      "updatedAt": "2020-07-02T23:30:43Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2025-02-06T02:25:46Z",
+      "closedAt": "2025-02-06T02:25:44Z",
+      "comments": [
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Now that we have scramble, etc, our discussion of possible attacks is much more robust. We don't prevent active attacks, but the implications are explained in detail.",
+          "createdAt": "2025-02-06T02:25:44Z",
+          "updatedAt": "2025-02-06T02:25:44Z"
+        }
+      ]
     },
     {
       "number": 3,
@@ -749,15 +757,15 @@
       "id": "MDU6SXNzdWU3NDY3MDc1NjE=",
       "title": "Proxy Response Behavior use of server",
       "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/36",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "gloinul",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "This section needs a clean up in terminology. It uses \"server-facing socket\" which propably should be changed to \"target-facing socket\". \r\n\r\n",
       "createdAt": "2020-11-19T15:56:48Z",
-      "updatedAt": "2020-11-19T20:40:18Z",
-      "closedAt": null,
+      "updatedAt": "2025-02-06T02:27:08Z",
+      "closedAt": "2025-02-06T02:27:07Z",
       "comments": [
         {
           "author": "tfpauly",
@@ -765,6 +773,13 @@
           "body": "It could be \"target-facing\", yes, but the end-to-end QUIC connection is thought of in terms of Client and Server, too. ",
           "createdAt": "2020-11-19T20:40:18Z",
           "updatedAt": "2020-11-19T20:40:18Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Fixed by: https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/53",
+          "createdAt": "2025-02-06T02:27:07Z",
+          "updatedAt": "2025-02-06T02:27:07Z"
         }
       ]
     },
@@ -773,15 +788,15 @@
       "id": "MDU6SXNzdWU3NDY3MTkyMDg=",
       "title": "Example unclear about long headers",
       "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/37",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "gloinul",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "The example states:\r\n\r\n\r\n   When the proxy receives a response from target.example.com:443 that\r\n   has 0x31323334 as the Destination Connection ID, the proxy will\r\n   forward that packet to the client on DATAGRAM flow ID 2.\r\n\r\nAnd the later:\r\n\r\n   Upon receiving the response, the client starts sending Short Header\r\n   packets with a Destination Connection ID of 0x61626364 directly to\r\n   the proxy (not tunnelled), and these are forwarded directly to the\r\n   target by the proxy.  Similarly, Short Header packets from the target\r\n   with a Destination Connection ID of 0x31323334 are forwarded directly\r\n   to the client.\r\n\r\nSo the first paragraph I think it is correct as far as long header packets are received. However, will not short header packets from the target arriving at the proxy be forwarded to the client, even if the second request never happened. Thus, the implied connection to the response in the last sentence of the second paragraph is misleading.\r\n",
       "createdAt": "2020-11-19T16:10:16Z",
-      "updatedAt": "2020-11-19T20:41:50Z",
-      "closedAt": null,
+      "updatedAt": "2025-02-06T02:28:31Z",
+      "closedAt": "2025-02-06T02:28:30Z",
       "comments": [
         {
           "author": "tfpauly",
@@ -789,6 +804,13 @@
           "body": "Forwarding mode does rely on the second request being accepted, to allow the server to choose whether or not to forward. This doesn't support only forwarding in one direction, which we deemed to not be a useful feature.",
           "createdAt": "2020-11-19T20:41:50Z",
           "updatedAt": "2020-11-19T20:41:50Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "We believe this comment no longer applies to the design based on capsules. Please let us know if there's any remaining issue!",
+          "createdAt": "2025-02-06T02:28:30Z",
+          "updatedAt": "2025-02-06T02:28:30Z"
         }
       ]
     },
@@ -804,15 +826,15 @@
       "labels": [],
       "body": "Lets pull out one issue from #35 that likely need separate treatment.\r\n\r\nSo the security consideration says: \r\n\r\n   Since proxies that forward QUIC packets do not perform any\r\n   cryptographic integrity check, it is possible that these packets are\r\n   either malformed, replays, or otherwise malicious.  This may result\r\n   in proxy targets rate limiting or decreasing the reputation of a\r\n   given proxy.\r\n\r\nSo this is indicating that you agree that forwarded traffic may misbehave and cause reactions in the network. Based on this I think any reuse of 5-tuples between the proxy and the target between multiple clients results in that one MASQUE client and its users could affect the flow of another MASQUE client through its traffic beyond traffic volume. I think that should most definitely be discussed, and I think this is to dangerous and should be recommended against. \r\n\r\nI further think client's need to have some control over re-use of target facing proxy-socket. This as a MASQUE client that represent multiple different users, for example some type of gateway from a network may not have trust in that all its users are good behaving citizens and thus one users traffic should not have fatesharing with another. ",
       "createdAt": "2020-11-19T16:18:04Z",
-      "updatedAt": "2020-11-19T20:44:06Z",
+      "updatedAt": "2025-02-06T02:28:58Z",
       "closedAt": null,
       "comments": [
         {
           "author": "tfpauly",
           "authorAssociation": "COLLABORATOR",
-          "body": "Which I see the concerns, I think we should describe them rather than prohibit anything. If the target is well-known, such as another proxy if we are doing multiple proxy hops, then the concerns about reuse may not apply.",
+          "body": "While I see the concerns, I think we should describe them rather than prohibit anything. If the target is well-known, such as another proxy if we are doing multiple proxy hops, then the concerns about reuse may not apply.",
           "createdAt": "2020-11-19T20:44:05Z",
-          "updatedAt": "2020-11-19T20:44:05Z"
+          "updatedAt": "2025-02-06T02:28:58Z"
         }
       ]
     },
@@ -821,15 +843,15 @@
       "id": "MDU6SXNzdWU3NDY3MzIyMjc=",
       "title": "Signalling for rate-limits for a client?",
       "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/39",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "gloinul",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "The draft do discuss the aspect that the proxy may rate limit a client. Should there actually be explicit signalling of these rates to the client. \r\n\r\nI also assume these parameters are on client level and thus apply across the different UDP flows. ",
       "createdAt": "2020-11-19T16:25:42Z",
-      "updatedAt": "2020-11-20T06:58:53Z",
-      "closedAt": null,
+      "updatedAt": "2025-02-06T02:30:36Z",
+      "closedAt": "2025-02-06T02:30:36Z",
       "comments": [
         {
           "author": "tfpauly",
@@ -865,6 +887,13 @@
           "body": "@gloinul I think having strict limits on the number of packets or bytes that go through a proxy connection could be enforced by a proxy closing a given CONNECT request stream if it violates a policy. If you want explicit signaling about expected rates or datagram flow control, that'd need to be another separate extension.",
           "createdAt": "2020-11-20T06:58:53Z",
           "updatedAt": "2020-11-20T06:58:53Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I believe that there isn't anything to do here \u2014 I agree with Lucas's points. Please re-open if you disagree!",
+          "createdAt": "2025-02-06T02:30:36Z",
+          "updatedAt": "2025-02-06T02:30:36Z"
         }
       ]
     },
@@ -1142,7 +1171,7 @@
       "id": "I_kwDOEHrEP85L8SDb",
       "title": "Happy Eyeballs?",
       "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/59",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "DavidSchinazi",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
@@ -1151,8 +1180,8 @@
       ],
       "body": "CONNECT-UDP can't perform Happy Eyeballs because UDP doesn't have an equivalent of the TCP SYN-ACK. However, QUIC has such an equivalent. This extension could recommend performing Happy Eyeballs when target_host is a DNS host name.",
       "createdAt": "2022-06-16T21:21:40Z",
-      "updatedAt": "2023-03-07T23:15:57Z",
-      "closedAt": null,
+      "updatedAt": "2025-02-06T22:47:47Z",
+      "closedAt": "2025-02-06T02:37:02Z",
       "comments": [
         {
           "author": "LPardue",
@@ -1230,6 +1259,20 @@
           "body": "Yeah agree it's a tradeoff. \r\n\r\nThinking aloud.\r\nIt seems like in an era of HTTPS records, happy eyeballs for QUIC could be useful for non-proxy clients. And guidance on how to close an uneeded connection seems useful. The decision whether to duplicate Initials could be part of guidance around tradeoffs. A proxy could then take that and use it. A CONNECT-UDP proxy that snoops could even employ the approach ypu outline ",
           "createdAt": "2022-06-21T19:09:33Z",
           "updatedAt": "2022-06-21T19:09:33Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Discussed with David, OK to close",
+          "createdAt": "2025-02-06T02:37:02Z",
+          "updatedAt": "2025-02-06T02:37:02Z"
+        },
+        {
+          "author": "DavidSchinazi",
+          "authorAssociation": "COLLABORATOR",
+          "body": "To add context from that offline discussion here: both Tommy's and my deployment end up only using IPv6 to the target, so Happy Eyeballs isn't a pressing need for us. Since this can be added in a future document just as easily, it makes sense to punt it for now.",
+          "createdAt": "2025-02-06T22:47:46Z",
+          "updatedAt": "2025-02-06T22:47:46Z"
         }
       ]
     },
