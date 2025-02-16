@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-02-13T00:35:24.265148+00:00",
+  "timestamp": "2025-02-16T00:38:56.979104+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -1633,10 +1633,12 @@
       "author": "marten-seemann",
       "authorAssociation": "NONE",
       "assignees": [],
-      "labels": [],
+      "labels": [
+        "Discuss"
+      ],
       "body": "When the client wishes to issue a new CID for the target, it might be advantageous to register it with the proxy first (and wait for acknowledgement), before actually sending it to the target. That way, if the proxy rejects the CID, there\u2019s no risk that the target already started using that CID, which would lead to the loss of all packets sent using that CID, until that CID is retired (which takes at least 1 RTT).",
       "createdAt": "2023-07-03T01:18:13Z",
-      "updatedAt": "2023-07-03T02:22:19Z",
+      "updatedAt": "2025-02-13T22:22:14Z",
       "closedAt": null,
       "comments": [
         {
@@ -1652,6 +1654,20 @@
           "body": "Yes, it would be useful to clarify the ordering \u2014 saying \"before\" is good there, or at least in the same packet to the proxy so the proxy is able to read the content first before passing along a packet to the next hop.",
           "createdAt": "2023-07-03T02:22:19Z",
           "updatedAt": "2023-07-03T02:22:19Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "As a note here, this text:\n\n> If the rejection indicated a conflict due to the client CID, the client MUST select a new Connection ID before sending a new request, and generate a new packet. For example, if a client is sending a QUIC Initial packet and chooses a Connection ID that conflicts with an existing mapping to the same target server, it will need to generate a new QUIC Initial.[\u00b6](https://ietf-wg-masque.github.io/draft-ietf-masque-quic-proxy/draft-ietf-masque-quic-proxy.html#section-4.9.1-5)\n\nExplains that a client needs to resend the initial, but doesn't describe how the proxy drops this initial, or how it knows which packets to allow/drop.",
+          "createdAt": "2025-02-13T22:19:07Z",
+          "updatedAt": "2025-02-13T22:19:07Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Option:\n- If the proxy sends a close client CID capsule, it will drop all packets sent by the client until the proxy sends an acknowledgement of a new client CID. This regresses us into a slower case when we have a conflict. The client can be told to only send the initial flight before getting the ack or close, and to then not send anything more until it gets an ack.",
+          "createdAt": "2025-02-13T22:22:12Z",
+          "updatedAt": "2025-02-13T22:22:12Z"
         }
       ]
     },
@@ -1775,7 +1791,7 @@
       "labels": [],
       "body": "Connection ID registration capsules allow the client to communicate client and target connection IDs to the proxy. This enables both port reuse on the proxy and the option to use forwarding mode.\r\n\r\nWhen the head `Proxy-QUIC-Forwarding=?1` was mutually communicated, the client **may** send in forwarding mode, but **must** be able to receive in forwarding mode. As a client, if \"mid stream\" I decide a don't want to do forwarding anymore, I don't have a way to communicate this to the proxy. CloseClientCid/CloseTargetCid capsules don't work here because that would break the proxy's ability to distinguish QUIC packets on a reused UDP port.",
       "createdAt": "2023-11-05T11:29:30Z",
-      "updatedAt": "2023-11-05T14:45:16Z",
+      "updatedAt": "2025-02-15T02:07:01Z",
       "closedAt": null,
       "comments": [
         {
@@ -1798,6 +1814,20 @@
           "body": "That makes sense, thanks",
           "createdAt": "2023-11-05T14:45:15Z",
           "updatedAt": "2023-11-05T14:45:15Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "One option here is to migrate the end-to-end QUIC connection to a new MASQUE request stream that doesn't allow forwarding",
+          "createdAt": "2025-02-13T22:30:28Z",
+          "updatedAt": "2025-02-13T22:30:28Z"
+        },
+        {
+          "author": "DavidSchinazi",
+          "authorAssociation": "COLLABORATOR",
+          "body": "That's definitely a workable solution. And unless we have a use case that someone's shipping where that solution isn't good enough, maybe we resolve this by adding text to recommend this?",
+          "createdAt": "2025-02-15T02:07:00Z",
+          "updatedAt": "2025-02-15T02:07:00Z"
         }
       ]
     },
