@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-02-16T00:38:56.979104+00:00",
+  "timestamp": "2025-02-18T00:35:19.138208+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -1787,11 +1787,13 @@
       "state": "OPEN",
       "author": "ehaydenr",
       "authorAssociation": "COLLABORATOR",
-      "assignees": [],
+      "assignees": [
+        "ehaydenr"
+      ],
       "labels": [],
       "body": "Connection ID registration capsules allow the client to communicate client and target connection IDs to the proxy. This enables both port reuse on the proxy and the option to use forwarding mode.\r\n\r\nWhen the head `Proxy-QUIC-Forwarding=?1` was mutually communicated, the client **may** send in forwarding mode, but **must** be able to receive in forwarding mode. As a client, if \"mid stream\" I decide a don't want to do forwarding anymore, I don't have a way to communicate this to the proxy. CloseClientCid/CloseTargetCid capsules don't work here because that would break the proxy's ability to distinguish QUIC packets on a reused UDP port.",
       "createdAt": "2023-11-05T11:29:30Z",
-      "updatedAt": "2025-02-15T02:07:01Z",
+      "updatedAt": "2025-02-17T16:55:14Z",
       "closedAt": null,
       "comments": [
         {
@@ -1828,6 +1830,13 @@
           "body": "That's definitely a workable solution. And unless we have a use case that someone's shipping where that solution isn't good enough, maybe we resolve this by adding text to recommend this?",
           "createdAt": "2025-02-15T02:07:00Z",
           "updatedAt": "2025-02-15T02:07:00Z"
+        },
+        {
+          "author": "ehaydenr",
+          "authorAssociation": "COLLABORATOR",
+          "body": "That works for me!",
+          "createdAt": "2025-02-17T16:55:08Z",
+          "updatedAt": "2025-02-17T16:55:08Z"
         }
       ]
     },
