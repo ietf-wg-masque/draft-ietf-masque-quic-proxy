@@ -804,7 +804,7 @@ stream with error code NO_ERROR. This may happen, for example, if the target ser
 sends a NEW_CONNECTION_ID frame with Sequence Number and Retire Prior To equal to the
 same value.
 
-Clients may cease receiving with forwarded mode over an existing tunnel while
+Clients can cease receiving with forwarded mode over an existing tunnel while
 retaining the same client-to-target connection by creating a new tunnel with
 "Proxy-QUIC-Forwarding" set to "?0" and migrating the client-to-target connection.
 
