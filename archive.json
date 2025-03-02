@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-02-27T00:36:27.552613+00:00",
+  "timestamp": "2025-03-02T00:39:22.671618+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -1784,7 +1784,7 @@
       "id": "I_kwDOEHrEP8514gWQ",
       "title": "No way of disabling forwarding mode half way through stream",
       "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/91",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "ehaydenr",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -1793,8 +1793,8 @@
       "labels": [],
       "body": "Connection ID registration capsules allow the client to communicate client and target connection IDs to the proxy. This enables both port reuse on the proxy and the option to use forwarding mode.\r\n\r\nWhen the head `Proxy-QUIC-Forwarding=?1` was mutually communicated, the client **may** send in forwarding mode, but **must** be able to receive in forwarding mode. As a client, if \"mid stream\" I decide a don't want to do forwarding anymore, I don't have a way to communicate this to the proxy. CloseClientCid/CloseTargetCid capsules don't work here because that would break the proxy's ability to distinguish QUIC packets on a reused UDP port.",
       "createdAt": "2023-11-05T11:29:30Z",
-      "updatedAt": "2025-02-17T16:55:14Z",
-      "closedAt": null,
+      "updatedAt": "2025-02-28T19:19:38Z",
+      "closedAt": "2025-02-28T19:19:38Z",
       "comments": [
         {
           "author": "DavidSchinazi",
@@ -10530,6 +10530,68 @@
               "updatedAt": "2024-10-19T03:05:27Z"
             }
           ]
+        }
+      ]
+    },
+    {
+      "number": 119,
+      "id": "PR_kwDOEHrEP86M-D2U",
+      "title": "guidance for disabling forwarding mode",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/119",
+      "state": "MERGED",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "closes #91 ",
+      "createdAt": "2025-02-28T17:29:48Z",
+      "updatedAt": "2025-02-28T19:22:26Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "e1f868a5c4153d17b532094b7c000c81513aa766",
+      "headRepository": "ehaydenr/quic-proxy",
+      "headRefName": "issue-91",
+      "headRefOid": "17cb9f830e095dfac48fe69826446c5bf4b95974",
+      "closedAt": "2025-02-28T19:19:37Z",
+      "mergedAt": "2025-02-28T19:19:37Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "df5be65ebaabe95748529531d151cf946bac4f10"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP86eDAxJ",
+          "commit": {
+            "abbreviatedOid": "1b23af0"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-02-28T19:11:18Z",
+          "updatedAt": "2025-02-28T19:12:14Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "```suggestion\r\nClients can cease receiving with forwarded mode over an existing tunnel while\r\n```",
+              "createdAt": "2025-02-28T19:11:18Z",
+              "updatedAt": "2025-02-28T19:12:14Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOEHrEP86eDEAR",
+          "commit": {
+            "abbreviatedOid": "17cb9f8"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-02-28T19:19:17Z",
+          "updatedAt": "2025-02-28T19:19:17Z",
+          "comments": []
         }
       ]
     }
