@@ -634,6 +634,19 @@ Table of Contents
    receiving a MAX_CONNECTION_IDS capsule with a value less than 1 MUST
    reset the stream with H3_DATAGRAM_ERROR error code.
 
+   When port sharing Section 4 is supported, the client MUST register
+   and receive acknowledgements for client and target CIDs before using
+   them.  Packets with unknown connection IDs received by the proxy on a
+   target-facing sockets that support port sharing MUST be dropped.  In
+   order to avoid introducing an additional round trip on setup, a
+   REGISTER_CLIENT_CID capsule SHOULD be sent at the same time as the
+   client's first flight.  If the proxy rejects the client CID, the
+   proxy MUST drop all packets until it has sent an ACK_CLIENT_CID
+   capsule and the client MUST NOT send any packets until receiving an
+   ACK_CLIENT_CID.  When port sharing is supported, a proxy SHOULD
+   buffer a reasonable number of incoming packets while waiting for the
+   first REGISTER_CLIENT_CID capsule.
+
 5.1.  REGISTER_CLIENT_CID
 
    The REGISTER_CLIENT_CID capsule is sent by the client and contains a
@@ -892,22 +905,22 @@ Table of Contents
 
 5.9.  Client Considerations
 
-   The client sends a REGISTER_CLIENT_CID capsule whenever it advertises
-   a new client CID to the target, and a REGISTER_TARGET_CID capsule
-   when it has received a new target CID for the target.  In order to
-   change the connection ID bytes on the wire, a client can solicit new
-   virtual connection IDs by re-registering the same connection IDs.
-   The client may solicit a new target VCID by sending a
-   REGISTER_TARGET_CID capsule with a previously registered target CID.
-   Similarly, the client may solicit a new client VCID by sending a
-   REGISTER_CLIENT_CID with a previously registered client CID.  The
-   client MUST acknowledge the new client VCID with an ACK_CLIENT_VCID
-   capsule or close the registration.  The proxy MUST NOT send in
-   forwarded mode until ACK_CLIENT_VCID has been received.  Clients are
-   responsible for changing Virtual Connection IDs when the HTTP
-   stream's network path changes to avoid linkability across network
-   paths.  Note that initial REGISTER_CLIENT_CID capsules MAY be sent
-   prior to receiving an HTTP response from the proxy.
+   The client sends a REGISTER_CLIENT_CID capsule before it advertises a
+   new client CID to the target, and a REGISTER_TARGET_CID capsule when
+   it has received a new target CID for the target.  In order to change
+   the connection ID bytes on the wire, a client can solicit new virtual
+   connection IDs by re-registering the same connection IDs.  The client
+   may solicit a new target VCID by sending a REGISTER_TARGET_CID
+   capsule with a previously registered target CID.  Similarly, the
+   client may solicit a new client VCID by sending a REGISTER_CLIENT_CID
+   with a previously registered client CID.  The client MUST acknowledge
+   the new client VCID with an ACK_CLIENT_VCID capsule or close the
+   registration.  The proxy MUST NOT send in forwarded mode until
+   ACK_CLIENT_VCID has been received.  Clients are responsible for
+   changing Virtual Connection IDs when the HTTP stream's network path
+   changes to avoid linkability across network paths.  Note that initial
+   REGISTER_CLIENT_CID capsules MAY be sent prior to receiving an HTTP
+   response from the proxy.
 
    Connection ID registrations are subject to a proxy-advertised limit.
    Each registration has a corresponding sequence number.  The client

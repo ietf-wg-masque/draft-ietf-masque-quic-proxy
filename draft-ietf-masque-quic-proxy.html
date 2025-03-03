@@ -1985,6 +1985,16 @@ one with sequence number 0 and another with sequence number 1. A proxy MUST NOT
 send a MAX_CONNECTION_IDS capsule with a value less than 1. Clients receiving a
 MAX_CONNECTION_IDS capsule with a value less than 1 MUST reset the stream with
 H3_DATAGRAM_ERROR error code.<a href="#section-5-7" class="pilcrow">¶</a></p>
+<p id="section-5-8">When port sharing <a href="#port-sharing-header" class="auto internal xref">Section 4</a> is supported, the client MUST register
+and receive acknowledgements for client and target CIDs before using them. Packets with
+unknown connection IDs received by the proxy on a target-facing sockets that support
+port sharing MUST be dropped. In order to avoid introducing an additional round trip
+on setup, a REGISTER_CLIENT_CID capsule SHOULD be sent at the same time as the client's
+first flight. If the proxy rejects the client CID, the proxy MUST drop all packets until
+it has sent an ACK_CLIENT_CID capsule and the client MUST NOT send any packets until
+receiving an ACK_CLIENT_CID. When port sharing is supported, a proxy SHOULD buffer a
+reasonable number of incoming packets while waiting for the first REGISTER_CLIENT_CID
+capsule.<a href="#section-5-8" class="pilcrow">¶</a></p>
 <div id="capsule-reg-client">
 <section id="section-5.1">
         <h3 id="name-register_client_cid">
@@ -2377,7 +2387,7 @@ conflicts.<a href="#section-5.8-5" class="pilcrow">¶</a></p>
         <h3 id="name-client-considerations">
 <a href="#section-5.9" class="section-number selfRef">5.9. </a><a href="#name-client-considerations" class="section-name selfRef">Client Considerations</a>
         </h3>
-<p id="section-5.9-1">The client sends a REGISTER_CLIENT_CID capsule whenever it advertises a new
+<p id="section-5.9-1">The client sends a REGISTER_CLIENT_CID capsule before it advertises a new
 client CID to the target, and a REGISTER_TARGET_CID capsule when
 it has received a new target CID for the target. In order to change
 the connection ID bytes on the wire, a client can solicit new virtual connection
