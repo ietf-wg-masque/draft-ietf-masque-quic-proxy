@@ -15,7 +15,7 @@ proxied connections, and adds a mode of proxying in which QUIC short header pack
 can be forwarded and transformed through a HTTP/3 proxy rather than being fully
 re-encapsulated and re-encrypted. 
     " name="description">
-<meta content="xml2rfc 3.27.0" name="generator">
+<meta content="xml2rfc 3.28.0" name="generator">
 <meta content="quic" name="keyword">
 <meta content="http" name="keyword">
 <meta content="datagram" name="keyword">
@@ -28,7 +28,7 @@ re-encapsulated and re-encrypted.
 <meta content="http-ng" name="keyword">
 <meta content="draft-ietf-masque-quic-proxy-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.27.0
+  xml2rfc 3.28.0
     Python 3.12.9
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
@@ -1059,11 +1059,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">QUIC Proxy</td>
-<td class="right">February 2025</td>
+<td class="right">March 2025</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Pauly, et al.</td>
-<td class="center">Expires 1 September 2025</td>
+<td class="center">Expires 4 September 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1076,12 +1076,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-masque-quic-proxy-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-02-28" class="published">28 February 2025</time>
+<time datetime="2025-03-03" class="published">3 March 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Experimental</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-09-01">1 September 2025</time></dd>
+<dd class="expires"><time datetime="2025-09-04">4 September 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1143,7 +1143,7 @@ re-encapsulated and re-encrypted.<a href="#section-abstract-1" class="pilcrow">�
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 1 September 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 4 September 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1201,142 +1201,145 @@ re-encapsulated and re-encrypted.<a href="#section-abstract-1" class="pilcrow">�
             <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-proxy-quic-forwarding-heade" class="internal xref">Proxy-QUIC-Forwarding Header</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
-            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-connection-id-capsules" class="internal xref">Connection ID Capsules</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
-                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-register_client_cid" class="internal xref">REGISTER_CLIENT_CID</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
-                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-register_target_cid" class="internal xref">REGISTER_TARGET_CID</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
-                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-ack_client_cid" class="internal xref">ACK_CLIENT_CID</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4">
-                <p id="section-toc.1-1.4.2.4.1"><a href="#section-4.4" class="auto internal xref">4.4</a>.  <a href="#name-ack_target_cid" class="internal xref">ACK_TARGET_CID</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.5">
-                <p id="section-toc.1-1.4.2.5.1"><a href="#section-4.5" class="auto internal xref">4.5</a>.  <a href="#name-ack_client_vcid" class="internal xref">ACK_CLIENT_VCID</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.6">
-                <p id="section-toc.1-1.4.2.6.1"><a href="#section-4.6" class="auto internal xref">4.6</a>.  <a href="#name-close_client_cid-and-close_" class="internal xref">CLOSE_CLIENT_CID and CLOSE_TARGET_CID</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.7">
-                <p id="section-toc.1-1.4.2.7.1"><a href="#section-4.7" class="auto internal xref">4.7</a>.  <a href="#name-max_connection_ids" class="internal xref">MAX_CONNECTION_IDS</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.8">
-                <p id="section-toc.1-1.4.2.8.1"><a href="#section-4.8" class="auto internal xref">4.8</a>.  <a href="#name-detecting-conflicts" class="internal xref">Detecting Conflicts</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.9">
-                <p id="section-toc.1-1.4.2.9.1"><a href="#section-4.9" class="auto internal xref">4.9</a>.  <a href="#name-client-considerations" class="internal xref">Client Considerations</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.9.2.1">
-                    <p id="section-toc.1-1.4.2.9.2.1.1"><a href="#section-4.9.1" class="auto internal xref">4.9.1</a>.  <a href="#name-new-proxied-connection-setu" class="internal xref">New Proxied Connection Setup</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.9.2.2">
-                    <p id="section-toc.1-1.4.2.9.2.2.1"><a href="#section-4.9.2" class="auto internal xref">4.9.2</a>.  <a href="#name-adding-new-client-connectio" class="internal xref">Adding New Client Connection IDs</a></p>
-</li>
-                </ul>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.10">
-                <p id="section-toc.1-1.4.2.10.1"><a href="#section-4.10" class="auto internal xref">4.10</a>. <a href="#name-proxy-considerations" class="internal xref">Proxy Considerations</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.10.2.1">
-                    <p id="section-toc.1-1.4.2.10.2.1.1"><a href="#section-4.10.1" class="auto internal xref">4.10.1</a>.  <a href="#name-closing-proxy-state" class="internal xref">Closing Proxy State</a></p>
-</li>
-                </ul>
-</li>
-            </ul>
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-proxy-quic-port-sharing-hea" class="internal xref">Proxy-QUIC-Port-Sharing Header</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
-            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-using-forwarded-mode" class="internal xref">Using Forwarded Mode</a></p>
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-connection-id-capsules" class="internal xref">Connection ID Capsules</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
-                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-sending-with-forwarded-mode" class="internal xref">Sending With Forwarded Mode</a></p>
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-register_client_cid" class="internal xref">REGISTER_CLIENT_CID</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
-                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-receiving-with-forwarded-mo" class="internal xref">Receiving With Forwarded Mode</a></p>
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-register_target_cid" class="internal xref">REGISTER_TARGET_CID</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
-                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="auto internal xref">5.3</a>.  <a href="#name-packet-transforms" class="internal xref">Packet Transforms</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3.2.1">
-                    <p id="section-toc.1-1.5.2.3.2.1.1"><a href="#section-5.3.1" class="auto internal xref">5.3.1</a>.  <a href="#name-the-identify-transform" class="internal xref">The identify transform</a></p>
+                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="auto internal xref">5.3</a>.  <a href="#name-ack_client_cid" class="internal xref">ACK_CLIENT_CID</a></p>
 </li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3.2.2">
-                    <p id="section-toc.1-1.5.2.3.2.2.1"><a href="#section-5.3.2" class="auto internal xref">5.3.2</a>.  <a href="#name-the-scramble-transform" class="internal xref">The scramble transform</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.4">
+                <p id="section-toc.1-1.5.2.4.1"><a href="#section-5.4" class="auto internal xref">5.4</a>.  <a href="#name-ack_target_cid" class="internal xref">ACK_TARGET_CID</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.5">
+                <p id="section-toc.1-1.5.2.5.1"><a href="#section-5.5" class="auto internal xref">5.5</a>.  <a href="#name-ack_client_vcid" class="internal xref">ACK_CLIENT_VCID</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.6">
+                <p id="section-toc.1-1.5.2.6.1"><a href="#section-5.6" class="auto internal xref">5.6</a>.  <a href="#name-close_client_cid-and-close_" class="internal xref">CLOSE_CLIENT_CID and CLOSE_TARGET_CID</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.7">
+                <p id="section-toc.1-1.5.2.7.1"><a href="#section-5.7" class="auto internal xref">5.7</a>.  <a href="#name-max_connection_ids" class="internal xref">MAX_CONNECTION_IDS</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.8">
+                <p id="section-toc.1-1.5.2.8.1"><a href="#section-5.8" class="auto internal xref">5.8</a>.  <a href="#name-detecting-conflicts" class="internal xref">Detecting Conflicts</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.9">
+                <p id="section-toc.1-1.5.2.9.1"><a href="#section-5.9" class="auto internal xref">5.9</a>.  <a href="#name-client-considerations" class="internal xref">Client Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.9.2.1">
+                    <p id="section-toc.1-1.5.2.9.2.1.1"><a href="#section-5.9.1" class="auto internal xref">5.9.1</a>.  <a href="#name-new-proxied-connection-setu" class="internal xref">New Proxied Connection Setup</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.9.2.2">
+                    <p id="section-toc.1-1.5.2.9.2.2.1"><a href="#section-5.9.2" class="auto internal xref">5.9.2</a>.  <a href="#name-adding-new-client-connectio" class="internal xref">Adding New Client Connection IDs</a></p>
 </li>
                 </ul>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.4">
-                <p id="section-toc.1-1.5.2.4.1"><a href="#section-5.4" class="auto internal xref">5.4</a>.  <a href="#name-connection-maintenance-in-f" class="internal xref">Connection Maintenance in Forwarded Mode</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.5">
-                <p id="section-toc.1-1.5.2.5.1"><a href="#section-5.5" class="auto internal xref">5.5</a>.  <a href="#name-handling-connection-migrati" class="internal xref">Handling Connection Migration</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.6">
-                <p id="section-toc.1-1.5.2.6.1"><a href="#section-5.6" class="auto internal xref">5.6</a>.  <a href="#name-handling-ecn-marking" class="internal xref">Handling ECN Marking</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.7">
-                <p id="section-toc.1-1.5.2.7.1"><a href="#section-5.7" class="auto internal xref">5.7</a>.  <a href="#name-stateless-resets-for-forwar" class="internal xref">Stateless Resets for Forwarded Mode QUIC Packets</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.10">
+                <p id="section-toc.1-1.5.2.10.1"><a href="#section-5.10" class="auto internal xref">5.10</a>. <a href="#name-proxy-considerations" class="internal xref">Proxy Considerations</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.7.2.1">
-                    <p id="section-toc.1-1.5.2.7.2.1.1"><a href="#section-5.7.1" class="auto internal xref">5.7.1</a>.  <a href="#name-stateless-resets-from-the-t" class="internal xref">Stateless Resets from the Target</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.10.2.1">
+                    <p id="section-toc.1-1.5.2.10.2.1.1"><a href="#section-5.10.1" class="auto internal xref">5.10.1</a>.  <a href="#name-closing-proxy-state" class="internal xref">Closing Proxy State</a></p>
 </li>
                 </ul>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-example-exchange" class="internal xref">Example Exchange</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-packet-size-considerations" class="internal xref">Packet Size Considerations</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-using-forwarded-mode" class="internal xref">Using Forwarded Mode</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
-                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-passive-attacks" class="internal xref">Passive Attacks</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-sending-with-forwarded-mode" class="internal xref">Sending With Forwarded Mode</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
-                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-active-attacks" class="internal xref">Active Attacks</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-receiving-with-forwarded-mo" class="internal xref">Receiving With Forwarded Mode</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
+                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-packet-transforms" class="internal xref">Packet Transforms</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.1">
+                    <p id="section-toc.1-1.6.2.3.2.1.1"><a href="#section-6.3.1" class="auto internal xref">6.3.1</a>.  <a href="#name-the-identify-transform" class="internal xref">The identify transform</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.2">
+                    <p id="section-toc.1-1.6.2.3.2.2.1"><a href="#section-6.3.2" class="auto internal xref">6.3.2</a>.  <a href="#name-the-scramble-transform" class="internal xref">The scramble transform</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.4">
+                <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="auto internal xref">6.4</a>.  <a href="#name-connection-maintenance-in-f" class="internal xref">Connection Maintenance in Forwarded Mode</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.5">
+                <p id="section-toc.1-1.6.2.5.1"><a href="#section-6.5" class="auto internal xref">6.5</a>.  <a href="#name-handling-connection-migrati" class="internal xref">Handling Connection Migration</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.6">
+                <p id="section-toc.1-1.6.2.6.1"><a href="#section-6.6" class="auto internal xref">6.6</a>.  <a href="#name-handling-ecn-marking" class="internal xref">Handling ECN Marking</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.7">
+                <p id="section-toc.1-1.6.2.7.1"><a href="#section-6.7" class="auto internal xref">6.7</a>.  <a href="#name-stateless-resets-for-forwar" class="internal xref">Stateless Resets for Forwarded Mode QUIC Packets</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.7.2.1">
+                    <p id="section-toc.1-1.6.2.7.2.1.1"><a href="#section-6.7.1" class="auto internal xref">6.7.1</a>.  <a href="#name-stateless-resets-from-the-t" class="internal xref">Stateless Resets from the Target</a></p>
+</li>
+                </ul>
 </li>
             </ul>
 </li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-example-exchange" class="internal xref">Example Exchange</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-packet-size-considerations" class="internal xref">Packet Size Considerations</a></p>
+</li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
-                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-http-header-field" class="internal xref">HTTP Header Field</a></p>
+                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-passive-attacks" class="internal xref">Passive Attacks</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
-                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-proxy-quic-forwarding-param" class="internal xref">Proxy QUIC Forwarding Parameter Names</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.3">
-                <p id="section-toc.1-1.9.2.3.1"><a href="#section-9.3" class="auto internal xref">9.3</a>.  <a href="#name-packet-transform-names" class="internal xref">Packet Transform Names</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.4">
-                <p id="section-toc.1-1.9.2.4.1"><a href="#section-9.4" class="auto internal xref">9.4</a>.  <a href="#name-capsule-types" class="internal xref">Capsule Types</a></p>
+                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-active-attacks" class="internal xref">Active Attacks</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-references" class="internal xref">References</a></p>
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1">
-                <p id="section-toc.1-1.10.2.1.1"><a href="#section-10.1" class="auto internal xref">10.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+                <p id="section-toc.1-1.10.2.1.1"><a href="#section-10.1" class="auto internal xref">10.1</a>.  <a href="#name-http-header-field" class="internal xref">HTTP Header Field</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.2">
-                <p id="section-toc.1-1.10.2.2.1"><a href="#section-10.2" class="auto internal xref">10.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+                <p id="section-toc.1-1.10.2.2.1"><a href="#section-10.2" class="auto internal xref">10.2</a>.  <a href="#name-proxy-quic-forwarding-param" class="internal xref">Proxy QUIC Forwarding Parameter Names</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.3">
+                <p id="section-toc.1-1.10.2.3.1"><a href="#section-10.3" class="auto internal xref">10.3</a>.  <a href="#name-packet-transform-names" class="internal xref">Packet Transform Names</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.4">
+                <p id="section-toc.1-1.10.2.4.1"><a href="#section-10.4" class="auto internal xref">10.4</a>.  <a href="#name-capsule-types" class="internal xref">Capsule Types</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
-            <p id="section-toc.1-1.11.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1">
+                <p id="section-toc.1-1.11.2.1.1"><a href="#section-11.1" class="auto internal xref">11.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.2">
+                <p id="section-toc.1-1.11.2.2.1"><a href="#section-11.2" class="auto internal xref">11.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
-            <p id="section-toc.1-1.12.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+            <p id="section-toc.1-1.12.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
+            <p id="section-toc.1-1.13.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1358,8 +1361,8 @@ another proxy for cases where proxies are chained together.<a href="#section-1-2
 Connection IDs. QUIC Connection IDs are used to identify QUIC connections in
 scenarios where there is not a strict one-to-one mapping between QUIC
 connections and UDP 4-tuples (pairs of IP addresses and ports).<a href="#section-1-3" class="pilcrow">¶</a></p>
-<p id="section-1-4">Once a proxy is aware of QUIC Connection IDs, it can reuse UDP 4-tuples between
-itself and a target for multiple proxied QUIC connections.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-4">If a client permits proxy port reuse, once a proxy is aware of QUIC Connection IDs,
+it can reuse UDP 4-tuples between itself and a target for multiple proxied QUIC connections.<a href="#section-1-4" class="pilcrow">¶</a></p>
 <p id="section-1-5">For proxies that are themselves running on HTTP/3 <span>[<a href="#HTTP3" class="cite xref">HTTP3</a>]</span>, and thus
 are accessed by clients over QUIC, QUIC Connection IDs can be used to treat
 packets differently on the link between clients and proxies. New QUIC Connection IDs
@@ -1411,7 +1414,7 @@ communication than if no proxy was used.<a href="#section-1-11.3.1" class="pilcr
 <p id="section-1-12">Forwarded mode does not prevent correlation of packets on the link between
 client and proxy and the link between proxy and target by an entity that
 can observe both links. The precise risks depend on the negotiated transform
-(<a href="#transforms" class="auto internal xref">Section 5.3</a>). See <a href="#security" class="auto internal xref">Section 8</a> for further discussion.<a href="#section-1-12" class="pilcrow">¶</a></p>
+(<a href="#transforms" class="auto internal xref">Section 6.3</a>). See <a href="#security" class="auto internal xref">Section 9</a> for further discussion.<a href="#section-1-12" class="pilcrow">¶</a></p>
 <p id="section-1-13">Both clients and proxies can unilaterally choose to disable forwarded mode for
 any client-to-target connection.<a href="#section-1-13" class="pilcrow">¶</a></p>
 <p id="section-1-14">The forwarded mode of proxying is only defined for HTTP/3 <span>[<a href="#HTTP3" class="cite xref">HTTP3</a>]</span> and not
@@ -1640,7 +1643,7 @@ correct client based on CID <code>AAAA0000</code> or <code>BBBB0000</code>.<a hr
           </figcaption></figure>
 </div>
 <p id="section-2.1-5">In order to share a proxy-to-target 4-tuple between multiple proxied connections,
-the proxy MUST guarantee that the client CIDs do not conflict. See <a href="#conflicts" class="auto internal xref">Section 4.8</a>
+the proxy MUST guarantee that the client CIDs do not conflict. See <a href="#conflicts" class="auto internal xref">Section 5.8</a>
 for more discussion of handlng CID conflicts.<a href="#section-2.1-5" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1653,7 +1656,7 @@ for more discussion of handlng CID conflicts.<a href="#section-2.1-5" class="pil
 client and proxy that do not belong to the QUIC connection between the client
 and proxy, but instead are aliases for particular client-to-target connections.
 VCIDs are only used in forwarded mode. They are established using HTTP capsules
-<span>[<a href="#HTTP-CAPSULES" class="cite xref">HTTP-CAPSULES</a>]</span> as described in <a href="#cid-capsules" class="auto internal xref">Section 4</a>.<a href="#section-2.2-1" class="pilcrow">¶</a></p>
+<span>[<a href="#HTTP-CAPSULES" class="cite xref">HTTP-CAPSULES</a>]</span> as described in <a href="#cid-capsules" class="auto internal xref">Section 5</a>.<a href="#section-2.2-1" class="pilcrow">¶</a></p>
 <p id="section-2.2-2">For example, consider a proxy using HTTP/3 that has a single client connected
 to it. The client-to-proxy QUIC connection has <code>CCCC0000</code> as the client CID
 and <code>0000CCCC</code> as the proxy CID. The client has connected to a single target
@@ -1754,7 +1757,7 @@ choose a client CID that's sufficiently long to reduce the likelihood
 of a conflict with the proxy-chosen client VCID. The client VCID MUST either be
 constructed such that it is unpredictable to the client or to guarantee no
 conflicts among all proxies sharing an IP address
-and port. See <a href="#security" class="auto internal xref">Section 8</a> for more discussion on client VCID
+and port. See <a href="#security" class="auto internal xref">Section 9</a> for more discussion on client VCID
 construction.<a href="#section-2.2-6" class="pilcrow">¶</a></p>
 <p id="section-2.2-7">Clients and Proxies not implementing forwarded mode do not need to consider
 VCIDs since all client-to-target datagrams will be encapsulated
@@ -1775,89 +1778,101 @@ field is not included, none of the functionality in this document can be used.<a
   capsule-protocol = ?1
 </pre><a href="#section-2.3-2" class="pilcrow">¶</a>
 </div>
-<p id="section-2.3-3">To support forwarded mode, both clients and proxies need to include
+<p id="section-2.3-3">To permit the proxy to share target-facing ports, the client needs to include the
+"Proxy-QUIC-Port-Sharing" header field, as defined in <a href="#port-sharing-header" class="auto internal xref">Section 4</a>.
+This indicates that the proxy may share target-facing 4-tuples concurrently with
+other QUIC connections. Clients that do not want the target-facing 4-tuple shared
+will not include this header or will provide it with a value of "?0".<a href="#section-2.3-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-2.3-4">
+<pre>
+  proxy-quic-port-sharing = ?1
+</pre><a href="#section-2.3-4" class="pilcrow">¶</a>
+</div>
+<p id="section-2.3-5">To support forwarded mode, both clients and proxies need to include
 the "Proxy-QUIC-Forwarding" header field, as defined in <a href="#forwarding-header" class="auto internal xref">Section 3</a>.
 This indicates support for forwarded mode, and allows negotiation of
-packet transforms to apply when forwarding (<a href="#transforms" class="auto internal xref">Section 5.3</a>), along
+packet transforms to apply when forwarding (<a href="#transforms" class="auto internal xref">Section 6.3</a>), along
 with any parameters for specific transforms. Clients or proxies that
-don't support forwarded mode will not include this header field.<a href="#section-2.3-3" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-2.3-4">
+don't support forwarded mode will not include this header field.<a href="#section-2.3-5" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-2.3-6">
 <pre>
   proxy-quic-forwarding = ?1; accept-transform=scramble,identity; \
       scramble-key=:abc...789=:
-</pre><a href="#section-2.3-4" class="pilcrow">¶</a>
+</pre><a href="#section-2.3-6" class="pilcrow">¶</a>
 </div>
-<p id="section-2.3-5">After negotiating support with header fields, clients and proxies use
-the capsules defined in <a href="#cid-capsules" class="auto internal xref">Section 4</a> to communicate information
-about CIDs and VCIDs.<a href="#section-2.3-5" class="pilcrow">¶</a></p>
-<p id="section-2.3-6">For QUIC-aware proxying without forwarded mode, the steps are as follows:<a href="#section-2.3-6" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-2.3-7">
-<li id="section-2.3-7.1">
-            <p id="section-2.3-7.1.1">The client sends the <code>REGISTER_CLIENT_CID</code> capsule once it selects a
-CID that it will use for receiving packets from a target.<a href="#section-2.3-7.1.1" class="pilcrow">¶</a></p>
+<p id="section-2.3-7">If neither header is supplied with a value of "?1", none of the functionality
+in this document can be used and handling reduces to normal connect-udp.<a href="#section-2.3-7" class="pilcrow">¶</a></p>
+<p id="section-2.3-8">After negotiating support with header fields, clients and proxies use
+the capsules defined in <a href="#cid-capsules" class="auto internal xref">Section 5</a> to communicate information
+about CIDs and VCIDs.<a href="#section-2.3-8" class="pilcrow">¶</a></p>
+<p id="section-2.3-9">For QUIC-aware proxying without forwarded mode, the steps are as follows:<a href="#section-2.3-9" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-2.3-10">
+<li id="section-2.3-10.1">
+            <p id="section-2.3-10.1.1">The client sends the <code>REGISTER_CLIENT_CID</code> capsule once it selects a
+CID that it will use for receiving packets from a target.<a href="#section-2.3-10.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-2.3-7.2">
-            <p id="section-2.3-7.2.1">The proxy sends the <code>ACK_CLIENT_CID</code> capsule to acknowledge that CID,
+          <li id="section-2.3-10.2">
+            <p id="section-2.3-10.2.1">The proxy sends the <code>ACK_CLIENT_CID</code> capsule to acknowledge that CID,
 with no associated client VCID; alternatively, the proxy can send the
-<code>CLOSE_CLIENT_CID</code> if it detects a conflict with another CID.<a href="#section-2.3-7.2.1" class="pilcrow">¶</a></p>
+<code>CLOSE_CLIENT_CID</code> if it detects a conflict with another CID.<a href="#section-2.3-10.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-2.3-7.3">
-            <p id="section-2.3-7.3.1">The client sends the <code>REGISTER_TARGET_CID</code> capsule as soon as it learns
-the target CID on the client-to-target connection.<a href="#section-2.3-7.3.1" class="pilcrow">¶</a></p>
+          <li id="section-2.3-10.3">
+            <p id="section-2.3-10.3.1">The client sends the <code>REGISTER_TARGET_CID</code> capsule as soon as it learns
+the target CID on the client-to-target connection.<a href="#section-2.3-10.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-2.3-7.4">
-            <p id="section-2.3-7.4.1">The proxy sends the <code>ACK_TARGET_CID</code> capsule to acknowledge that CID,
+          <li id="section-2.3-10.4">
+            <p id="section-2.3-10.4.1">The proxy sends the <code>ACK_TARGET_CID</code> capsule to acknowledge that CID,
 with no associated target VCID; alternatively, the proxy can send the
-<code>CLOSE_TARGET_CID</code> if it detects a conflict with another CID.<a href="#section-2.3-7.4.1" class="pilcrow">¶</a></p>
+<code>CLOSE_TARGET_CID</code> if it detects a conflict with another CID.<a href="#section-2.3-10.4.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-2.3-7.5">
-            <p id="section-2.3-7.5.1">The proxy sends the <code>MAX_CONNECTION_IDS</code> capsule to allow additional
+          <li id="section-2.3-10.5">
+            <p id="section-2.3-10.5.1">The proxy sends the <code>MAX_CONNECTION_IDS</code> capsule to allow additional
 registration of new connection IDs via future <code>REGISTER_CLIENT_CID</code> and
-<code>REGISTER_TARGET_CID</code> capsules.<a href="#section-2.3-7.5.1" class="pilcrow">¶</a></p>
+<code>REGISTER_TARGET_CID</code> capsules.<a href="#section-2.3-10.5.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-2.3-7.6">
-            <p id="section-2.3-7.6.1">Whenever a client or target stops uses a particular CID, the client
+          <li id="section-2.3-10.6">
+            <p id="section-2.3-10.6.1">Whenever a client or target stops uses a particular CID, the client
 sends a <code>CLOSE_CLIENT_CID</code> or <code>CLOSE_TARGET_CID</code> capsule. The client
 can also initiate new <code>REGISTER_CLIENT_CID</code> or <code>REGISTER_TARGET_CID</code>
-exchanges at any time.<a href="#section-2.3-7.6.1" class="pilcrow">¶</a></p>
+exchanges at any time.<a href="#section-2.3-10.6.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
-<p id="section-2.3-8">For QUIC-aware proxying with forwarded mode, the steps are as follows:<a href="#section-2.3-8" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-2.3-9">
-<li id="section-2.3-9.1">
-            <p id="section-2.3-9.1.1">The client sends the <code>REGISTER_CLIENT_CID</code> capsule once it selects a
-CID that it will use for receiving packets from a target.<a href="#section-2.3-9.1.1" class="pilcrow">¶</a></p>
+<p id="section-2.3-11">For QUIC-aware proxying with forwarded mode, the steps are as follows:<a href="#section-2.3-11" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-2.3-12">
+<li id="section-2.3-12.1">
+            <p id="section-2.3-12.1.1">The client sends the <code>REGISTER_CLIENT_CID</code> capsule once it selects a
+CID that it will use for receiving packets from a target.<a href="#section-2.3-12.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-2.3-9.2">
-            <p id="section-2.3-9.2.1">The proxy sends the <code>ACK_CLIENT_CID</code> capsule to acknowledge that CID,
+          <li id="section-2.3-12.2">
+            <p id="section-2.3-12.2.1">The proxy sends the <code>ACK_CLIENT_CID</code> capsule to acknowledge that CID,
 with a client VCID; alternatively, the proxy can send the
-<code>CLOSE_CLIENT_CID</code> if it detects a conflict with another CID.<a href="#section-2.3-9.2.1" class="pilcrow">¶</a></p>
+<code>CLOSE_CLIENT_CID</code> if it detects a conflict with another CID.<a href="#section-2.3-12.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-2.3-9.3">
-            <p id="section-2.3-9.3.1">The client sends the <code>ACK_CLIENT_VCID</code> capsule to acknowledge the
-client VCID, which allows forwarded packets for that VCID to be used.<a href="#section-2.3-9.3.1" class="pilcrow">¶</a></p>
+          <li id="section-2.3-12.3">
+            <p id="section-2.3-12.3.1">The client sends the <code>ACK_CLIENT_VCID</code> capsule to acknowledge the
+client VCID, which allows forwarded packets for that VCID to be used.<a href="#section-2.3-12.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-2.3-9.4">
-            <p id="section-2.3-9.4.1">The client sends the <code>REGISTER_TARGET_CID</code> capsule as soon as it learns
-the target CID on the client-to-target connection.<a href="#section-2.3-9.4.1" class="pilcrow">¶</a></p>
+          <li id="section-2.3-12.4">
+            <p id="section-2.3-12.4.1">The client sends the <code>REGISTER_TARGET_CID</code> capsule as soon as it learns
+the target CID on the client-to-target connection.<a href="#section-2.3-12.4.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-2.3-9.5">
-            <p id="section-2.3-9.5.1">The proxy sends the <code>ACK_TARGET_CID</code> capsule to acknowledge that CID,
+          <li id="section-2.3-12.5">
+            <p id="section-2.3-12.5.1">The proxy sends the <code>ACK_TARGET_CID</code> capsule to acknowledge that CID,
 with a target VCID; alternatively, the proxy can send the
 <code>CLOSE_TARGET_CID</code> if it detects a conflict with another CID. Once
 the client receives the target VCID, it can start sending forwarded
-packets using the target VCID.<a href="#section-2.3-9.5.1" class="pilcrow">¶</a></p>
+packets using the target VCID.<a href="#section-2.3-12.5.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-2.3-9.6">
-            <p id="section-2.3-9.6.1">The proxy sends the <code>MAX_CONNECTION_IDS</code> capsule to allow additional
+          <li id="section-2.3-12.6">
+            <p id="section-2.3-12.6.1">The proxy sends the <code>MAX_CONNECTION_IDS</code> capsule to allow additional
 registration of new connection IDs via future <code>REGISTER_CLIENT_CID</code> and
-<code>REGISTER_TARGET_CID</code> capsules.<a href="#section-2.3-9.6.1" class="pilcrow">¶</a></p>
+<code>REGISTER_TARGET_CID</code> capsules.<a href="#section-2.3-12.6.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-2.3-9.7">
-            <p id="section-2.3-9.7.1">Whenever a client or target stops uses a particular CID, the client
+          <li id="section-2.3-12.7">
+            <p id="section-2.3-12.7.1">Whenever a client or target stops uses a particular CID, the client
 sends a <code>CLOSE_CLIENT_CID</code> or <code>CLOSE_TARGET_CID</code> capsule. The client
 can also initiate new <code>REGISTER_CLIENT_CID</code> or <code>REGISTER_TARGET_CID</code>
-exchanges at any time.<a href="#section-2.3-9.7.1" class="pilcrow">¶</a></p>
+exchanges at any time.<a href="#section-2.3-12.7.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
 </section>
@@ -1881,7 +1896,7 @@ the value to "?1". If it doesn't want to enable forwarding, but instead only
 provide information about QUIC Connection IDs for the purpose of allowing
 the proxy to share a proxy-to-target 4-tuple, it sets the value to "?0".<a href="#section-3-3" class="pilcrow">¶</a></p>
 <p id="section-3-4">The client MUST add an "accept-transform" parameter whose value is an
-<code>sf-string</code> containing the supported packet transforms (<a href="#transforms" class="auto internal xref">Section 5.3</a>)
+<code>sf-string</code> containing the supported packet transforms (<a href="#transforms" class="auto internal xref">Section 6.3</a>)
 in order of descending preference, separated by commas. If the proxy receives a
 "Proxy-QUIC-Forwarding" header without the "accept-transform" parameters, it
 MUST ignore the header and respond as if the client had not sent the
@@ -1897,42 +1912,63 @@ any of the transforms offered by the client, it MUST omit this parameter and
 set the header field value to "?0", or omit the header entirely.<a href="#section-3-6" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="cid-capsules">
+<div id="port-sharing-header">
 <section id="section-4">
-      <h2 id="name-connection-id-capsules">
-<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-connection-id-capsules" class="section-name selfRef">Connection ID Capsules</a>
+      <h2 id="name-proxy-quic-port-sharing-hea">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-proxy-quic-port-sharing-hea" class="section-name selfRef">Proxy-QUIC-Port-Sharing Header</a>
       </h2>
-<p id="section-4-1">Connection ID awareness relies on using capsules <span>[<a href="#HTTP-CAPSULES" class="cite xref">HTTP-CAPSULES</a>]</span> to
+<p id="section-4-1">A client may include the "Proxy-QUIC-Port-Sharing" header to indicate whether
+or not the proxy is permitted to share ports between this QUIC connection and other
+proxied QUIC connections.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-2">"Proxy-QUIC-Port-Sharing" is an Item Structured Header <span>[<a href="#RFC8941" class="cite xref">RFC8941</a>]</span>. Its value
+MUST be a Boolean.<a href="#section-4-2" class="pilcrow">¶</a></p>
+<p id="section-4-3">Clients SHOULD send this with a value of "?1" unless the client wishes to prohibit
+this behavior. Permitting the proxy to share ports may allow the proxy to conserve
+resources and support more clients.<a href="#section-4-3" class="pilcrow">¶</a></p>
+<p id="section-4-4">A proxy that does not support port sharing, SHOULD send "Proxy-QUIC-Port-Sharing"
+with a value of "?0". Doing so allows clients to stop sending capsules for this
+extension if forwarding mode is also not supported. Clients who send "?1", but do
+not receive any "Proxy-QUIC-Port-Sharing" header in response must assume that port
+sharing may be in effect and MUST continue register connection IDs in order for
+the proxied connection to continue to work.<a href="#section-4-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="cid-capsules">
+<section id="section-5">
+      <h2 id="name-connection-id-capsules">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-connection-id-capsules" class="section-name selfRef">Connection ID Capsules</a>
+      </h2>
+<p id="section-5-1">Connection ID awareness relies on using capsules <span>[<a href="#HTTP-CAPSULES" class="cite xref">HTTP-CAPSULES</a>]</span> to
 signal addition and removal of Connection IDs. Clients send capsules
 to let proxies know when Connection IDs on the client-to-target
 QUIC connection are changing. Proxies send capsules to acknowledge or
 reject these Connection IDs, and in forwarded mode to let clients know
-about Virtual Connection IDs to use on the client-to-proxy link.<a href="#section-4-1" class="pilcrow">¶</a></p>
-<p id="section-4-2">Note that these capsules do not register contexts. QUIC packets are encoded
+about Virtual Connection IDs to use on the client-to-proxy link.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-2">Note that these capsules do not register contexts. QUIC packets are encoded
 using HTTP Datagrams with the context ID set to zero as defined in
-<span>[<a href="#CONNECT-UDP" class="cite xref">CONNECT-UDP</a>]</span>.<a href="#section-4-2" class="pilcrow">¶</a></p>
-<p id="section-4-3">The REGISTER_CLIENT_CID (<a href="#capsule-reg-client" class="auto internal xref">Section 4.1</a>) and REGISTER_TARGET_CID
-(<a href="#capsule-reg-target" class="auto internal xref">Section 4.2</a>) capsule types allow a client to inform
+<span>[<a href="#CONNECT-UDP" class="cite xref">CONNECT-UDP</a>]</span>.<a href="#section-5-2" class="pilcrow">¶</a></p>
+<p id="section-5-3">The REGISTER_CLIENT_CID (<a href="#capsule-reg-client" class="auto internal xref">Section 5.1</a>) and REGISTER_TARGET_CID
+(<a href="#capsule-reg-target" class="auto internal xref">Section 5.2</a>) capsule types allow a client to inform
 the proxy about a new client CID or a new target CID,
 respectively. These capsule types MUST only be sent by a client. These capsule
 types share a sequence number space which allows the proxy to limit the
 number of active registrations. The first registration (of either client CID or target CID)
 has sequence number 0, and subsequent registrations increment the sequence number
-by 1.<a href="#section-4-3" class="pilcrow">¶</a></p>
-<p id="section-4-4">The ACK_CLIENT_CID (<a href="#capsule-ack-client" class="auto internal xref">Section 4.3</a>) and ACK_TARGET_CID
-(<a href="#capsule-ack-target" class="auto internal xref">Section 4.4</a>) capsule types are sent by the proxy to the client
+by 1.<a href="#section-5-3" class="pilcrow">¶</a></p>
+<p id="section-5-4">The ACK_CLIENT_CID (<a href="#capsule-ack-client" class="auto internal xref">Section 5.3</a>) and ACK_TARGET_CID
+(<a href="#capsule-ack-target" class="auto internal xref">Section 5.4</a>) capsule types are sent by the proxy to the client
 to indicate that a mapping was successfully created for a registered
 connection ID as well as optionally provide the Virtual Connection IDs that can be
-used in forwarded mode. These capsule types MUST only be sent by a proxy.<a href="#section-4-4" class="pilcrow">¶</a></p>
-<p id="section-4-5">The ACK_CLIENT_VCID (<a href="#capsule-ack-virtual" class="auto internal xref">Section 4.5</a>) capsule type MUST only be sent
+used in forwarded mode. These capsule types MUST only be sent by a proxy.<a href="#section-5-4" class="pilcrow">¶</a></p>
+<p id="section-5-5">The ACK_CLIENT_VCID (<a href="#capsule-ack-virtual" class="auto internal xref">Section 5.5</a>) capsule type MUST only be sent
 by the client and only when forwarded mode is enabled. It is sent by the client
 to the proxy in response to an ACK_CLIENT_CID capsule to indicate that the client
 is ready to receive forwarded mode packets with the specified virtual connection ID.
 The proxy MUST NOT send forwarded mode packets to the client prior to receiving this
 acknowledgement. This capsule also contains a Stateless Reset Token the client
 may respond with when receiving forwarded mode packets with the specified
-virtual connection ID.<a href="#section-4-5" class="pilcrow">¶</a></p>
-<p id="section-4-6">The CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsule types (<a href="#capsule-close" class="auto internal xref">Section 4.6</a>)
+virtual connection ID.<a href="#section-5-5" class="pilcrow">¶</a></p>
+<p id="section-5-6">The CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsule types (<a href="#capsule-close" class="auto internal xref">Section 5.6</a>)
 allow either a client or a proxy to remove a mapping for a connection ID.
 These capsule types MAY be sent by either a client or the proxy. If a proxy sends a
 CLOSE_CLIENT_CID without having sent an ACK_CLIENT_CID, or if a proxy
@@ -1940,26 +1976,26 @@ sends a CLOSE_TARGET_CID without having sent an ACK_TARGET_CID,
 it is rejecting a Connection ID registration. Similarly, if a client sends
 CLOSE_CLIENT_CID without having sent an ACK_CLIENT_VCID capsule, the client is
 either rejecting the proxy-chosen client VCID or no longer
-needs the connection ID registered.<a href="#section-4-6" class="pilcrow">¶</a></p>
-<p id="section-4-7">The MAX_CONNECTION_IDS capsule type <a href="#capsule-max-cids" class="auto internal xref">Section 4.7</a> MUST only be sent by the
+needs the connection ID registered.<a href="#section-5-6" class="pilcrow">¶</a></p>
+<p id="section-5-7">The MAX_CONNECTION_IDS capsule type <a href="#capsule-max-cids" class="auto internal xref">Section 5.7</a> MUST only be sent by the
 proxy. It indicates to the client the maximum permitted sequence number for
 connection ID registrations. This allows the proxy to limit the number of active
 registrations. The initial maximum is 1, allowing the client to send 2 registrations,
 one with sequence number 0 and another with sequence number 1. A proxy MUST NOT
 send a MAX_CONNECTION_IDS capsule with a value less than 1. Clients receiving a
 MAX_CONNECTION_IDS capsule with a value less than 1 MUST reset the stream with
-H3_DATAGRAM_ERROR error code.<a href="#section-4-7" class="pilcrow">¶</a></p>
+H3_DATAGRAM_ERROR error code.<a href="#section-5-7" class="pilcrow">¶</a></p>
 <div id="capsule-reg-client">
-<section id="section-4.1">
+<section id="section-5.1">
         <h3 id="name-register_client_cid">
-<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-register_client_cid" class="section-name selfRef">REGISTER_CLIENT_CID</a>
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-register_client_cid" class="section-name selfRef">REGISTER_CLIENT_CID</a>
         </h3>
-<p id="section-4.1-1">The REGISTER_CLIENT_CID capsule is sent by the client and contains a single
+<p id="section-5.1-1">The REGISTER_CLIENT_CID capsule is sent by the client and contains a single
 connection ID that is the client-provided connection ID on the client-to-target QUIC
-connection.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+connection.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
 <span id="name-register-cid-capsule-format"></span><div id="fig-capsule-register-client-cid">
 <figure id="figure-4">
-          <div class="alignLeft art-text artwork" id="section-4.1-2.1">
+          <div class="alignLeft art-text artwork" id="section-5.1-2.1">
 <pre>
 Register CID Capsule {
   Type (i) = see {{iana}} for the value of the capsule type
@@ -1972,29 +2008,29 @@ Register CID Capsule {
 <a href="#name-register-cid-capsule-format" class="selfRef">Register CID Capsule Format</a>
           </figcaption></figure>
 </div>
-<span class="break"></span><dl class="dlParallel" id="section-4.1-3">
-          <dt id="section-4.1-3.1">Connection ID:</dt>
-          <dd style="margin-left: 1.5em" id="section-4.1-3.2">
-            <p id="section-4.1-3.2.1">A connection ID being registered, which is between 0 and 255 bytes in
+<span class="break"></span><dl class="dlParallel" id="section-5.1-3">
+          <dt id="section-5.1-3.1">Connection ID:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.1-3.2">
+            <p id="section-5.1-3.2.1">A connection ID being registered, which is between 0 and 255 bytes in
 length. The length of the connection ID is implied by the length of the
 capsule. Note that in QUICv1, the length of the Connection ID is limited
-to 20 bytes, but QUIC invariants allow up to 255 bytes.<a href="#section-4.1-3.2.1" class="pilcrow">¶</a></p>
+to 20 bytes, but QUIC invariants allow up to 255 bytes.<a href="#section-5.1-3.2.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
 </section>
 </div>
 <div id="capsule-reg-target">
-<section id="section-4.2">
+<section id="section-5.2">
         <h3 id="name-register_target_cid">
-<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-register_target_cid" class="section-name selfRef">REGISTER_TARGET_CID</a>
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-register_target_cid" class="section-name selfRef">REGISTER_TARGET_CID</a>
         </h3>
-<p id="section-4.2-1">The REGISTER_TARGET_CID capsule is sent by the client and includes the
+<p id="section-5.2-1">The REGISTER_TARGET_CID capsule is sent by the client and includes the
 target-provided connection ID on the client-to-target QUIC connection, and
-the corresponding Stateless Reset Token.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+the corresponding Stateless Reset Token.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 <span id="name-register-target-cid-capsule"></span><div id="fig-capsule-register-target-cid">
 <figure id="figure-5">
-          <div class="alignLeft art-text artwork" id="section-4.2-2.1">
+          <div class="alignLeft art-text artwork" id="section-5.2-2.1">
 <pre>
 Register Target CID Capsule {
   Type (i) = see {{iana}} for the value of the capsule type
@@ -2010,45 +2046,45 @@ Register Target CID Capsule {
 <a href="#name-register-target-cid-capsule" class="selfRef">Register Target CID Capsule Format</a>
           </figcaption></figure>
 </div>
-<span class="break"></span><dl class="dlParallel" id="section-4.2-3">
-          <dt id="section-4.2-3.1">Connection ID Length</dt>
-          <dd style="margin-left: 1.5em" id="section-4.2-3.2">
-            <p id="section-4.2-3.2.1">The length of the connection ID being registered, which is between 0 and
+<span class="break"></span><dl class="dlParallel" id="section-5.2-3">
+          <dt id="section-5.2-3.1">Connection ID Length</dt>
+          <dd style="margin-left: 1.5em" id="section-5.2-3.2">
+            <p id="section-5.2-3.2.1">The length of the connection ID being registered, which is between 0 and
 255. Note that in QUICv1, the length of the Connection ID is limited to 20
-bytes, but QUIC invariants allow up to 255 bytes.<a href="#section-4.2-3.2.1" class="pilcrow">¶</a></p>
+bytes, but QUIC invariants allow up to 255 bytes.<a href="#section-5.2-3.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-4.2-3.3">Connection ID</dt>
-          <dd style="margin-left: 1.5em" id="section-4.2-3.4">
-            <p id="section-4.2-3.4.1">A connection ID being registered whose length is equal to Connection ID
-Length. This is the real target CID.<a href="#section-4.2-3.4.1" class="pilcrow">¶</a></p>
+<dt id="section-5.2-3.3">Connection ID</dt>
+          <dd style="margin-left: 1.5em" id="section-5.2-3.4">
+            <p id="section-5.2-3.4.1">A connection ID being registered whose length is equal to Connection ID
+Length. This is the real target CID.<a href="#section-5.2-3.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-4.2-3.5">Stateless Reset Token Length</dt>
-          <dd style="margin-left: 1.5em" id="section-4.2-3.6">
-            <p id="section-4.2-3.6.1">The length of the target-provided Stateless Reset Token.<a href="#section-4.2-3.6.1" class="pilcrow">¶</a></p>
+<dt id="section-5.2-3.5">Stateless Reset Token Length</dt>
+          <dd style="margin-left: 1.5em" id="section-5.2-3.6">
+            <p id="section-5.2-3.6.1">The length of the target-provided Stateless Reset Token.<a href="#section-5.2-3.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-4.2-3.7">Stateless Reset Token</dt>
-          <dd style="margin-left: 1.5em" id="section-4.2-3.8">
-            <p id="section-4.2-3.8.1">The target-provided Stateless Reset token allowing the proxy to correctly
-recognize Stateless Reset packets to be tunnelled to the client.<a href="#section-4.2-3.8.1" class="pilcrow">¶</a></p>
+<dt id="section-5.2-3.7">Stateless Reset Token</dt>
+          <dd style="margin-left: 1.5em" id="section-5.2-3.8">
+            <p id="section-5.2-3.8.1">The target-provided Stateless Reset token allowing the proxy to correctly
+recognize Stateless Reset packets to be tunnelled to the client.<a href="#section-5.2-3.8.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
 </section>
 </div>
 <div id="capsule-ack-client">
-<section id="section-4.3">
+<section id="section-5.3">
         <h3 id="name-ack_client_cid">
-<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-ack_client_cid" class="section-name selfRef">ACK_CLIENT_CID</a>
+<a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-ack_client_cid" class="section-name selfRef">ACK_CLIENT_CID</a>
         </h3>
-<p id="section-4.3-1">The ACK_CLIENT_CID capsule is sent by the proxy in
+<p id="section-5.3-1">The ACK_CLIENT_CID capsule is sent by the proxy in
 response to a REGISTER_CLIENT_CID capsule. It optionally assigns a Virtual
-Connection ID when forwarded mode is supported.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+Connection ID when forwarded mode is supported.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
 <span id="name-acknowledge-client-cid-caps"></span><div id="fig-capsule-ack-client-cid">
 <figure id="figure-6">
-          <div class="alignLeft art-text artwork" id="section-4.3-2.1">
+          <div class="alignLeft art-text artwork" id="section-5.3-2.1">
 <pre>
 Acknowledge Client CID Capsule {
   Type (i) = see {{iana}} for the value of the capsule type
@@ -2064,52 +2100,52 @@ Acknowledge Client CID Capsule {
 <a href="#name-acknowledge-client-cid-caps" class="selfRef">Acknowledge Client CID Capsule Format</a>
           </figcaption></figure>
 </div>
-<span class="break"></span><dl class="dlParallel" id="section-4.3-3">
-          <dt id="section-4.3-3.1">Connection ID Length</dt>
-          <dd style="margin-left: 1.5em" id="section-4.3-3.2">
-            <p id="section-4.3-3.2.1">The length of the connection ID being acknowledged, which
+<span class="break"></span><dl class="dlParallel" id="section-5.3-3">
+          <dt id="section-5.3-3.1">Connection ID Length</dt>
+          <dd style="margin-left: 1.5em" id="section-5.3-3.2">
+            <p id="section-5.3-3.2.1">The length of the connection ID being acknowledged, which
 is between 0 and 255. Note that in QUICv1, the length of the Connection ID
-is limited to 20 bytes, but QUIC invariants allow up to 255 bytes.<a href="#section-4.3-3.2.1" class="pilcrow">¶</a></p>
+is limited to 20 bytes, but QUIC invariants allow up to 255 bytes.<a href="#section-5.3-3.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-4.3-3.3">Connection ID</dt>
-          <dd style="margin-left: 1.5em" id="section-4.3-3.4">
-            <p id="section-4.3-3.4.1">A connection ID being acknowledged whose length is equal to
-Connection ID Length. This is the real Cilent Connection ID.<a href="#section-4.3-3.4.1" class="pilcrow">¶</a></p>
+<dt id="section-5.3-3.3">Connection ID</dt>
+          <dd style="margin-left: 1.5em" id="section-5.3-3.4">
+            <p id="section-5.3-3.4.1">A connection ID being acknowledged whose length is equal to
+Connection ID Length. This is the real Cilent Connection ID.<a href="#section-5.3-3.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-4.3-3.5">Virtual Connection ID Length</dt>
-          <dd style="margin-left: 1.5em" id="section-4.3-3.6">
-            <p id="section-4.3-3.6.1">The length of the client VCID being provided. This MUST be a
+<dt id="section-5.3-3.5">Virtual Connection ID Length</dt>
+          <dd style="margin-left: 1.5em" id="section-5.3-3.6">
+            <p id="section-5.3-3.6.1">The length of the client VCID being provided. This MUST be a
 valid connection ID length for the QUIC version used in the client-to-proxy QUIC
 connection. When forwarded mode is not negotiated, the length MUST be zero.
 The Virtual Connection ID Length and Connection ID Length SHOULD be equal
 when possible to avoid the need to resize packets during replacement. The
 client VCID Length MUST be at least as large as the
-Connection ID to reduce the likelihood of connection ID conflicts.<a href="#section-4.3-3.6.1" class="pilcrow">¶</a></p>
+Connection ID to reduce the likelihood of connection ID conflicts.<a href="#section-5.3-3.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-4.3-3.7">Virtual Connection ID</dt>
-          <dd style="margin-left: 1.5em" id="section-4.3-3.8">
-            <p id="section-4.3-3.8.1">The proxy-chosen connection ID that the proxy MUST use when sending in
+<dt id="section-5.3-3.7">Virtual Connection ID</dt>
+          <dd style="margin-left: 1.5em" id="section-5.3-3.8">
+            <p id="section-5.3-3.8.1">The proxy-chosen connection ID that the proxy MUST use when sending in
 forwarded mode. The proxy rewrites forwarded mode packets to contain the
-correct client VCID prior to sending them to the client.<a href="#section-4.3-3.8.1" class="pilcrow">¶</a></p>
+correct client VCID prior to sending them to the client.<a href="#section-5.3-3.8.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
 </section>
 </div>
 <div id="capsule-ack-target">
-<section id="section-4.4">
+<section id="section-5.4">
         <h3 id="name-ack_target_cid">
-<a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-ack_target_cid" class="section-name selfRef">ACK_TARGET_CID</a>
+<a href="#section-5.4" class="section-number selfRef">5.4. </a><a href="#name-ack_target_cid" class="section-name selfRef">ACK_TARGET_CID</a>
         </h3>
-<p id="section-4.4-1">The ACK_TARGET_CID capsule is sent by the proxy in
+<p id="section-5.4-1">The ACK_TARGET_CID capsule is sent by the proxy in
 response to a REGISTER_TARGET_CID capsule. It optionally assigns a Virtual
-Connection ID and Stateless Reset Token if forwarded mode is enabled.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
+Connection ID and Stateless Reset Token if forwarded mode is enabled.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
 <span id="name-acknowledge-target-cid-caps"></span><div id="fig-capsule-ack-target-cid">
 <figure id="figure-7">
-          <div class="alignLeft art-text artwork" id="section-4.4-2.1">
+          <div class="alignLeft art-text artwork" id="section-5.4-2.1">
 <pre>
 Acknowledge Target CID Capsule {
   Type (i) = see {{iana}} for the value of the capsule type
@@ -2127,64 +2163,64 @@ Acknowledge Target CID Capsule {
 <a href="#name-acknowledge-target-cid-caps" class="selfRef">Acknowledge Target CID Capsule Format</a>
           </figcaption></figure>
 </div>
-<span class="break"></span><dl class="dlParallel" id="section-4.4-3">
-          <dt id="section-4.4-3.1">Connection ID Length</dt>
-          <dd style="margin-left: 1.5em" id="section-4.4-3.2">
-            <p id="section-4.4-3.2.1">The length of the connection ID being acknowledged, which
+<span class="break"></span><dl class="dlParallel" id="section-5.4-3">
+          <dt id="section-5.4-3.1">Connection ID Length</dt>
+          <dd style="margin-left: 1.5em" id="section-5.4-3.2">
+            <p id="section-5.4-3.2.1">The length of the connection ID being acknowledged, which
 is between 0 and 255. Note that in QUICv1, the length of the Connection ID
-is limited to 20 bytes, but QUIC invariants allow up to 255 bytes.<a href="#section-4.4-3.2.1" class="pilcrow">¶</a></p>
+is limited to 20 bytes, but QUIC invariants allow up to 255 bytes.<a href="#section-5.4-3.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-4.4-3.3">Connection ID</dt>
-          <dd style="margin-left: 1.5em" id="section-4.4-3.4">
-            <p id="section-4.4-3.4.1">A connection ID being acknowledged whose length is equal to
-Connection ID Length. This is the real target CID.<a href="#section-4.4-3.4.1" class="pilcrow">¶</a></p>
+<dt id="section-5.4-3.3">Connection ID</dt>
+          <dd style="margin-left: 1.5em" id="section-5.4-3.4">
+            <p id="section-5.4-3.4.1">A connection ID being acknowledged whose length is equal to
+Connection ID Length. This is the real target CID.<a href="#section-5.4-3.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-4.4-3.5">Virtual Connection ID Length</dt>
-          <dd style="margin-left: 1.5em" id="section-4.4-3.6">
-            <p id="section-4.4-3.6.1">The length of the target VCID being provided. This MUST be a
+<dt id="section-5.4-3.5">Virtual Connection ID Length</dt>
+          <dd style="margin-left: 1.5em" id="section-5.4-3.6">
+            <p id="section-5.4-3.6.1">The length of the target VCID being provided. This MUST be a
 valid connection ID length for the QUIC version used in the client-to-proxy QUIC
 connection. When forwarded mode is not negotiated, the length MUST be zero.
 The Virtual Connection ID Length and Connection ID Length SHOULD be equal
-when possible to avoid the need to resize packets during replacement.<a href="#section-4.4-3.6.1" class="pilcrow">¶</a></p>
+when possible to avoid the need to resize packets during replacement.<a href="#section-5.4-3.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-4.4-3.7">Virtual Connection ID</dt>
-          <dd style="margin-left: 1.5em" id="section-4.4-3.8">
-            <p id="section-4.4-3.8.1">The proxy-chosen connection ID that the client MUST use when sending in
+<dt id="section-5.4-3.7">Virtual Connection ID</dt>
+          <dd style="margin-left: 1.5em" id="section-5.4-3.8">
+            <p id="section-5.4-3.8.1">The proxy-chosen connection ID that the client MUST use when sending in
 forwarded mode. The proxy rewrites forwarded mode packets to contain the
-correct target CID prior to sending them.<a href="#section-4.4-3.8.1" class="pilcrow">¶</a></p>
+correct target CID prior to sending them.<a href="#section-5.4-3.8.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-4.4-3.9">Stateless Reset Token Length</dt>
-          <dd style="margin-left: 1.5em" id="section-4.4-3.10">
-            <p id="section-4.4-3.10.1">The length of the Stateless Reset Token sent by the proxy in response to
+<dt id="section-5.4-3.9">Stateless Reset Token Length</dt>
+          <dd style="margin-left: 1.5em" id="section-5.4-3.10">
+            <p id="section-5.4-3.10.1">The length of the Stateless Reset Token sent by the proxy in response to
 forwarded mode packets in order to reset the client-to-target QUIC connection.
 When forwarded mode is not negotiated, the length MUST be zero. Proxies choosing
 not to support stateless resets MAY set the length to zero. Clients receiving a
-zero-length stateless reset token MUST ignore it.<a href="#section-4.4-3.10.1" class="pilcrow">¶</a></p>
+zero-length stateless reset token MUST ignore it.<a href="#section-5.4-3.10.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-4.4-3.11">Stateless Reset Token</dt>
-          <dd style="margin-left: 1.5em" id="section-4.4-3.12">
-            <p id="section-4.4-3.12.1">A Stateless Reset Token allowing reset of the client-to-target connection in
-response to client-to-target forwarded mode packets.<a href="#section-4.4-3.12.1" class="pilcrow">¶</a></p>
+<dt id="section-5.4-3.11">Stateless Reset Token</dt>
+          <dd style="margin-left: 1.5em" id="section-5.4-3.12">
+            <p id="section-5.4-3.12.1">A Stateless Reset Token allowing reset of the client-to-target connection in
+response to client-to-target forwarded mode packets.<a href="#section-5.4-3.12.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
 </section>
 </div>
 <div id="capsule-ack-virtual">
-<section id="section-4.5">
+<section id="section-5.5">
         <h3 id="name-ack_client_vcid">
-<a href="#section-4.5" class="section-number selfRef">4.5. </a><a href="#name-ack_client_vcid" class="section-name selfRef">ACK_CLIENT_VCID</a>
+<a href="#section-5.5" class="section-number selfRef">5.5. </a><a href="#name-ack_client_vcid" class="section-name selfRef">ACK_CLIENT_VCID</a>
         </h3>
-<p id="section-4.5-1">The ACK_CLIENT_VCID capsule type is sent by the client in
-response to an ACK_TARGET_CID capsule that contains a virtual connection ID.<a href="#section-4.5-1" class="pilcrow">¶</a></p>
+<p id="section-5.5-1">The ACK_CLIENT_VCID capsule type is sent by the client in
+response to an ACK_TARGET_CID capsule that contains a virtual connection ID.<a href="#section-5.5-1" class="pilcrow">¶</a></p>
 <span id="name-acknowledge-client-vcid-cap"></span><div id="fig-capsule-ack-virtual-client-cid">
 <figure id="figure-8">
-          <div class="alignLeft art-text artwork" id="section-4.5-2.1">
+          <div class="alignLeft art-text artwork" id="section-5.5-2.1">
 <pre>
 Acknowledge Client VCID Capsule {
   Type (i) = see {{iana}} for the value of the capsule type
@@ -2202,58 +2238,58 @@ Acknowledge Client VCID Capsule {
 <a href="#name-acknowledge-client-vcid-cap" class="selfRef">Acknowledge Client VCID Capsule Format</a>
           </figcaption></figure>
 </div>
-<span class="break"></span><dl class="dlParallel" id="section-4.5-3">
-          <dt id="section-4.5-3.1">Connection ID Length</dt>
-          <dd style="margin-left: 1.5em" id="section-4.5-3.2">
-            <p id="section-4.5-3.2.1">The length of the connection ID being acknowledged, which
+<span class="break"></span><dl class="dlParallel" id="section-5.5-3">
+          <dt id="section-5.5-3.1">Connection ID Length</dt>
+          <dd style="margin-left: 1.5em" id="section-5.5-3.2">
+            <p id="section-5.5-3.2.1">The length of the connection ID being acknowledged, which
 is between 0 and 255. Note that in QUICv1, the length of the Connection ID
-is limited to 20 bytes, but QUIC invariants allow up to 255 bytes.<a href="#section-4.5-3.2.1" class="pilcrow">¶</a></p>
+is limited to 20 bytes, but QUIC invariants allow up to 255 bytes.<a href="#section-5.5-3.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-4.5-3.3">Connection ID</dt>
-          <dd style="margin-left: 1.5em" id="section-4.5-3.4">
-            <p id="section-4.5-3.4.1">A connection ID being acknowledged whose length is equal to
-Connection ID Length. This is the real Cilent Connection ID.<a href="#section-4.5-3.4.1" class="pilcrow">¶</a></p>
+<dt id="section-5.5-3.3">Connection ID</dt>
+          <dd style="margin-left: 1.5em" id="section-5.5-3.4">
+            <p id="section-5.5-3.4.1">A connection ID being acknowledged whose length is equal to
+Connection ID Length. This is the real Cilent Connection ID.<a href="#section-5.5-3.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-4.5-3.5">Virtual Connection ID Length</dt>
-          <dd style="margin-left: 1.5em" id="section-4.5-3.6">
-            <p id="section-4.5-3.6.1">The length of the client VCID being acknowledged.<a href="#section-4.5-3.6.1" class="pilcrow">¶</a></p>
+<dt id="section-5.5-3.5">Virtual Connection ID Length</dt>
+          <dd style="margin-left: 1.5em" id="section-5.5-3.6">
+            <p id="section-5.5-3.6.1">The length of the client VCID being acknowledged.<a href="#section-5.5-3.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-4.5-3.7">Virtual Connection ID</dt>
-          <dd style="margin-left: 1.5em" id="section-4.5-3.8">
-            <p id="section-4.5-3.8.1">The proxy-chosen virtual connection ID being acknowledged whose length is
-equal to Virtual Connection ID Length.<a href="#section-4.5-3.8.1" class="pilcrow">¶</a></p>
+<dt id="section-5.5-3.7">Virtual Connection ID</dt>
+          <dd style="margin-left: 1.5em" id="section-5.5-3.8">
+            <p id="section-5.5-3.8.1">The proxy-chosen virtual connection ID being acknowledged whose length is
+equal to Virtual Connection ID Length.<a href="#section-5.5-3.8.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-4.5-3.9">Stateless Reset Token Length</dt>
-          <dd style="margin-left: 1.5em" id="section-4.5-3.10">
-            <p id="section-4.5-3.10.1">The length of the Stateless Reset Token that may be sent by the client in
+<dt id="section-5.5-3.9">Stateless Reset Token Length</dt>
+          <dd style="margin-left: 1.5em" id="section-5.5-3.10">
+            <p id="section-5.5-3.10.1">The length of the Stateless Reset Token that may be sent by the client in
 response to forwarded mode packets to reset the client-to-target connection.
 Clients choosing not to support stateless resets MAY set the length to zero.
-Proxies receiving a zero-length stateless reset token MUST ignore it.<a href="#section-4.5-3.10.1" class="pilcrow">¶</a></p>
+Proxies receiving a zero-length stateless reset token MUST ignore it.<a href="#section-5.5-3.10.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-4.5-3.11">Stateless Reset Token</dt>
-          <dd style="margin-left: 1.5em" id="section-4.5-3.12">
-            <p id="section-4.5-3.12.1">A Stateless Reset Token allowing reset of the target-to-client forwarding rule
-in response to target-to-client forwarded mode packets.<a href="#section-4.5-3.12.1" class="pilcrow">¶</a></p>
+<dt id="section-5.5-3.11">Stateless Reset Token</dt>
+          <dd style="margin-left: 1.5em" id="section-5.5-3.12">
+            <p id="section-5.5-3.12.1">A Stateless Reset Token allowing reset of the target-to-client forwarding rule
+in response to target-to-client forwarded mode packets.<a href="#section-5.5-3.12.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
 </section>
 </div>
 <div id="capsule-close">
-<section id="section-4.6">
+<section id="section-5.6">
         <h3 id="name-close_client_cid-and-close_">
-<a href="#section-4.6" class="section-number selfRef">4.6. </a><a href="#name-close_client_cid-and-close_" class="section-name selfRef">CLOSE_CLIENT_CID and CLOSE_TARGET_CID</a>
+<a href="#section-5.6" class="section-number selfRef">5.6. </a><a href="#name-close_client_cid-and-close_" class="section-name selfRef">CLOSE_CLIENT_CID and CLOSE_TARGET_CID</a>
         </h3>
-<p id="section-4.6-1">CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsule types include a single connection ID to close. They
-can be sent by either clients or proxies.<a href="#section-4.6-1" class="pilcrow">¶</a></p>
+<p id="section-5.6-1">CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsule types include a single connection ID to close. They
+can be sent by either clients or proxies.<a href="#section-5.6-1" class="pilcrow">¶</a></p>
 <span id="name-close-cid-capsule-format"></span><div id="fig-capsule-close-cid">
 <figure id="figure-9">
-          <div class="alignLeft art-text artwork" id="section-4.6-2.1">
+          <div class="alignLeft art-text artwork" id="section-5.6-2.1">
 <pre>
 Close CID Capsule {
   Type (i) = see {{iana}} for the values of the capsule types
@@ -2266,28 +2302,28 @@ Close CID Capsule {
 <a href="#name-close-cid-capsule-format" class="selfRef">Close CID Capsule Format</a>
           </figcaption></figure>
 </div>
-<span class="break"></span><dl class="dlParallel" id="section-4.6-3">
-          <dt id="section-4.6-3.1">Connection ID:</dt>
-          <dd style="margin-left: 1.5em" id="section-4.6-3.2">
-            <p id="section-4.6-3.2.1">A connection ID being closed, which is between 0 and 255 bytes in
+<span class="break"></span><dl class="dlParallel" id="section-5.6-3">
+          <dt id="section-5.6-3.1">Connection ID:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.6-3.2">
+            <p id="section-5.6-3.2.1">A connection ID being closed, which is between 0 and 255 bytes in
 length. The length of the connection ID is implied by the length of the
 capsule. Note that in QUICv1, the length of the Connection ID is limited
-to 20 bytes, but QUIC invariants allow up to 255 bytes.<a href="#section-4.6-3.2.1" class="pilcrow">¶</a></p>
+to 20 bytes, but QUIC invariants allow up to 255 bytes.<a href="#section-5.6-3.2.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
 </section>
 </div>
 <div id="capsule-max-cids">
-<section id="section-4.7">
+<section id="section-5.7">
         <h3 id="name-max_connection_ids">
-<a href="#section-4.7" class="section-number selfRef">4.7. </a><a href="#name-max_connection_ids" class="section-name selfRef">MAX_CONNECTION_IDS</a>
+<a href="#section-5.7" class="section-number selfRef">5.7. </a><a href="#name-max_connection_ids" class="section-name selfRef">MAX_CONNECTION_IDS</a>
         </h3>
-<p id="section-4.7-1">The MAX_CONNECTION_IDS capsule is sent by the proxy
-to permit additional connection ID registrations.<a href="#section-4.7-1" class="pilcrow">¶</a></p>
+<p id="section-5.7-1">The MAX_CONNECTION_IDS capsule is sent by the proxy
+to permit additional connection ID registrations.<a href="#section-5.7-1" class="pilcrow">¶</a></p>
 <span id="name-maximum-connection-ids-caps"></span><div id="fig-capsule-max-connection-ids">
 <figure id="figure-10">
-          <div class="alignLeft art-text artwork" id="section-4.7-2.1">
+          <div class="alignLeft art-text artwork" id="section-5.7-2.1">
 <pre>
 Maximum Connection IDs Capsule {
   Type (i) = see {{iana}} for the value of the capsule type
@@ -2300,48 +2336,48 @@ Maximum Connection IDs Capsule {
 <a href="#name-maximum-connection-ids-caps" class="selfRef">Maximum Connection IDs Capsule Format</a>
           </figcaption></figure>
 </div>
-<span class="break"></span><dl class="dlParallel" id="section-4.7-3">
-          <dt id="section-4.7-3.1">Maximum Sequence Number</dt>
-          <dd style="margin-left: 1.5em" id="section-4.7-3.2">
-            <p id="section-4.7-3.2.1">The maximum permitted sequence number for connection ID registrations. This MUST
-NOT be less than 1.<a href="#section-4.7-3.2.1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-5.7-3">
+          <dt id="section-5.7-3.1">Maximum Sequence Number</dt>
+          <dd style="margin-left: 1.5em" id="section-5.7-3.2">
+            <p id="section-5.7-3.2.1">The maximum permitted sequence number for connection ID registrations. This MUST
+NOT be less than 1.<a href="#section-5.7-3.2.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
 </section>
 </div>
 <div id="conflicts">
-<section id="section-4.8">
+<section id="section-5.8">
         <h3 id="name-detecting-conflicts">
-<a href="#section-4.8" class="section-number selfRef">4.8. </a><a href="#name-detecting-conflicts" class="section-name selfRef">Detecting Conflicts</a>
+<a href="#section-5.8" class="section-number selfRef">5.8. </a><a href="#name-detecting-conflicts" class="section-name selfRef">Detecting Conflicts</a>
         </h3>
-<p id="section-4.8-1">In order to be able to route packets correctly in both tunnelled and forwarded
+<p id="section-5.8-1">In order to be able to route packets correctly in both tunnelled and forwarded
 mode, proxies check for conflicts before creating a new CID mapping. If a conflict
 is detected, the proxy will reject the client's request using a CLOSE_CLIENT_CID
-or CLOSE_TARGET_CID capsule.<a href="#section-4.8-1" class="pilcrow">¶</a></p>
-<p id="section-4.8-2">Two 4-tuples conflict if and only if all members of the 4-tuple (local IP
-address, local UDP port, remote IP address, and remote UDP port) are identical.<a href="#section-4.8-2" class="pilcrow">¶</a></p>
-<p id="section-4.8-3">Two Connection IDs conflict if and only if one Connection ID is equal to or a
+or CLOSE_TARGET_CID capsule.<a href="#section-5.8-1" class="pilcrow">¶</a></p>
+<p id="section-5.8-2">Two 4-tuples conflict if and only if all members of the 4-tuple (local IP
+address, local UDP port, remote IP address, and remote UDP port) are identical.<a href="#section-5.8-2" class="pilcrow">¶</a></p>
+<p id="section-5.8-3">Two Connection IDs conflict if and only if one Connection ID is equal to or a
 prefix of another. For example, a zero-length Connection ID conflicts with all
 connection IDs. This definition of a conflict originates from the fact that
 QUIC short headers do not carry the length of the Destination Connection ID
 field, and therefore if two short headers with different Destination Connection
 IDs are received on a shared 4-tuple, one being a prefix of the other prevents
-the receiver from identifying which mapping this corresponds to.<a href="#section-4.8-3" class="pilcrow">¶</a></p>
-<p id="section-4.8-4">The proxy treats two mappings as being in conflict when a conflict is detected
-for all elements on the left side of the mapping diagrams above.<a href="#section-4.8-4" class="pilcrow">¶</a></p>
-<p id="section-4.8-5">Since very short Connection IDs are more likely to lead to conflicts,
+the receiver from identifying which mapping this corresponds to.<a href="#section-5.8-3" class="pilcrow">¶</a></p>
+<p id="section-5.8-4">The proxy treats two mappings as being in conflict when a conflict is detected
+for all elements on the left side of the mapping diagrams above.<a href="#section-5.8-4" class="pilcrow">¶</a></p>
+<p id="section-5.8-5">Since very short Connection IDs are more likely to lead to conflicts,
 particularly zero-length Connection IDs, a proxy MAY choose to reject all
 requests for very short Connection IDs as conflicts, in anticipation of future
-conflicts.<a href="#section-4.8-5" class="pilcrow">¶</a></p>
+conflicts.<a href="#section-5.8-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="client-considerations">
-<section id="section-4.9">
+<section id="section-5.9">
         <h3 id="name-client-considerations">
-<a href="#section-4.9" class="section-number selfRef">4.9. </a><a href="#name-client-considerations" class="section-name selfRef">Client Considerations</a>
+<a href="#section-5.9" class="section-number selfRef">5.9. </a><a href="#name-client-considerations" class="section-name selfRef">Client Considerations</a>
         </h3>
-<p id="section-4.9-1">The client sends a REGISTER_CLIENT_CID capsule whenever it advertises a new
+<p id="section-5.9-1">The client sends a REGISTER_CLIENT_CID capsule whenever it advertises a new
 client CID to the target, and a REGISTER_TARGET_CID capsule when
 it has received a new target CID for the target. In order to change
 the connection ID bytes on the wire, a client can solicit new virtual connection
@@ -2355,102 +2391,104 @@ registration. The proxy MUST NOT send in forwarded mode until ACK_CLIENT_VCID
 has been received. Clients are responsible for changing Virtual Connection IDs
 when the HTTP stream's network path changes to avoid linkability across network
 paths. Note that initial REGISTER_CLIENT_CID capsules MAY be sent prior to
-receiving an HTTP response from the proxy.<a href="#section-4.9-1" class="pilcrow">¶</a></p>
-<p id="section-4.9-2">Connection ID registrations are subject to a proxy-advertised limit. Each registration
+receiving an HTTP response from the proxy.<a href="#section-5.9-1" class="pilcrow">¶</a></p>
+<p id="section-5.9-2">Connection ID registrations are subject to a proxy-advertised limit. Each registration
 has a corresponding sequence number. The client MUST NOT send a registration
 capsule with a sequence number greater than what the proxy advertises via the
 MAX_CONNECTION_IDS capsule. The initial MAX_CONNECTION_IDS value is 1, allowing both
 sequence numbers 0 and 1 for a total of two registrations without receiving a
-MAX_CONNECTION_IDS capsule from the proxy.<a href="#section-4.9-2" class="pilcrow">¶</a></p>
-<p id="section-4.9-3">Clients that cannot register new connection IDs within a reasonable time due to
+MAX_CONNECTION_IDS capsule from the proxy.<a href="#section-5.9-2" class="pilcrow">¶</a></p>
+<p id="section-5.9-3">Clients that cannot register new connection IDs within a reasonable time due to
 the MAX_CONNECTION_IDS limit SHOULD abort the proxied connection by resetting the HTTP
 stream with error code NO_ERROR. This may happen, for example, if the target server
 sends a NEW_CONNECTION_ID frame with Sequence Number and Retire Prior To equal to the
-same value.<a href="#section-4.9-3" class="pilcrow">¶</a></p>
-<p id="section-4.9-4">Clients can cease receiving with forwarded mode over an existing tunnel while
+same value.<a href="#section-5.9-3" class="pilcrow">¶</a></p>
+<p id="section-5.9-4">Clients can cease receiving with forwarded mode over an existing tunnel while
 retaining the same client-to-target connection by creating a new tunnel with
-"Proxy-QUIC-Forwarding" set to "?0" and migrating the client-to-target connection.<a href="#section-4.9-4" class="pilcrow">¶</a></p>
+"Proxy-QUIC-Forwarding" set to "?0" and migrating the client-to-target connection.<a href="#section-5.9-4" class="pilcrow">¶</a></p>
 <div id="new-proxied-connection-setup">
-<section id="section-4.9.1">
+<section id="section-5.9.1">
           <h4 id="name-new-proxied-connection-setu">
-<a href="#section-4.9.1" class="section-number selfRef">4.9.1. </a><a href="#name-new-proxied-connection-setu" class="section-name selfRef">New Proxied Connection Setup</a>
+<a href="#section-5.9.1" class="section-number selfRef">5.9.1. </a><a href="#name-new-proxied-connection-setu" class="section-name selfRef">New Proxied Connection Setup</a>
           </h4>
-<p id="section-4.9.1-1">To initiate QUIC-aware proxying, the client sends a REGISTER_CLIENT_CID
+<p id="section-5.9.1-1">To initiate QUIC-aware proxying, the client sends a REGISTER_CLIENT_CID
 capsule containing the initial client CID that the client has
-advertised to the target.<a href="#section-4.9.1-1" class="pilcrow">¶</a></p>
-<p id="section-4.9.1-2">If the mapping is created successfully, the client will receive a
+advertised to the target.<a href="#section-5.9.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.9.1-2">If the mapping is created successfully, the client will receive a
 ACK_CLIENT_CID capsule that contains the same client CID that was
 requested as well as a client VCID that the client MUST use
-when sending forwarded mode packets, assuming forwarded mode is supported.<a href="#section-4.9.1-2" class="pilcrow">¶</a></p>
-<p id="section-4.9.1-3">If forwarded mode is supported, the client MUST respond with an
+when sending forwarded mode packets, assuming forwarded mode is supported.<a href="#section-5.9.1-2" class="pilcrow">¶</a></p>
+<p id="section-5.9.1-3">If forwarded mode is supported, the client MUST respond with an
 ACK_CLIENT_VCID to signal to the proxy that it may start sending forwarded mode
 packets. If forwarded mode is not supported, an ACK_CLIENT_VCID capsule MUST
-NOT be sent.<a href="#section-4.9.1-3" class="pilcrow">¶</a></p>
-<p id="section-4.9.1-4">Since clients are always aware whether or not they are using a QUIC proxy,
+NOT be sent.<a href="#section-5.9.1-3" class="pilcrow">¶</a></p>
+<p id="section-5.9.1-4">Since clients are always aware whether or not they are using a QUIC proxy,
 clients are expected to cooperate with proxies in selecting client CIDs.
 A proxy detects a conflict when it is not able to create a unique mapping
-using the client CID (<a href="#conflicts" class="auto internal xref">Section 4.8</a>). It can reject requests that
+using the client CID (<a href="#conflicts" class="auto internal xref">Section 5.8</a>). It can reject requests that
 would cause a conflict and indicate this to the client by replying with a
 CLOSE_CLIENT_CID capsule. In order to avoid conflicts, clients SHOULD select
 client CIDs of at least 8 bytes in length with unpredictable values.
 A client also SHOULD NOT select a client CID that matches the ID used
-for the QUIC connection to the proxy, as this inherently creates a conflict.<a href="#section-4.9.1-4" class="pilcrow">¶</a></p>
-<p id="section-4.9.1-5">If the rejection indicated a conflict due to the client CID, the
+for the QUIC connection to the proxy, as this inherently creates a conflict.<a href="#section-5.9.1-4" class="pilcrow">¶</a></p>
+<p id="section-5.9.1-5">If the rejection indicated a conflict due to the client CID, the
 client MUST select a new Connection ID before sending a new request, and
 generate a new packet. For example, if a client is sending a QUIC Initial
 packet and chooses a Connection ID that conflicts with an existing mapping
-to the same target server, it will need to generate a new QUIC Initial.<a href="#section-4.9.1-5" class="pilcrow">¶</a></p>
+to the same target server, it will need to generate a new QUIC Initial.<a href="#section-5.9.1-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="adding-new-client-connection-ids">
-<section id="section-4.9.2">
+<section id="section-5.9.2">
           <h4 id="name-adding-new-client-connectio">
-<a href="#section-4.9.2" class="section-number selfRef">4.9.2. </a><a href="#name-adding-new-client-connectio" class="section-name selfRef">Adding New Client Connection IDs</a>
+<a href="#section-5.9.2" class="section-number selfRef">5.9.2. </a><a href="#name-adding-new-client-connectio" class="section-name selfRef">Adding New Client Connection IDs</a>
           </h4>
-<p id="section-4.9.2-1">Since QUIC connection IDs are chosen by the receiver, an endpoint needs to
+<p id="section-5.9.2-1">Since QUIC connection IDs are chosen by the receiver, an endpoint needs to
 communicate its chosen connection IDs to its peer before the peer can start
-using them. In QUICv1, this is performed using the NEW_CONNECTION_ID frame.<a href="#section-4.9.2-1" class="pilcrow">¶</a></p>
-<p id="section-4.9.2-2">Prior to informing the target of a new chosen client CID, the client
+using them. In QUICv1, this is performed using the NEW_CONNECTION_ID frame.<a href="#section-5.9.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.9.2-2">Prior to informing the target of a new chosen client CID, the client
 MUST send a REGISTER_CLIENT_CID capsule to the proxy containing the new client
-CID.<a href="#section-4.9.2-2" class="pilcrow">¶</a></p>
-<p id="section-4.9.2-3">The client should only inform the target of the new client CID once an
-ACK_CLIENT_CID capsule is received that contains the echoed connection ID.<a href="#section-4.9.2-3" class="pilcrow">¶</a></p>
-<p id="section-4.9.2-4">If forwarded mode is enabled, the client MUST reply to the ACK_CLIENT_CID with
+CID.<a href="#section-5.9.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.9.2-3">The client should only inform the target of the new client CID once an
+ACK_CLIENT_CID capsule is received that contains the echoed connection ID.<a href="#section-5.9.2-3" class="pilcrow">¶</a></p>
+<p id="section-5.9.2-4">If forwarded mode is enabled, the client MUST reply to the ACK_CLIENT_CID with
 an ACK_CLIENT_VCID capsule with the real and virtual connection IDs along with
-an optional Stateless Reset Token.<a href="#section-4.9.2-4" class="pilcrow">¶</a></p>
+an optional Stateless Reset Token.<a href="#section-5.9.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="proxy-considerations">
-<section id="section-4.10">
+<section id="section-5.10">
         <h3 id="name-proxy-considerations">
-<a href="#section-4.10" class="section-number selfRef">4.10. </a><a href="#name-proxy-considerations" class="section-name selfRef">Proxy Considerations</a>
+<a href="#section-5.10" class="section-number selfRef">5.10. </a><a href="#name-proxy-considerations" class="section-name selfRef">Proxy Considerations</a>
         </h3>
-<p id="section-4.10-1">The proxy MUST reply to each REGISTER_CLIENT_CID capsule with either
+<p id="section-5.10-1">The proxy MUST reply to each REGISTER_CLIENT_CID capsule with either
 an ACK_CLIENT_CID or CLOSE_CLIENT_CID capsule containing the
-Connection ID that was in the registration capsule.<a href="#section-4.10-1" class="pilcrow">¶</a></p>
-<p id="section-4.10-2">Similarly, the proxy MUST reply to each REGISTER_TARGET_CID capsule with
+Connection ID that was in the registration capsule.<a href="#section-5.10-1" class="pilcrow">¶</a></p>
+<p id="section-5.10-2">Similarly, the proxy MUST reply to each REGISTER_TARGET_CID capsule with
 either an ACK_TARGET_CID or CLOSE_TARGET_CID capsule containing the
-Connection ID that was in the registration capsule.<a href="#section-4.10-2" class="pilcrow">¶</a></p>
-<p id="section-4.10-3">The proxy then determines the proxy-to-target 4-tuple to associate with the
+Connection ID that was in the registration capsule.<a href="#section-5.10-2" class="pilcrow">¶</a></p>
+<p id="section-5.10-3">The proxy then determines the proxy-to-target 4-tuple to associate with the
 client's request. This will generally involve performing a DNS lookup for
 the target hostname in the CONNECT request, or finding an existing proxy-to-target
 4-tuple to the authority. The proxy-to-target 4-tuple might already be open due to a
 previous request from this client, or another. If the 4-tuple is not already
 created, the proxy creates a new one. Proxies can choose to reuse proxy-to-target
 4-tuples across multiple UDP proxying requests, or have a unique proxy-to-target 4-tuple
-for every UDP proxying request.<a href="#section-4.10-3" class="pilcrow">¶</a></p>
-<p id="section-4.10-4">If a proxy reuses proxy-to-target 4-tuples, it SHOULD store which authorities
+for every UDP proxying request. If the client did not send a value of "?1" for the
+"Proxy-QUIC-Port-Sharing" header, port reuse is not permitted and the proxy MUST allocate
+a new UDP 4-tuple.<a href="#section-5.10-3" class="pilcrow">¶</a></p>
+<p id="section-5.10-4">If a proxy reuses proxy-to-target 4-tuples, it SHOULD store which authorities
 (which could be a domain name or IP address literal) are being accessed over a
 particular proxy-to-target 4-tuple so it can avoid performing a new DNS query and
 potentially choosing a different target server IP address which could map to a
-different target server.<a href="#section-4.10-4" class="pilcrow">¶</a></p>
-<p id="section-4.10-5">Proxy-to-target 4-tuples MUST NOT be reused across QUIC and non-QUIC UDP proxy
+different target server.<a href="#section-5.10-4" class="pilcrow">¶</a></p>
+<p id="section-5.10-5">Proxy-to-target 4-tuples MUST NOT be reused across QUIC and non-QUIC UDP proxy
 requests, since it might not be possible to correctly demultiplex or direct
 the traffic. Any packets received on a proxy-to-target 4-tuple used for proxying
-QUIC that does not correspond to a known CID MUST be dropped.<a href="#section-4.10-5" class="pilcrow">¶</a></p>
-<p id="section-4.10-6">When the proxy recieves a REGISTER_CLIENT_CID capsule, it is receiving a
+QUIC that does not correspond to a known CID MUST be dropped.<a href="#section-5.10-5" class="pilcrow">¶</a></p>
+<p id="section-5.10-6">When the proxy recieves a REGISTER_CLIENT_CID capsule, it is receiving a
 request to be able to route traffic matching the client CID back to
 the client using. If the pair of this client CID and the selected
 proxy-to-target 4-tuple does not create a conflict, the proxy creates the mapping
@@ -2465,8 +2503,8 @@ the length to zero. The proxy MUST use tunnelled mode (HTTP Datagram frames) for
 any long header packets. The proxy SHOULD forward directly to the client for any
 matching short header packets if forwarding is supported by the client, but the
 proxy MAY tunnel these packets in HTTP Datagram frames instead. If the mapping
-would create a conflict, the proxy responds with a CLOSE_CLIENT_CID capsule.<a href="#section-4.10-6" class="pilcrow">¶</a></p>
-<p id="section-4.10-7">When the proxy recieves a REGISTER_TARGET_CID capsule, it is receiving a
+would create a conflict, the proxy responds with a CLOSE_CLIENT_CID capsule.<a href="#section-5.10-6" class="pilcrow">¶</a></p>
+<p id="section-5.10-7">When the proxy recieves a REGISTER_TARGET_CID capsule, it is receiving a
 request to allow the client to forward packets to the target. The proxy
 generates a target VCID for the client to use when sending
 packets in forwarded mode. If forwarded mode is not supported, the proxy MUST
@@ -2477,30 +2515,30 @@ client-to-proxy 4-tuple. The proxy creates the mapping and responds with an
 ACK_TARGET_CID capsule. Once the successful response is sent, the proxy will
 forward any short header packets received on the client-to-proxy 4-tuple that use
 the target VCID using the correct proxy-to-target 4-tuple after
-first rewriting the target VCID to be the correct target CID.<a href="#section-4.10-7" class="pilcrow">¶</a></p>
-<p id="section-4.10-8">Proxies MUST choose unpredictable client and target VCIDs to
-avoid forwarding loop attacks.<a href="#section-4.10-8" class="pilcrow">¶</a></p>
-<p id="section-4.10-9">The proxy MUST only forward non-tunnelled packets from the client that are QUIC
+first rewriting the target VCID to be the correct target CID.<a href="#section-5.10-7" class="pilcrow">¶</a></p>
+<p id="section-5.10-8">Proxies MUST choose unpredictable client and target VCIDs to
+avoid forwarding loop attacks.<a href="#section-5.10-8" class="pilcrow">¶</a></p>
+<p id="section-5.10-9">The proxy MUST only forward non-tunnelled packets from the client that are QUIC
 short header packets (based on the Header Form bit) and have mapped target VCIDs.
 Packets sent by the client that are forwarded SHOULD be
-considered as activity for restarting QUIC's Idle Timeout <span>[<a href="#QUIC" class="cite xref">QUIC</a>]</span>.<a href="#section-4.10-9" class="pilcrow">¶</a></p>
-<p id="section-4.10-10">In order to permit the client to change client-to-target connection IDs, the proxy
+considered as activity for restarting QUIC's Idle Timeout <span>[<a href="#QUIC" class="cite xref">QUIC</a>]</span>.<a href="#section-5.10-9" class="pilcrow">¶</a></p>
+<p id="section-5.10-10">In order to permit the client to change client-to-target connection IDs, the proxy
 SHOULD send MAX_CONNECTION_IDS capsules allowing the client additional connection ID
-registrations.<a href="#section-4.10-10" class="pilcrow">¶</a></p>
+registrations.<a href="#section-5.10-10" class="pilcrow">¶</a></p>
 <div id="closing-proxy-state">
-<section id="section-4.10.1">
+<section id="section-5.10.1">
           <h4 id="name-closing-proxy-state">
-<a href="#section-4.10.1" class="section-number selfRef">4.10.1. </a><a href="#name-closing-proxy-state" class="section-name selfRef">Closing Proxy State</a>
+<a href="#section-5.10.1" class="section-number selfRef">5.10.1. </a><a href="#name-closing-proxy-state" class="section-name selfRef">Closing Proxy State</a>
           </h4>
-<p id="section-4.10.1-1">For any registration capsule for which the proxy has sent an acknowledgement, any
+<p id="section-5.10.1-1">For any registration capsule for which the proxy has sent an acknowledgement, any
 mappings last until either endpoint sends a close capsule or the either side of the
-HTTP stream closes.<a href="#section-4.10.1-1" class="pilcrow">¶</a></p>
-<p id="section-4.10.1-2">A client that no longer wants a given Connection ID to be forwarded by the
-proxy sends a CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsule.<a href="#section-4.10.1-2" class="pilcrow">¶</a></p>
-<p id="section-4.10.1-3">If a client's connection to the proxy is terminated for any reason, all
-mappings associated with all requests are removed.<a href="#section-4.10.1-3" class="pilcrow">¶</a></p>
-<p id="section-4.10.1-4">A proxy can close its proxy-to-target 4-tuple once all UDP proxying requests mapped to
-that 4-tuple have been removed.<a href="#section-4.10.1-4" class="pilcrow">¶</a></p>
+HTTP stream closes.<a href="#section-5.10.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.10.1-2">A client that no longer wants a given Connection ID to be forwarded by the
+proxy sends a CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsule.<a href="#section-5.10.1-2" class="pilcrow">¶</a></p>
+<p id="section-5.10.1-3">If a client's connection to the proxy is terminated for any reason, all
+mappings associated with all requests are removed.<a href="#section-5.10.1-3" class="pilcrow">¶</a></p>
+<p id="section-5.10.1-4">A proxy can close its proxy-to-target 4-tuple once all UDP proxying requests mapped to
+that 4-tuple have been removed.<a href="#section-5.10.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2508,144 +2546,144 @@ that 4-tuple have been removed.<a href="#section-4.10.1-4" class="pilcrow">¶</a
 </section>
 </div>
 <div id="using-forwarded-mode">
-<section id="section-5">
+<section id="section-6">
       <h2 id="name-using-forwarded-mode">
-<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-using-forwarded-mode" class="section-name selfRef">Using Forwarded Mode</a>
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-using-forwarded-mode" class="section-name selfRef">Using Forwarded Mode</a>
       </h2>
-<p id="section-5-1">All packets sent in forwarded mode use a transform in which CIDs are switched
+<p id="section-6-1">All packets sent in forwarded mode use a transform in which CIDs are switched
 into VCIDs, and the contents of packets are either left the same, or modified
-(<a href="#transforms" class="auto internal xref">Section 5.3</a>).<a href="#section-5-1" class="pilcrow">¶</a></p>
-<p id="section-5-2">Forwarded mode also raises special considerations for handling connection
-maintenance (<a href="#maintenance" class="auto internal xref">Section 5.4</a>), connection migration (<a href="#migration" class="auto internal xref">Section 5.5</a>),
-ECN markings (<a href="#ecn" class="auto internal xref">Section 5.6</a>), and stateless resets (<a href="#resets" class="auto internal xref">Section 5.7</a>).<a href="#section-5-2" class="pilcrow">¶</a></p>
+(<a href="#transforms" class="auto internal xref">Section 6.3</a>).<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2">Forwarded mode also raises special considerations for handling connection
+maintenance (<a href="#maintenance" class="auto internal xref">Section 6.4</a>), connection migration (<a href="#migration" class="auto internal xref">Section 6.5</a>),
+ECN markings (<a href="#ecn" class="auto internal xref">Section 6.6</a>), and stateless resets (<a href="#resets" class="auto internal xref">Section 6.7</a>).<a href="#section-6-2" class="pilcrow">¶</a></p>
 <div id="sending-with-forwarded-mode">
-<section id="section-5.1">
+<section id="section-6.1">
         <h3 id="name-sending-with-forwarded-mode">
-<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-sending-with-forwarded-mode" class="section-name selfRef">Sending With Forwarded Mode</a>
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-sending-with-forwarded-mode" class="section-name selfRef">Sending With Forwarded Mode</a>
         </h3>
-<p id="section-5.1-1">Support for forwarded mode is determined by the "Proxy-QUIC-Forwarding" header,
-see <a href="#forwarding-header" class="auto internal xref">Section 3</a>.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
-<p id="section-5.1-2">Once the client has learned the target server's Connection ID, such as in the
+<p id="section-6.1-1">Support for forwarded mode is determined by the "Proxy-QUIC-Forwarding" header,
+see <a href="#forwarding-header" class="auto internal xref">Section 3</a>.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.1-2">Once the client has learned the target server's Connection ID, such as in the
 response to a QUIC Initial packet, it can send a REGISTER_TARGET_CID capsule
-containing the target CID to request the ability to forward packets.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
-<p id="section-5.1-3">The client MUST wait for an ACK_TARGET_CID capsule that contains the echoed
-connection ID and target VCID before using forwarded mode.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
-<p id="section-5.1-4">Prior to receiving the proxy server response, the client MUST send short header
+containing the target CID to request the ability to forward packets.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.1-3">The client MUST wait for an ACK_TARGET_CID capsule that contains the echoed
+connection ID and target VCID before using forwarded mode.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
+<p id="section-6.1-4">Prior to receiving the proxy server response, the client MUST send short header
 packets tunnelled in HTTP Datagram frames. The client MAY also choose to tunnel
-some short header packets even after receiving the successful response.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
-<p id="section-5.1-5">If the target CID registration is rejected, for example with a
+some short header packets even after receiving the successful response.<a href="#section-6.1-4" class="pilcrow">¶</a></p>
+<p id="section-6.1-5">If the target CID registration is rejected, for example with a
 CLOSE_TARGET_CID capsule, it MUST NOT forward packets to the requested target CID,
 but only use tunnelled mode. The request might also be rejected
-if the proxy does not support forwarded mode or has it disabled by policy.<a href="#section-5.1-5" class="pilcrow">¶</a></p>
-<p id="section-5.1-6">QUIC long header packets MUST NOT be forwarded. These packets can only be
+if the proxy does not support forwarded mode or has it disabled by policy.<a href="#section-6.1-5" class="pilcrow">¶</a></p>
+<p id="section-6.1-6">QUIC long header packets MUST NOT be forwarded. These packets can only be
 tunnelled within HTTP Datagram frames to avoid exposing unnecessary connection
-metadata.<a href="#section-5.1-6" class="pilcrow">¶</a></p>
-<p id="section-5.1-7">When forwarding, the client sends a QUIC packet with the target VCID
+metadata.<a href="#section-6.1-6" class="pilcrow">¶</a></p>
+<p id="section-6.1-7">When forwarding, the client sends a QUIC packet with the target VCID
 in the QUIC short header, using the same 4-tuple between client and
-proxy that was used for the main QUIC connection between client and proxy.<a href="#section-5.1-7" class="pilcrow">¶</a></p>
-<p id="section-5.1-8">When forwarding, the proxy sends a QUIC packet with the client VCID
+proxy that was used for the main QUIC connection between client and proxy.<a href="#section-6.1-7" class="pilcrow">¶</a></p>
+<p id="section-6.1-8">When forwarding, the proxy sends a QUIC packet with the client VCID
 in the QUIC short header, using the same 4-tuple between client
-and proxy that was used for the main QUIC connection between client and proxy.<a href="#section-5.1-8" class="pilcrow">¶</a></p>
-<p id="section-5.1-9">Prior to sending a forwarded mode packet, the sender MUST replace the Connection
+and proxy that was used for the main QUIC connection between client and proxy.<a href="#section-6.1-8" class="pilcrow">¶</a></p>
+<p id="section-6.1-9">Prior to sending a forwarded mode packet, the sender MUST replace the Connection
 ID with the Virtual Connection ID. If the Virtual Connection ID is larger than
 the Connection ID, the sender MUST extend the length of the packet by the
 difference between the two lengths, to include the entire Virtual Connection ID.
 If the Virtual Connection ID is smaller than the Connection ID, the sender MUST
-shrink the length of the packet by the difference between the two lengths.<a href="#section-5.1-9" class="pilcrow">¶</a></p>
-<p id="section-5.1-10">Clients and proxies supporting forwarded mode MUST be able to handle Virtual
-Connection IDs of different lengths than the corresponding Connection IDs.<a href="#section-5.1-10" class="pilcrow">¶</a></p>
+shrink the length of the packet by the difference between the two lengths.<a href="#section-6.1-9" class="pilcrow">¶</a></p>
+<p id="section-6.1-10">Clients and proxies supporting forwarded mode MUST be able to handle Virtual
+Connection IDs of different lengths than the corresponding Connection IDs.<a href="#section-6.1-10" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="receiving-with-forwarded-mode">
-<section id="section-5.2">
+<section id="section-6.2">
         <h3 id="name-receiving-with-forwarded-mo">
-<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-receiving-with-forwarded-mo" class="section-name selfRef">Receiving With Forwarded Mode</a>
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-receiving-with-forwarded-mo" class="section-name selfRef">Receiving With Forwarded Mode</a>
         </h3>
-<p id="section-5.2-1">If the client has indicated support for forwarded mode with the "Proxy-QUIC-Forwarding"
+<p id="section-6.2-1">If the client has indicated support for forwarded mode with the "Proxy-QUIC-Forwarding"
 header, the proxy MAY use forwarded mode for any client CID for which
-it has a valid mapping.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
-<p id="section-5.2-2">Once a client has sent an ACK_CLIENT_VCID capsule to the proxy, it MUST be
+it has a valid mapping.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.2-2">Once a client has sent an ACK_CLIENT_VCID capsule to the proxy, it MUST be
 prepared to receive forwarded short header packets on the 4-tuple between itself
-and the proxy for the specified client VCID.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
-<p id="section-5.2-3">The client uses the Destination Connection ID field of the received packet to
+and the proxy for the specified client VCID.<a href="#section-6.2-2" class="pilcrow">¶</a></p>
+<p id="section-6.2-3">The client uses the Destination Connection ID field of the received packet to
 determine if the packet was originated by the proxy, or merely forwarded from
 the target. The client replaces the client VCID with the real
-client CID before processing the packet further.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
+client CID before processing the packet further.<a href="#section-6.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="transforms">
-<section id="section-5.3">
+<section id="section-6.3">
         <h3 id="name-packet-transforms">
-<a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-packet-transforms" class="section-name selfRef">Packet Transforms</a>
+<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-packet-transforms" class="section-name selfRef">Packet Transforms</a>
         </h3>
-<p id="section-5.3-1">A packet transform is the procedure applied to encode packets as they are sent
+<p id="section-6.3-1">A packet transform is the procedure applied to encode packets as they are sent
 on the link between the client and proxy, along with the inverse decode step applied
-on receipt. Simple transforms can be modeled as a function as follows:<a href="#section-5.3-1" class="pilcrow">¶</a></p>
-<p id="section-5.3-2">Inputs:<a href="#section-5.3-2" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-5.3-3">
-<li id="section-5.3-3.1">
-            <p id="section-5.3-3.1.1">A QUIC short header packet (after Connection ID remapping).<a href="#section-5.3-3.1.1" class="pilcrow">¶</a></p>
+on receipt. Simple transforms can be modeled as a function as follows:<a href="#section-6.3-1" class="pilcrow">¶</a></p>
+<p id="section-6.3-2">Inputs:<a href="#section-6.3-2" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.3-3">
+<li id="section-6.3-3.1">
+            <p id="section-6.3-3.1.1">A QUIC short header packet (after Connection ID remapping).<a href="#section-6.3-3.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-5.3-3.2">
-            <p id="section-5.3-3.2.1">The mode (encode or decode).<a href="#section-5.3-3.2.1" class="pilcrow">¶</a></p>
+          <li id="section-6.3-3.2">
+            <p id="section-6.3-3.2.1">The mode (encode or decode).<a href="#section-6.3-3.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-5.3-3.3">
-            <p id="section-5.3-3.3.1">The direction (client-to-proxy or proxy-to-client).<a href="#section-5.3-3.3.1" class="pilcrow">¶</a></p>
+          <li id="section-6.3-3.3">
+            <p id="section-6.3-3.3.1">The direction (client-to-proxy or proxy-to-client).<a href="#section-6.3-3.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-5.3-3.4">
-            <p id="section-5.3-3.4.1">Any configuration information negotiated at startup.<a href="#section-5.3-3.4.1" class="pilcrow">¶</a></p>
+          <li id="section-6.3-3.4">
+            <p id="section-6.3-3.4.1">Any configuration information negotiated at startup.<a href="#section-6.3-3.4.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
-<p id="section-5.3-4">Output:<a href="#section-5.3-4" class="pilcrow">¶</a></p>
+<p id="section-6.3-4">Output:<a href="#section-6.3-4" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-5.3-5.1">
-            <p id="section-5.3-5.1.1">A UDP payload that conforms to the QUIC invariants <span>[<a href="#RFC8999" class="cite xref">RFC8999</a>]</span> and does not
-modify the Connection ID.<a href="#section-5.3-5.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-6.3-5.1">
+            <p id="section-6.3-5.1.1">A UDP payload that conforms to the QUIC invariants <span>[<a href="#RFC8999" class="cite xref">RFC8999</a>]</span> and does not
+modify the Connection ID.<a href="#section-6.3-5.1.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-5.3-6">More complex transform behaviors could have internal state, but no such transforms
-are presented here.<a href="#section-5.3-6" class="pilcrow">¶</a></p>
-<p id="section-5.3-7">Packet transforms are identified by an IANA-registered name, and negotiated in
+<p id="section-6.3-6">More complex transform behaviors could have internal state, but no such transforms
+are presented here.<a href="#section-6.3-6" class="pilcrow">¶</a></p>
+<p id="section-6.3-7">Packet transforms are identified by an IANA-registered name, and negotiated in
 the HTTP headers (see <a href="#forwarding-header" class="auto internal xref">Section 3</a>).  This document defines two initial
-transforms: the <code>identity</code> transform and the <code>scramble</code> transform.<a href="#section-5.3-7" class="pilcrow">¶</a></p>
+transforms: the <code>identity</code> transform and the <code>scramble</code> transform.<a href="#section-6.3-7" class="pilcrow">¶</a></p>
 <div id="identity-transform">
-<section id="section-5.3.1">
+<section id="section-6.3.1">
           <h4 id="name-the-identify-transform">
-<a href="#section-5.3.1" class="section-number selfRef">5.3.1. </a><a href="#name-the-identify-transform" class="section-name selfRef">The identify transform</a>
+<a href="#section-6.3.1" class="section-number selfRef">6.3.1. </a><a href="#name-the-identify-transform" class="section-name selfRef">The identify transform</a>
           </h4>
-<p id="section-5.3.1-1">The <code>identity</code> transform does not modify the packet in any way.  When this transform
+<p id="section-6.3.1-1">The <code>identity</code> transform does not modify the packet in any way.  When this transform
 is in use, a global passive adversary can trivially correlate pairs of packets
 that crossed the forwarder, providing a compact proof that a specific client
-was communicating to a specific target.<a href="#section-5.3.1-1" class="pilcrow">¶</a></p>
-<p id="section-5.3.1-2">The <code>identity</code> transform is identified by the value "identity" <a href="#iana-transforms" class="auto internal xref">Section 9.3</a>.<a href="#section-5.3.1-2" class="pilcrow">¶</a></p>
-<p id="section-5.3.1-3">Use of this transform is NOT RECOMMENDED if the <code>scramble</code> transform is supported
+was communicating to a specific target.<a href="#section-6.3.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-2">The <code>identity</code> transform is identified by the value "identity" <a href="#iana-transforms" class="auto internal xref">Section 10.3</a>.<a href="#section-6.3.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-3">Use of this transform is NOT RECOMMENDED if the <code>scramble</code> transform is supported
 by both the client and the proxy. Implementations MAY choose to not implement or
 support the <code>identity</code> transform, depending on the use cases and privacy requirements of
-the deployment.<a href="#section-5.3.1-3" class="pilcrow">¶</a></p>
+the deployment.<a href="#section-6.3.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="scramble-transform">
-<section id="section-5.3.2">
+<section id="section-6.3.2">
           <h4 id="name-the-scramble-transform">
-<a href="#section-5.3.2" class="section-number selfRef">5.3.2. </a><a href="#name-the-scramble-transform" class="section-name selfRef">The scramble transform</a>
+<a href="#section-6.3.2" class="section-number selfRef">6.3.2. </a><a href="#name-the-scramble-transform" class="section-name selfRef">The scramble transform</a>
           </h4>
-<p id="section-5.3.2-1">The <code>scramble</code> transform implements length-preserving unauthenticated
+<p id="section-6.3.2-1">The <code>scramble</code> transform implements length-preserving unauthenticated
 re-encryption of QUIC packets while preserving the QUIC invariants.  When
 the <code>scramble</code> transform is in use, a global passive adversary cannot simply compare the packet
 contents on both sides of the proxy
 to link the client and target.  However, the <code>scramble</code> transform does not defend against
 analysis of packet sizes and timing, nor does it protect privacy against an
-active attacker.<a href="#section-5.3.2-1" class="pilcrow">¶</a></p>
-<p id="section-5.3.2-2">Deployments that implement the version of the <code>scramble</code> transform defined in this
+active attacker.<a href="#section-6.3.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-2">Deployments that implement the version of the <code>scramble</code> transform defined in this
 document MUST use the value "scramble-dt". The finalized version is expected
-to use the reserved value "scramble" <a href="#iana-transforms" class="auto internal xref">Section 9.3</a>.<a href="#section-5.3.2-2" class="pilcrow">¶</a></p>
-<p id="section-5.3.2-3">The <code>scramble</code> transform is initialized using a 32-byte random symmetric key.
+to use the reserved value "scramble" <a href="#iana-transforms" class="auto internal xref">Section 10.3</a>.<a href="#section-6.3.2-2" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-3">The <code>scramble</code> transform is initialized using a 32-byte random symmetric key.
 When offering or selecting this transform, the client and server each
 generate the key that they will use to encrypt scrambled packets and MUST add it to the
 "Proxy-QUIC-Transform" header in an <code>sf-binary</code> parameter named "scramble-key".
 If either side receives a <code>scramble</code> transform without the "scramble-key" parameter,
-forwarded mode MUST be disabled.<a href="#section-5.3.2-3" class="pilcrow">¶</a></p>
-<p id="section-5.3.2-4">This transform relies on the AES-128 block cipher, which is represented by the
+forwarded mode MUST be disabled.<a href="#section-6.3.2-3" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-4">This transform relies on the AES-128 block cipher, which is represented by the
 syntax <code>AES-ECB(key, plaintext_block)</code> as in <span>[<a href="#RFC9001" class="cite xref">RFC9001</a>]</span>.  The corresponding
 decryption operation is written here as <code>AES-ECB-inv(key, ciphertext_block)</code>.
 It also uses AES in Counter Mode (<span>[<a href="#SP800-38A" class="cite xref">SP800-38A</a>]</span>, Section 6.5), which is
@@ -2653,74 +2691,74 @@ represented by the syntax <code>AES-CTR(key, iv, input)</code> for encryption an
 decryption (which are identical).  In this syntax, <code>iv</code> is an array of 16 bytes
 containing the initial counter block.  The counter is incremented by the
 standard incrementing function (<span>[<a href="#SP800-38A" class="cite xref">SP800-38A</a>]</span>, Appendix B.1) on the full block
-width.<a href="#section-5.3.2-4" class="pilcrow">¶</a></p>
-<p id="section-5.3.2-5">In brief, the transform applies AES in counter mode (AES-CTR) using an
+width.<a href="#section-6.3.2-4" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-5">In brief, the transform applies AES in counter mode (AES-CTR) using an
 initialization vector drawn from the packet, then encrypts the initialization
-vector with AES-ECB. The detailed procedure is as follows:<a href="#section-5.3.2-5" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-5.3.2-6">
-<li id="section-5.3.2-6.1">
-              <p id="section-5.3.2-6.1.1">Let <code>k1, k2 = scramble_key[:16], scramble_key[16:32]</code>.<a href="#section-5.3.2-6.1.1" class="pilcrow">¶</a></p>
+vector with AES-ECB. The detailed procedure is as follows:<a href="#section-6.3.2-5" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.3.2-6">
+<li id="section-6.3.2-6.1">
+              <p id="section-6.3.2-6.1.1">Let <code>k1, k2 = scramble_key[:16], scramble_key[16:32]</code>.<a href="#section-6.3.2-6.1.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-5.3.2-6.2">
-              <p id="section-5.3.2-6.2.1">Let <code>L</code> be the Connection ID length.<a href="#section-5.3.2-6.2.1" class="pilcrow">¶</a></p>
+            <li id="section-6.3.2-6.2">
+              <p id="section-6.3.2-6.2.1">Let <code>L</code> be the Connection ID length.<a href="#section-6.3.2-6.2.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-5.3.2-6.3">
-              <p id="section-5.3.2-6.3.1">Let <code>cid = packet[1:L+1]</code>, i.e., the Connection ID.<a href="#section-5.3.2-6.3.1" class="pilcrow">¶</a></p>
+            <li id="section-6.3.2-6.3">
+              <p id="section-6.3.2-6.3.1">Let <code>cid = packet[1:L+1]</code>, i.e., the Connection ID.<a href="#section-6.3.2-6.3.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-5.3.2-6.4">
-              <p id="section-5.3.2-6.4.1">Let <code>iv = packet[L+1:L+17]</code>, i.e., the 16 bytes following the Connection ID.<a href="#section-5.3.2-6.4.1" class="pilcrow">¶</a></p>
+            <li id="section-6.3.2-6.4">
+              <p id="section-6.3.2-6.4.1">Let <code>iv = packet[L+1:L+17]</code>, i.e., the 16 bytes following the Connection ID.<a href="#section-6.3.2-6.4.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-5.3.2-6.5">
-              <p id="section-5.3.2-6.5.1">Let <code>ctr_input = packet[0] | packet[L+17:]</code>.<a href="#section-5.3.2-6.5.1" class="pilcrow">¶</a></p>
+            <li id="section-6.3.2-6.5">
+              <p id="section-6.3.2-6.5.1">Let <code>ctr_input = packet[0] | packet[L+17:]</code>.<a href="#section-6.3.2-6.5.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-5.3.2-6.6">
-              <p id="section-5.3.2-6.6.1">Let <code>ctr_output = AES-CTR(k1, iv, ctr_input)</code>.<a href="#section-5.3.2-6.6.1" class="pilcrow">¶</a></p>
+            <li id="section-6.3.2-6.6">
+              <p id="section-6.3.2-6.6.1">Let <code>ctr_output = AES-CTR(k1, iv, ctr_input)</code>.<a href="#section-6.3.2-6.6.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-5.3.2-6.7">
-              <p id="section-5.3.2-6.7.1">Let <code>header = ctr_output[0] &amp; 0x7F</code>.  This ensures that the Header Form bit
-is zero, as required by the QUIC invariants (<span>[<a href="#RFC8999" class="cite xref">RFC8999</a>]</span>, Section 5.2).<a href="#section-5.3.2-6.7.1" class="pilcrow">¶</a></p>
+            <li id="section-6.3.2-6.7">
+              <p id="section-6.3.2-6.7.1">Let <code>header = ctr_output[0] &amp; 0x7F</code>.  This ensures that the Header Form bit
+is zero, as required by the QUIC invariants (<span>[<a href="#RFC8999" class="cite xref">RFC8999</a>]</span>, Section 5.2).<a href="#section-6.3.2-6.7.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-5.3.2-6.8">
-              <p id="section-5.3.2-6.8.1">Encrypt <code>iv</code> with the block cipher: <code>encrypted_iv = AES-ECB(k2, iv)</code>.<a href="#section-5.3.2-6.8.1" class="pilcrow">¶</a></p>
+            <li id="section-6.3.2-6.8">
+              <p id="section-6.3.2-6.8.1">Encrypt <code>iv</code> with the block cipher: <code>encrypted_iv = AES-ECB(k2, iv)</code>.<a href="#section-6.3.2-6.8.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-5.3.2-6.9">
-              <p id="section-5.3.2-6.9.1">Produce the output packet as:<br>
-                <code>header | cid | encrypted_iv | ctr_output[1:]</code>.<a href="#section-5.3.2-6.9.1" class="pilcrow">¶</a></p>
-</li>
-          </ol>
-<p id="section-5.3.2-7">The inverse transform operates as follows:<a href="#section-5.3.2-7" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-5.3.2-8">
-<li id="section-5.3.2-8.1">
-              <p id="section-5.3.2-8.1.1">Decrypt the AES-CTR initialization vector:<br>
-                <code>iv = AES-ECB-inv(k2, packet[L+1:L+17])</code>.<a href="#section-5.3.2-8.1.1" class="pilcrow">¶</a></p>
-</li>
-            <li id="section-5.3.2-8.2">
-              <p id="section-5.3.2-8.2.1">Compute the other variables exactly as in the forward transform.
-(AES-CTR encryption and decryption are identical.)<a href="#section-5.3.2-8.2.1" class="pilcrow">¶</a></p>
-</li>
-            <li id="section-5.3.2-8.3">
-              <p id="section-5.3.2-8.3.1">Produce the output: <code>header | cid | iv | ctr_output[1:]</code>.<a href="#section-5.3.2-8.3.1" class="pilcrow">¶</a></p>
+            <li id="section-6.3.2-6.9">
+              <p id="section-6.3.2-6.9.1">Produce the output packet as:<br>
+                <code>header | cid | encrypted_iv | ctr_output[1:]</code>.<a href="#section-6.3.2-6.9.1" class="pilcrow">¶</a></p>
 </li>
           </ol>
-<p id="section-5.3.2-9">The encryption keys used in this procedure do not depend on the packet contents,
-so each party only needs to perform AES initialization once for each connection.<a href="#section-5.3.2-9" class="pilcrow">¶</a></p>
-<p id="section-5.3.2-10">NOTE: The security of this arrangement relies on every short-header QUIC packet
+<p id="section-6.3.2-7">The inverse transform operates as follows:<a href="#section-6.3.2-7" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.3.2-8">
+<li id="section-6.3.2-8.1">
+              <p id="section-6.3.2-8.1.1">Decrypt the AES-CTR initialization vector:<br>
+                <code>iv = AES-ECB-inv(k2, packet[L+1:L+17])</code>.<a href="#section-6.3.2-8.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.3.2-8.2">
+              <p id="section-6.3.2-8.2.1">Compute the other variables exactly as in the forward transform.
+(AES-CTR encryption and decryption are identical.)<a href="#section-6.3.2-8.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-6.3.2-8.3">
+              <p id="section-6.3.2-8.3.1">Produce the output: <code>header | cid | iv | ctr_output[1:]</code>.<a href="#section-6.3.2-8.3.1" class="pilcrow">¶</a></p>
+</li>
+          </ol>
+<p id="section-6.3.2-9">The encryption keys used in this procedure do not depend on the packet contents,
+so each party only needs to perform AES initialization once for each connection.<a href="#section-6.3.2-9" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-10">NOTE: The security of this arrangement relies on every short-header QUIC packet
 containing a distinct 16 bytes following the Connection ID.  This is true
 for the original ciphersuites of QUICv1, but it is not guaranteed by the QUIC
 Invariants. Future ciphersuites and QUIC versions could in principle produce
 packets that are too short or repeat the values at this location. When using the
 <code>scramble</code> transform, clients MUST NOT offer any configuration that could
-cause the client or target to violate this requirement.<a href="#section-5.3.2-10" class="pilcrow">¶</a></p>
+cause the client or target to violate this requirement.<a href="#section-6.3.2-10" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="maintenance">
-<section id="section-5.4">
+<section id="section-6.4">
         <h3 id="name-connection-maintenance-in-f">
-<a href="#section-5.4" class="section-number selfRef">5.4. </a><a href="#name-connection-maintenance-in-f" class="section-name selfRef">Connection Maintenance in Forwarded Mode</a>
+<a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-connection-maintenance-in-f" class="section-name selfRef">Connection Maintenance in Forwarded Mode</a>
         </h3>
-<p id="section-5.4-1">When a client and proxy are using forwarded mode, it is possible that there can be
+<p id="section-6.4-1">When a client and proxy are using forwarded mode, it is possible that there can be
 long periods of time in which no ack-eliciting packets
 (see <span><a href="https://rfc-editor.org/rfc/rfc9002#section-2" class="relref">Section 2</a> of [<a href="#QUIC-RETRANSMISSION" class="cite xref">QUIC-RETRANSMISSION</a>]</span>) are exchanged
 between the client and proxy. If these periods extend beyond the effective idle
@@ -2729,22 +2767,22 @@ the QUIC connection might be closed by the proxy if the proxy does not use
 forwarded packets as an explicit liveness signal. To avoid this, clients SHOULD
 send keepalive packets to the proxy before the idle timeouts would be reached,
 which can be done using a PING frame or another ack-eliciting frame as described
-in <span><a href="https://rfc-editor.org/rfc/rfc9000#section-10.1.1" class="relref">Section 10.1.1</a> of [<a href="#QUIC" class="cite xref">QUIC</a>]</span>.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
+in <span><a href="https://rfc-editor.org/rfc/rfc9000#section-10.1.1" class="relref">Section 10.1.1</a> of [<a href="#QUIC" class="cite xref">QUIC</a>]</span>.<a href="#section-6.4-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="migration">
-<section id="section-5.5">
+<section id="section-6.5">
         <h3 id="name-handling-connection-migrati">
-<a href="#section-5.5" class="section-number selfRef">5.5. </a><a href="#name-handling-connection-migrati" class="section-name selfRef">Handling Connection Migration</a>
+<a href="#section-6.5" class="section-number selfRef">6.5. </a><a href="#name-handling-connection-migrati" class="section-name selfRef">Handling Connection Migration</a>
         </h3>
-<p id="section-5.5-1">If a proxy supports QUIC connection migration, it needs to ensure that a migration
+<p id="section-6.5-1">If a proxy supports QUIC connection migration, it needs to ensure that a migration
 event does not end up sending too many tunnelled or forwarded packets on a new
-path prior to path validation.<a href="#section-5.5-1" class="pilcrow">¶</a></p>
-<p id="section-5.5-2">Specifically, the proxy MUST limit the number of packets that it will proxy
+path prior to path validation.<a href="#section-6.5-1" class="pilcrow">¶</a></p>
+<p id="section-6.5-2">Specifically, the proxy MUST limit the number of packets that it will proxy
 to an unvalidated client address to the size of an initial congestion window.
 Proxies additionally SHOULD pace the rate at which packets are sent over a new
-path to avoid creating unintentional congestion on the new path.<a href="#section-5.5-2" class="pilcrow">¶</a></p>
-<p id="section-5.5-3">When operating in forwarded mode, the proxy reconfigures or removes forwarding
+path to avoid creating unintentional congestion on the new path.<a href="#section-6.5-2" class="pilcrow">¶</a></p>
+<p id="section-6.5-3">When operating in forwarded mode, the proxy reconfigures or removes forwarding
 rules as the network path between the client and proxy changes. In the event of
 passive migration, the proxy automatically reconfigures forwarding rules to use
 the latest active and validated network path for the HTTP stream. In the event of
@@ -2756,41 +2794,41 @@ tunnelled mode or can request new forwarding rules via REGISTER_CLIENT_CID and
 REGISTER_TARGET_CID capsules. Each of the acknowledging capsules will contain new
 virtual connection IDs to prevent packets with the same connection ID bytes being
 used over multiple network paths. Note that the client CID and target CID
-can stay the same while the target VCID and client VCID change.<a href="#section-5.5-3" class="pilcrow">¶</a></p>
+can stay the same while the target VCID and client VCID change.<a href="#section-6.5-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="ecn">
-<section id="section-5.6">
+<section id="section-6.6">
         <h3 id="name-handling-ecn-marking">
-<a href="#section-5.6" class="section-number selfRef">5.6. </a><a href="#name-handling-ecn-marking" class="section-name selfRef">Handling ECN Marking</a>
+<a href="#section-6.6" class="section-number selfRef">6.6. </a><a href="#name-handling-ecn-marking" class="section-name selfRef">Handling ECN Marking</a>
         </h3>
-<p id="section-5.6-1">Explicit Congestion Notification marking <span>[<a href="#ECN" class="cite xref">ECN</a>]</span> uses two bits in the IP
+<p id="section-6.6-1">Explicit Congestion Notification marking <span>[<a href="#ECN" class="cite xref">ECN</a>]</span> uses two bits in the IP
 header to signal congestion from a network to endpoints. When using forwarded mode,
 the proxy replaces IP headers for packets exchanged between the client and target;
 these headers can include ECN markings. Proxies SHOULD preserve ECN markings on
 forwarded packets in both directions, to allow ECN to function end-to-end. If the proxy does not
-preserve ECN markings, it MUST set ECN marks to zero on the IP headers it generates.<a href="#section-5.6-1" class="pilcrow">¶</a></p>
-<p id="section-5.6-2">Forwarded mode does not create an IP-in-IP tunnel, so the guidance in
+preserve ECN markings, it MUST set ECN marks to zero on the IP headers it generates.<a href="#section-6.6-1" class="pilcrow">¶</a></p>
+<p id="section-6.6-2">Forwarded mode does not create an IP-in-IP tunnel, so the guidance in
 <span>[<a href="#ECN-TUNNEL" class="cite xref">ECN-TUNNEL</a>]</span> about transferring ECN markings between inner and outer IP
-headers does not apply.<a href="#section-5.6-2" class="pilcrow">¶</a></p>
-<p id="section-5.6-3">A proxy MAY additionally add ECN markings to signal congestion being experienced
-on the proxy itself.<a href="#section-5.6-3" class="pilcrow">¶</a></p>
+headers does not apply.<a href="#section-6.6-2" class="pilcrow">¶</a></p>
+<p id="section-6.6-3">A proxy MAY additionally add ECN markings to signal congestion being experienced
+on the proxy itself.<a href="#section-6.6-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="resets">
-<section id="section-5.7">
+<section id="section-6.7">
         <h3 id="name-stateless-resets-for-forwar">
-<a href="#section-5.7" class="section-number selfRef">5.7. </a><a href="#name-stateless-resets-for-forwar" class="section-name selfRef">Stateless Resets for Forwarded Mode QUIC Packets</a>
+<a href="#section-6.7" class="section-number selfRef">6.7. </a><a href="#name-stateless-resets-for-forwar" class="section-name selfRef">Stateless Resets for Forwarded Mode QUIC Packets</a>
         </h3>
-<p id="section-5.7-1">While the lifecycle of forwarding rules are bound to the lifecycle of the
+<p id="section-6.7-1">While the lifecycle of forwarding rules are bound to the lifecycle of the
 client-to-proxy HTTP stream, a peer may not be aware that the stream has
 terminated. If the above mappings are lost or removed without the peer's
 knowledge, they may send forwarded mode packets even though the client
 or proxy no longer has state for that connection. To allow the client or
 proxy to reset the client-to-target connection in the absence of the mappings
 above, a stateless reset token corresponding to the Virtual Connection ID
-can be provided.<a href="#section-5.7-1" class="pilcrow">¶</a></p>
-<p id="section-5.7-2">Consider a proxy that initiates closure of a client-to-proxy QUIC connection.
+can be provided.<a href="#section-6.7-1" class="pilcrow">¶</a></p>
+<p id="section-6.7-2">Consider a proxy that initiates closure of a client-to-proxy QUIC connection.
 If the client is temporarily unresponsive or unreachable, the proxy might have
 considered the connection closed and removed all connection state (including
 the stream mappings used for forwarding). If the client never learned about the closure, it
@@ -2800,13 +2838,13 @@ forwarded mode packets, but won't have any state corresponding to the
 destination connection ID in the packet. If the proxy has provided a stateless
 reset token for the target VCID, it can send a stateless reset
 packet to quickly notify the client that the client-to-target connection is
-broken.<a href="#section-5.7-2" class="pilcrow">¶</a></p>
+broken.<a href="#section-6.7-2" class="pilcrow">¶</a></p>
 <div id="stateless-resets-from-the-target">
-<section id="section-5.7.1">
+<section id="section-6.7.1">
           <h4 id="name-stateless-resets-from-the-t">
-<a href="#section-5.7.1" class="section-number selfRef">5.7.1. </a><a href="#name-stateless-resets-from-the-t" class="section-name selfRef">Stateless Resets from the Target</a>
+<a href="#section-6.7.1" class="section-number selfRef">6.7.1. </a><a href="#name-stateless-resets-from-the-t" class="section-name selfRef">Stateless Resets from the Target</a>
           </h4>
-<p id="section-5.7.1-1">Reuse of proxy-to-target 4-tuples is only possible because QUIC connection IDs
+<p id="section-6.7.1-1">Reuse of proxy-to-target 4-tuples is only possible because QUIC connection IDs
 allow distinguishing packets for multiple QUIC connections received with the
 same 5-tuple. One exception to this is Stateless Reset packets, in which the
 connection ID is not used, but rather populated with unpredictable bits followed
@@ -2816,7 +2854,7 @@ Reset packets, the client SHOULD share the Stateless Reset token for each
 registered target CID. When the proxy receives a Stateless Reset packet,
 it can send the packet to the client as a tunnelled datagram. Although Stateless Reset packets
 look like short header packets, they are not technically short header packets and do not contain
-negotiated connection IDs, and thus are not eligible for forwarded mode.<a href="#section-5.7.1-1" class="pilcrow">¶</a></p>
+negotiated connection IDs, and thus are not eligible for forwarded mode.<a href="#section-6.7.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2824,18 +2862,18 @@ negotiated connection IDs, and thus are not eligible for forwarded mode.<a href=
 </section>
 </div>
 <div id="example-exchange">
-<section id="section-6">
+<section id="section-7">
       <h2 id="name-example-exchange">
-<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-example-exchange" class="section-name selfRef">Example Exchange</a>
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-example-exchange" class="section-name selfRef">Example Exchange</a>
       </h2>
-<p id="section-6-1">Consider a client that is establishing a new QUIC connection through the proxy.
+<p id="section-7-1">Consider a client that is establishing a new QUIC connection through the proxy.
 In this example, the client prefers the <code>scramble</code> transform, but also offers the <code>identity</code>
 transform. It has selected a client CID of <code>0x31323334</code>. In order to inform a proxy
 of the new QUIC client CID, the client also sends a
-REGISTER_CLIENT_CID capsule.<a href="#section-6-1" class="pilcrow">¶</a></p>
-<p id="section-6-2">The client will also send the initial QUIC packet with the Long Header form in
-an HTTP datagram.<a href="#section-6-2" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-6-3">
+REGISTER_CLIENT_CID capsule.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-2">The client will also send the initial QUIC packet with the Long Header form in
+an HTTP datagram.<a href="#section-7-2" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-7-3">
 <pre>
 Client                                             Server
 
@@ -2845,6 +2883,7 @@ STREAM(44): HEADERS             --------&gt;
   :scheme = https
   :path = /target.example.com/443/
   :authority = proxy.example.org
+  proxy-quic-port-sharing = ?1
   proxy-quic-forwarding = ?1; accept-transform=scramble,identity; \
       scramble-key=:abc...789=:
   capsule-protocol = ?1
@@ -2874,28 +2913,28 @@ DATAGRAM                        --------&gt;
                         Capsule Type = ACK_CLIENT_CID
                         Connection ID = 0x31323334
                         Virtual CID = 0x62646668
-</pre><a href="#section-6-3" class="pilcrow">¶</a>
+</pre><a href="#section-7-3" class="pilcrow">¶</a>
 </div>
-<p id="section-6-4">The proxy has acknowledged the client CID and provided a client VCID.
+<p id="section-7-4">The proxy has acknowledged the client CID and provided a client VCID.
 Even if there were Short Header packets to send, the proxy
 cannot send forwarded mode packets because the client hasn't acknowledged the
-client VCID.<a href="#section-6-4" class="pilcrow">¶</a></p>
-<p id="section-6-5">The proxy indicates to the client that it will allow connection ID registrations
+client VCID.<a href="#section-7-4" class="pilcrow">¶</a></p>
+<p id="section-7-5">The proxy indicates to the client that it will allow connection ID registrations
 with sequence numbers 0-3, allowing for registrations beyond the initial maximum
-of 1.<a href="#section-6-5" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-6-6">
+of 1.<a href="#section-7-5" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-7-6">
 <pre>
 STREAM(44): DATA                --------&gt;
   Capsule Type = ACK_CLIENT_VCID
   Connection ID = 0x31323334
   Virtual CID = 0x62646668
   Stateless Reset Token = Token
-</pre><a href="#section-6-6" class="pilcrow">¶</a>
+</pre><a href="#section-7-6" class="pilcrow">¶</a>
 </div>
-<p id="section-6-7">The client acknowledges the client VCID. The proxy still
+<p id="section-7-7">The client acknowledges the client VCID. The proxy still
 doesn't have any Short Header Packets to send, but, if it did, it would be able
-to send with forwarded mode.<a href="#section-6-7" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-6-8">
+to send with forwarded mode.<a href="#section-7-7" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-7-8">
 <pre>
 /* Wait for target server to respond to UDP packet. */
 
@@ -2916,9 +2955,9 @@ DATAGRAM                        --------&gt;
            &lt;--------  UDP Datagram
                         Payload = Forwarded QUIC SH packet
 
-</pre><a href="#section-6-8" class="pilcrow">¶</a>
+</pre><a href="#section-7-8" class="pilcrow">¶</a>
 </div>
-<p id="section-6-9">The client may receive forwarded mode packets from the proxy with a Virtual
+<p id="section-7-9">The client may receive forwarded mode packets from the proxy with a Virtual
 client CID of 0x62646668 which it will replace with the real client CID
 of 0x31323334. All forwarded mode packets sent by the proxy
 will have been modified to contain the client VCID instead
@@ -2926,12 +2965,12 @@ of the client CID, and processed by the negotiated "scramble"
 packet transform. However, in the unlikely event that a forwarded packet
 arrives before the proxy's HTTP response, the client will not know which
 transform the proxy selected. In this case, the client will have to ignore
-the packet or buffer it until the HTTP response is received.<a href="#section-6-9" class="pilcrow">¶</a></p>
-<p id="section-6-10">Once the client learns which Connection ID has been selected by the target
+the packet or buffer it until the HTTP response is received.<a href="#section-7-9" class="pilcrow">¶</a></p>
+<p id="section-7-10">Once the client learns which Connection ID has been selected by the target
 server, it can send a new request to the proxy to establish a mapping for
 forwarding. In this case, that ID is 0x61626364. The client sends the
-following capsule:<a href="#section-6-10" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-6-11">
+following capsule:<a href="#section-7-10" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-7-11">
 <pre>
 STREAM(44): DATA                --------&gt;
   Capsule Type = REGISTER_TARGET_CID
@@ -2948,89 +2987,89 @@ STREAM(44): DATA                --------&gt;
 UDP Datagram                     --------&gt;
   Payload = Forwarded QUIC SH packet
 
-</pre><a href="#section-6-11" class="pilcrow">¶</a>
+</pre><a href="#section-7-11" class="pilcrow">¶</a>
 </div>
-<p id="section-6-12">Upon receiving an ACK_TARGET_CID capsule, the client starts sending Short Header
+<p id="section-7-12">Upon receiving an ACK_TARGET_CID capsule, the client starts sending Short Header
 packets with a Destination Connection ID of 0x123412341234 directly to the proxy
 (not tunnelled), and these are rewritten by the proxy to have the Destination
 Connection ID 0x61626364 prior to being forwarded directly to the target. In the
 reverse direction, Short Header packets from the target with a Destination
 Connection ID of 0x31323334 are modified to replace the Destination Connection
 ID with the client VCID of 0x62646668 and forwarded directly to
-the client.<a href="#section-6-12" class="pilcrow">¶</a></p>
+the client.<a href="#section-7-12" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="packet-size-considerations">
-<section id="section-7">
+<section id="section-8">
       <h2 id="name-packet-size-considerations">
-<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-packet-size-considerations" class="section-name selfRef">Packet Size Considerations</a>
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-packet-size-considerations" class="section-name selfRef">Packet Size Considerations</a>
       </h2>
-<p id="section-7-1">Since Initial QUIC packets must be at least 1200 bytes in length, the HTTP
+<p id="section-8-1">Since Initial QUIC packets must be at least 1200 bytes in length, the HTTP
 Datagram frames that are used for a QUIC-aware proxy MUST be able to carry at least
-1200 bytes.<a href="#section-7-1" class="pilcrow">¶</a></p>
-<p id="section-7-2">Additionally, clients that connect to a proxy for purpose of proxying QUIC
+1200 bytes.<a href="#section-8-1" class="pilcrow">¶</a></p>
+<p id="section-8-2">Additionally, clients that connect to a proxy for purpose of proxying QUIC
 SHOULD start their connection with a larger packet size than 1200 bytes, to
 account for the overhead of tunnelling an Initial QUIC packet within an
 HTTP Datagram frame. If the client does not begin with a larger packet size than
 1200 bytes, it will need to perform Path MTU (Maximum Transmission Unit)
 discovery to discover a larger path size prior to sending any tunnelled Initial
-QUIC packets.<a href="#section-7-2" class="pilcrow">¶</a></p>
-<p id="section-7-3">Once a proxied QUIC connections moves into forwarded mode, the client SHOULD
-initiate Path MTU discovery to increase its end-to-end MTU.<a href="#section-7-3" class="pilcrow">¶</a></p>
+QUIC packets.<a href="#section-8-2" class="pilcrow">¶</a></p>
+<p id="section-8-3">Once a proxied QUIC connections moves into forwarded mode, the client SHOULD
+initiate Path MTU discovery to increase its end-to-end MTU.<a href="#section-8-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security">
-<section id="section-8">
+<section id="section-9">
       <h2 id="name-security-considerations">
-<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-8-1">Proxies that support this extension SHOULD provide protections to rate-limit
+<p id="section-9-1">Proxies that support this extension SHOULD provide protections to rate-limit
 or restrict clients from opening an excessive number of proxied connections, so
-as to limit abuse or use of proxies to launch Denial-of-Service attacks.<a href="#section-8-1" class="pilcrow">¶</a></p>
-<p id="section-8-2">Sending QUIC packets by forwarding through a proxy without tunnelling exposes
+as to limit abuse or use of proxies to launch Denial-of-Service attacks.<a href="#section-9-1" class="pilcrow">¶</a></p>
+<p id="section-9-2">Sending QUIC packets by forwarding through a proxy without tunnelling exposes
 clients to additional information exposure and deanonymization attacks which
 need to be carefully considered. Analysis should consider both passive and
 active attackers which may be global or localized to the network paths used
 on one side of the proxy. The following sections highlight deanonymization risks with
-using forwarded mode.<a href="#section-8-2" class="pilcrow">¶</a></p>
+using forwarded mode.<a href="#section-9-2" class="pilcrow">¶</a></p>
 <div id="passive-attacks">
-<section id="section-8.1">
+<section id="section-9.1">
         <h3 id="name-passive-attacks">
-<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-passive-attacks" class="section-name selfRef">Passive Attacks</a>
+<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-passive-attacks" class="section-name selfRef">Passive Attacks</a>
         </h3>
-<p id="section-8.1-1">A passive attacker aims to deanonymize a client by correlating traffic across
+<p id="section-9.1-1">A passive attacker aims to deanonymize a client by correlating traffic across
 both sides of the proxy. When using forwarded mode with the <code>identity</code> packet
-transform (see <a href="#identity-transform" class="auto internal xref">Section 5.3.1</a>), such correlation is trivial by matching
+transform (see <a href="#identity-transform" class="auto internal xref">Section 6.3.1</a>), such correlation is trivial by matching
 a subset of QUIC packet bytes as packets enter the proxy on one side and exit
 on the other. Packet transforms such as <code>scramble</code> mitigate this by
 cryptographically preventing such byte comparisons
-(see <a href="#scramble-transform" class="auto internal xref">Section 5.3.2</a>).<a href="#section-8.1-1" class="pilcrow">¶</a></p>
-<p id="section-8.1-2">Regardless of which packet transform is used, both tunnelled and forwarded mode
+(see <a href="#scramble-transform" class="auto internal xref">Section 6.3.2</a>).<a href="#section-9.1-1" class="pilcrow">¶</a></p>
+<p id="section-9.1-2">Regardless of which packet transform is used, both tunnelled and forwarded mode
 are still vulnerable to size and timing attacks, without the addition of techniques that go beyond the analysis
 in this document, such as padding and adding chaff packets.  Such techniques could be supported
-in future packet transforms, subject to additional security analysis.<a href="#section-8.1-2" class="pilcrow">¶</a></p>
-<p id="section-8.1-3">Unlike tunnelled mode where packets are fully encapsulated in the client-to-proxy
+in future packet transforms, subject to additional security analysis.<a href="#section-9.1-2" class="pilcrow">¶</a></p>
+<p id="section-9.1-3">Unlike tunnelled mode where packets are fully encapsulated in the client-to-proxy
 connection, clients using forwarded mode to access multiple target servers
 over the same client-to-proxy connection expose the number of target servers
 they are communicating with on each connection to passive attackers that can
 observe the client-to-proxy traffic. This additional metadata revealed on each
-packet simplifies size and timing attacks.<a href="#section-8.1-3" class="pilcrow">¶</a></p>
+packet simplifies size and timing attacks.<a href="#section-9.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="active-attacks">
-<section id="section-8.2">
+<section id="section-9.2">
         <h3 id="name-active-attacks">
-<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-active-attacks" class="section-name selfRef">Active Attacks</a>
+<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-active-attacks" class="section-name selfRef">Active Attacks</a>
         </h3>
-<p id="section-8.2-1">An active attacker is an adversary that can inject, modify, drop, and view
+<p id="section-9.2-1">An active attacker is an adversary that can inject, modify, drop, and view
 packets in the network. Some active attacks have different effects between
 forwarded mode and tunnelled mode, but active attacks can be used to correlate
-flows in either mode.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
-<p id="section-8.2-2">Both tunnelled mode and forwarded mode (regardless of packet transform) are
+flows in either mode.<a href="#section-9.2-1" class="pilcrow">¶</a></p>
+<p id="section-9.2-2">Both tunnelled mode and forwarded mode (regardless of packet transform) are
 vulnerable to packet injection in the target-to-client direction. An attacker
 can inject a burst of packets with a known QUIC Connection ID and see which
-Connection ID is used for the corresponding burst on the proxy-to-client network path.<a href="#section-8.2-2" class="pilcrow">¶</a></p>
-<p id="section-8.2-3">Packet injection with a known QUIC Connection ID can also happen in the
+Connection ID is used for the corresponding burst on the proxy-to-client network path.<a href="#section-9.2-2" class="pilcrow">¶</a></p>
+<p id="section-9.2-3">Packet injection with a known QUIC Connection ID can also happen in the
 client-to-proxy direction, which only affects forwarded mode since
 tunnelled mode sends packets within an authenticated and integrity protected
 QUIC connection to the proxy (see <span>[<a href="#RFC9001" class="cite xref">RFC9001</a>]</span>). None of the packet transforms
@@ -3038,36 +3077,36 @@ defined in this document provide integrity protection. Even if a packet
 transform did provide integrity protection, attackers can inject replayed
 packets. Protection against replayed packets is similarly provided by QUIC in
 tunnelled mode, but not provided by any of the forwarded mode packet transforms
-defined in this document.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
-<p id="section-8.2-4">An active attacker can modify packets in the client-to-proxy direction, which
+defined in this document.<a href="#section-9.2-3" class="pilcrow">¶</a></p>
+<p id="section-9.2-4">An active attacker can modify packets in the client-to-proxy direction, which
 would cause a tunnelling proxy to silently drop packets, while a forwarding proxy
 would forward the packets. In this way, forwarded mode is less vulnerable to
-flow recognition based on corrupting a portion of packets in a burst.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
-<p id="section-8.2-5">Chaining of proxies using forwarded mode introduces the risk of forwarding loop
+flow recognition based on corrupting a portion of packets in a burst.<a href="#section-9.2-4" class="pilcrow">¶</a></p>
+<p id="section-9.2-5">Chaining of proxies using forwarded mode introduces the risk of forwarding loop
 attacks. Preventing client VCID conflicts across proxies
 sharing an IP address and port mitigates one such forwarding loop attack.
 Conflicts can be avoided by partitioning the client VCID space
-across proxies, using sufficiently long and random values, or by other means.<a href="#section-8.2-5" class="pilcrow">¶</a></p>
+across proxies, using sufficiently long and random values, or by other means.<a href="#section-9.2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="iana">
-<section id="section-9">
+<section id="section-10">
       <h2 id="name-iana-considerations">
-<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
 <div id="iana-header">
-<section id="section-9.1">
+<section id="section-10.1">
         <h3 id="name-http-header-field">
-<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-http-header-field" class="section-name selfRef">HTTP Header Field</a>
+<a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-http-header-field" class="section-name selfRef">HTTP Header Field</a>
         </h3>
-<p id="section-9.1-1">This document registers the "Proxy-QUIC-Forwarding" header field in the
+<p id="section-10.1-1">This document registers the "Proxy-QUIC-Forwarding" header field in the
 "Hypertext Transfer Protocol (HTTP) Field Name Registry"
-&lt;<span><a href="https://www.iana.org/assignments/http-fields">https://www.iana.org/assignments/http-fields</a></span>&gt;.<a href="#section-9.1-1" class="pilcrow">¶</a></p>
+&lt;<span><a href="https://www.iana.org/assignments/http-fields">https://www.iana.org/assignments/http-fields</a></span>&gt;.<a href="#section-10.1-1" class="pilcrow">¶</a></p>
 <span id="name-registered-http-header-fiel"></span><div id="iana-header-type-table">
 <figure id="figure-11">
-          <div class="alignLeft art-text artwork" id="section-9.1-2.1">
+          <div class="alignLeft art-text artwork" id="section-10.1-2.1">
 <pre>
     +-----------------------+-----------+-----------------+---------------+----------+
     |      Field Name       |  Status   | Structured Type |   Reference   | Comments |
@@ -3083,18 +3122,18 @@ across proxies, using sufficiently long and random values, or by other means.<a 
 </section>
 </div>
 <div id="proxy-quic-forwarding-parameter-names">
-<section id="section-9.2">
+<section id="section-10.2">
         <h3 id="name-proxy-quic-forwarding-param">
-<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-proxy-quic-forwarding-param" class="section-name selfRef">Proxy QUIC Forwarding Parameter Names</a>
+<a href="#section-10.2" class="section-number selfRef">10.2. </a><a href="#name-proxy-quic-forwarding-param" class="section-name selfRef">Proxy QUIC Forwarding Parameter Names</a>
         </h3>
-<p id="section-9.2-1">This document establishes a new registry, "Proxy QUIC Forwarding Parameter Names",
+<p id="section-10.2-1">This document establishes a new registry, "Proxy QUIC Forwarding Parameter Names",
 for parameter names to use with the "Proxy-QUIC-Forwarding" header field,
 in &lt;<span><a href="https://www.iana.org/assignments/masque/masque.xhtml">https://www.iana.org/assignments/masque/masque.xhtml</a></span>&gt;.
 Registrations in this registry are assigned using the
-Specification Required policy (Section 4.6 of [IANA-POLICY]).<a href="#section-9.2-1" class="pilcrow">¶</a></p>
+Specification Required policy (Section 4.6 of [IANA-POLICY]).<a href="#section-10.2-1" class="pilcrow">¶</a></p>
 <span id="name-initial-proxy-quic-forwardi"></span><div id="iana-parameter-names-table">
 <figure id="figure-12">
-          <div class="alignLeft art-text artwork" id="section-9.2-2.1">
+          <div class="alignLeft art-text artwork" id="section-10.2-2.1">
 <pre>
     +-----------------------+-------------------------------------+---------------+--------------------------------+
     | Parameter Name        | Description                         | Reference     | Notes                          |
@@ -3114,11 +3153,11 @@ Specification Required policy (Section 4.6 of [IANA-POLICY]).<a href="#section-9
 </section>
 </div>
 <div id="iana-transforms">
-<section id="section-9.3">
+<section id="section-10.3">
         <h3 id="name-packet-transform-names">
-<a href="#section-9.3" class="section-number selfRef">9.3. </a><a href="#name-packet-transform-names" class="section-name selfRef">Packet Transform Names</a>
+<a href="#section-10.3" class="section-number selfRef">10.3. </a><a href="#name-packet-transform-names" class="section-name selfRef">Packet Transform Names</a>
         </h3>
-<p id="section-9.3-1">This document establishes a new registry for packet transform names
+<p id="section-10.3-1">This document establishes a new registry for packet transform names
 in &lt;<span><a href="https://www.iana.org/assignments/masque/masque.xhtml">https://www.iana.org/assignments/masque/masque.xhtml</a></span>&gt;
 and defines two initial transforms: "identity" and "scramble".
 Prior to finalization, deployments that implement the version of
@@ -3126,7 +3165,7 @@ the <code>scramble</code> transform defined in this document should use the valu
 "scramble-dt". Once the design team proposal is adopted and a new draft is submitted,
 the wire identifier will become "scramble-XX" where XX is the draft number.
 Registrations in this registry are assigned using the
-Specification Required policy (Section 4.6 of [IANA-POLICY]).<a href="#section-9.3-1" class="pilcrow">¶</a></p>
+Specification Required policy (Section 4.6 of [IANA-POLICY]).<a href="#section-10.3-1" class="pilcrow">¶</a></p>
 <span id="name-initial-packet-transform-na"></span><div id="iana-packet-transforms-table">
 <table class="center" id="table-1">
           <caption>
@@ -3146,14 +3185,14 @@ Specification Required policy (Section 4.6 of [IANA-POLICY]).<a href="#section-9
               <td class="text-left" rowspan="1" colspan="1">identity</td>
               <td class="text-left" rowspan="1" colspan="1">no transformation</td>
               <td class="text-left" rowspan="1" colspan="1">This Document</td>
-              <td class="text-left" rowspan="1" colspan="1">Section <a href="#identity-transform" class="auto internal xref">Section 5.3.1</a>
+              <td class="text-left" rowspan="1" colspan="1">Section <a href="#identity-transform" class="auto internal xref">Section 6.3.1</a>
 </td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">scramble</td>
               <td class="text-left" rowspan="1" colspan="1">Reserved (will be used for final version)</td>
               <td class="text-left" rowspan="1" colspan="1">This Document</td>
-              <td class="text-left" rowspan="1" colspan="1">Section <a href="#scramble-transform" class="auto internal xref">Section 5.3.2</a>
+              <td class="text-left" rowspan="1" colspan="1">Section <a href="#scramble-transform" class="auto internal xref">Section 6.3.2</a>
 </td>
             </tr>
           </tbody>
@@ -3162,13 +3201,13 @@ Specification Required policy (Section 4.6 of [IANA-POLICY]).<a href="#section-9
 </section>
 </div>
 <div id="iana-capsule-types">
-<section id="section-9.4">
+<section id="section-10.4">
         <h3 id="name-capsule-types">
-<a href="#section-9.4" class="section-number selfRef">9.4. </a><a href="#name-capsule-types" class="section-name selfRef">Capsule Types</a>
+<a href="#section-10.4" class="section-number selfRef">10.4. </a><a href="#name-capsule-types" class="section-name selfRef">Capsule Types</a>
         </h3>
-<p id="section-9.4-1">This document registers six new values in the "HTTP Capsule Types"
+<p id="section-10.4-1">This document registers six new values in the "HTTP Capsule Types"
 registry established by <span>[<a href="#HTTP-CAPSULES" class="cite xref">HTTP-CAPSULES</a>]</span>. Note that the codepoints below
-will be replaced with lower values before publication.<a href="#section-9.4-1" class="pilcrow">¶</a></p>
+will be replaced with lower values before publication.<a href="#section-10.4-1" class="pilcrow">¶</a></p>
 <span id="name-registered-capsule-types"></span><div id="iana-capsule-type-table">
 <table class="center" id="table-2">
           <caption>
@@ -3226,31 +3265,31 @@ will be replaced with lower values before publication.<a href="#section-9.4-1" c
           </tbody>
         </table>
 </div>
-<p id="section-9.4-3">All of these new entries use the following values for these fields:<a href="#section-9.4-3" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlCompact dlParallel" id="section-9.4-4">
-          <dt id="section-9.4-4.1">Status:</dt>
-          <dd style="margin-left: 1.5em" id="section-9.4-4.2">
-            <p id="section-9.4-4.2.1">provisional (permanent when this document is published)<a href="#section-9.4-4.2.1" class="pilcrow">¶</a></p>
+<p id="section-10.4-3">All of these new entries use the following values for these fields:<a href="#section-10.4-3" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlCompact dlParallel" id="section-10.4-4">
+          <dt id="section-10.4-4.1">Status:</dt>
+          <dd style="margin-left: 1.5em" id="section-10.4-4.2">
+            <p id="section-10.4-4.2.1">provisional (permanent when this document is published)<a href="#section-10.4-4.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-9.4-4.3">Reference:</dt>
-          <dd style="margin-left: 1.5em" id="section-9.4-4.4">
-            <p id="section-9.4-4.4.1">This document<a href="#section-9.4-4.4.1" class="pilcrow">¶</a></p>
+<dt id="section-10.4-4.3">Reference:</dt>
+          <dd style="margin-left: 1.5em" id="section-10.4-4.4">
+            <p id="section-10.4-4.4.1">This document<a href="#section-10.4-4.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-9.4-4.5">Change Controller:</dt>
-          <dd style="margin-left: 1.5em" id="section-9.4-4.6">
-            <p id="section-9.4-4.6.1">IETF<a href="#section-9.4-4.6.1" class="pilcrow">¶</a></p>
+<dt id="section-10.4-4.5">Change Controller:</dt>
+          <dd style="margin-left: 1.5em" id="section-10.4-4.6">
+            <p id="section-10.4-4.6.1">IETF<a href="#section-10.4-4.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-9.4-4.7">Contact:</dt>
-          <dd style="margin-left: 1.5em" id="section-9.4-4.8">
-            <p id="section-9.4-4.8.1">masque@ietf.org<a href="#section-9.4-4.8.1" class="pilcrow">¶</a></p>
+<dt id="section-10.4-4.7">Contact:</dt>
+          <dd style="margin-left: 1.5em" id="section-10.4-4.8">
+            <p id="section-10.4-4.8.1">masque@ietf.org<a href="#section-10.4-4.8.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-9.4-4.9">Notes:</dt>
-          <dd style="margin-left: 1.5em" id="section-9.4-4.10">
-            <p id="section-9.4-4.10.1">None<a href="#section-9.4-4.10.1" class="pilcrow">¶</a></p>
+<dt id="section-10.4-4.9">Notes:</dt>
+          <dd style="margin-left: 1.5em" id="section-10.4-4.10">
+            <p id="section-10.4-4.10.1">None<a href="#section-10.4-4.10.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
@@ -3259,14 +3298,14 @@ will be replaced with lower values before publication.<a href="#section-9.4-1" c
 </section>
 </div>
 <div id="sec-combined-references">
-<section id="section-10">
+<section id="section-11">
       <h2 id="name-references">
-<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-references" class="section-name selfRef">References</a>
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
 <div id="sec-normative-references">
-<section id="section-10.1">
+<section id="section-11.1">
         <h3 id="name-normative-references">
-<a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+<a href="#section-11.1" class="section-number selfRef">11.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
         </h3>
 <dl class="references">
 <dt id="CONNECT-UDP">[CONNECT-UDP]</dt>
@@ -3317,9 +3356,9 @@ will be replaced with lower values before publication.<a href="#section-9.4-1" c
 </section>
 </div>
 <div id="sec-informative-references">
-<section id="section-10.2">
+<section id="section-11.2">
         <h3 id="name-informative-references">
-<a href="#section-10.2" class="section-number selfRef">10.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+<a href="#section-11.2" class="section-number selfRef">11.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
         </h3>
 <dl class="references">
 <dt id="ECN-TUNNEL">[ECN-TUNNEL]</dt>
@@ -3328,7 +3367,7 @@ will be replaced with lower values before publication.<a href="#section-9.4-1" c
 <dd class="break"></dd>
 <dt id="QUIC-LB">[QUIC-LB]</dt>
         <dd>
-<span class="refAuthor">Duke, M.</span>, <span class="refAuthor">Banks, N.</span>, and <span class="refAuthor">C. Huitema</span>, <span class="refTitle">"QUIC-LB: Generating Routable QUIC Connection IDs"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-load-balancers-19</span>, <time datetime="2024-02-05" class="refDate">5 February 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-load-balancers-19">https://datatracker.ietf.org/doc/html/draft-ietf-quic-load-balancers-19</a>&gt;</span>. </dd>
+<span class="refAuthor">Duke, M.</span>, <span class="refAuthor">Banks, N.</span>, and <span class="refAuthor">C. Huitema</span>, <span class="refTitle">"QUIC-LB: Generating Routable QUIC Connection IDs"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-load-balancers-20</span>, <time datetime="2025-03-03" class="refDate">3 March 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-load-balancers-20">https://datatracker.ietf.org/doc/html/draft-ietf-quic-load-balancers-20</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8999">[RFC8999]</dt>
         <dd>
