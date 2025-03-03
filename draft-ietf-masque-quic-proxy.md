@@ -93,8 +93,8 @@ Connection IDs. QUIC Connection IDs are used to identify QUIC connections in
 scenarios where there is not a strict one-to-one mapping between QUIC
 connections and UDP 4-tuples (pairs of IP addresses and ports).
 
-Once a proxy is aware of QUIC Connection IDs, it can reuse UDP 4-tuples between
-itself and a target for multiple proxied QUIC connections.
+If a client permits proxy port reuse, once a proxy is aware of QUIC Connection IDs,
+it can reuse UDP 4-tuples between itself and a target for multiple proxied QUIC connections.
 
 For proxies that are themselves running on HTTP/3 {{!HTTP3=RFC9114}}, and thus
 are accessed by clients over QUIC, QUIC Connection IDs can be used to treat
@@ -355,6 +355,16 @@ field is not included, none of the functionality in this document can be used.
   capsule-protocol = ?1
 ~~~
 
+To permit the proxy to share target-facing ports, the client needs to include the
+"Proxy-QUIC-Port-Sharing" header field, as defined in {{port-sharing-header}}.
+This indicates that the proxy may share target-facing 4-tuples concurrently with
+other QUIC connections. Clients that do not want the target-facing 4-tuple shared
+will not include this header or will provide it with a value of "?0".
+
+~~~
+  proxy-quic-port-sharing = ?1
+~~~
+
 To support forwarded mode, both clients and proxies need to include
 the "Proxy-QUIC-Forwarding" header field, as defined in {{forwarding-header}}.
 This indicates support for forwarded mode, and allows negotiation of
@@ -366,6 +376,9 @@ don't support forwarded mode will not include this header field.
   proxy-quic-forwarding = ?1; accept-transform=scramble,identity; \
       scramble-key=:abc...789=:
 ~~~
+
+If neither header is supplied with a value of "?1", none of the functionality
+in this document can be used and handling reduces to normal connect-udp.
 
 After negotiating support with header fields, clients and proxies use
 the capsules defined in {{cid-capsules}} to communicate information
@@ -459,6 +472,26 @@ The proxy MUST include a "transform" parameter whose value is an `sf-string`
 indicating the selected transform. If the proxy does not recognize or accept
 any of the transforms offered by the client, it MUST omit this parameter and
 set the header field value to "?0", or omit the header entirely.
+
+# Proxy-QUIC-Port-Sharing Header {#port-sharing-header}
+
+A client may include the "Proxy-QUIC-Port-Sharing" header to indicate whether
+or not the proxy is permitted to share ports between this QUIC connection and other
+proxied QUIC connections.
+
+"Proxy-QUIC-Port-Sharing" is an Item Structured Header {{!RFC8941}}. Its value
+MUST be a Boolean.
+
+Clients SHOULD send this with a value of "?1" unless the client wishes to prohibit
+this behavior. Permitting the proxy to share ports may allow the proxy to conserve
+resources and support more clients.
+
+A proxy that does not support port sharing, SHOULD send "Proxy-QUIC-Port-Sharing"
+with a value of "?0". Doing so allows clients to stop sending capsules for this
+extension if forwarding mode is also not supported. Clients who send "?1", but do
+not receive any "Proxy-QUIC-Port-Sharing" header in response must assume that port
+sharing may be in effect and MUST continue register connection IDs in order for
+the proxied connection to continue to work.
 
 # Connection ID Capsules {#cid-capsules}
 
@@ -874,7 +907,9 @@ the target hostname in the CONNECT request, or finding an existing proxy-to-targ
 previous request from this client, or another. If the 4-tuple is not already
 created, the proxy creates a new one. Proxies can choose to reuse proxy-to-target
 4-tuples across multiple UDP proxying requests, or have a unique proxy-to-target 4-tuple
-for every UDP proxying request.
+for every UDP proxying request. If the client did not send a value of "?1" for the
+"Proxy-QUIC-Port-Sharing" header, port reuse is not permitted and the proxy MUST allocate
+a new UDP 4-tuple.
 
 If a proxy reuses proxy-to-target 4-tuples, it SHOULD store which authorities
 (which could be a domain name or IP address literal) are being accessed over a
@@ -1228,6 +1263,7 @@ STREAM(44): HEADERS             -------->
   :scheme = https
   :path = /target.example.com/443/
   :authority = proxy.example.org
+  proxy-quic-port-sharing = ?1
   proxy-quic-forwarding = ?1; accept-transform=scramble,identity; \
       scramble-key=:abc...789=:
   capsule-protocol = ?1
