@@ -549,6 +549,17 @@ send a MAX_CONNECTION_IDS capsule with a value less than 1. Clients receiving a
 MAX_CONNECTION_IDS capsule with a value less than 1 MUST reset the stream with
 H3_DATAGRAM_ERROR error code.
 
+When port sharing {{port-sharing-header}} is supported, the client MUST register
+and receive acknowledgements for client and target CIDs before using them. Packets with
+unknown connection IDs received by the proxy on a target-facing sockets that support
+port sharing MUST be dropped. In order to avoid introducing an additional round trip
+on setup, a REGISTER_CLIENT_CID capsule SHOULD be sent at the same time as the client's
+first flight. If the proxy rejects the client CID, the proxy MUST drop all packets until
+it has sent an ACK_CLIENT_CID capsule and the client MUST NOT send any packets until
+receiving an ACK_CLIENT_CID. When port sharing is supported, a proxy SHOULD buffer a
+reasonable number of incoming packets while waiting for the first REGISTER_CLIENT_CID
+capsule.
+
 ## REGISTER_CLIENT_CID {#capsule-reg-client}
 
 The REGISTER_CLIENT_CID capsule is sent by the client and contains a single
@@ -808,7 +819,7 @@ conflicts.
 
 ## Client Considerations
 
-The client sends a REGISTER_CLIENT_CID capsule whenever it advertises a new
+The client sends a REGISTER_CLIENT_CID capsule before it advertises a new
 client CID to the target, and a REGISTER_TARGET_CID capsule when
 it has received a new target CID for the target. In order to change
 the connection ID bytes on the wire, a client can solicit new virtual connection
