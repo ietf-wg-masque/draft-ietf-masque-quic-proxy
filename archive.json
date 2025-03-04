@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-03-02T00:39:22.671618+00:00",
+  "timestamp": "2025-03-04T00:37:07.703223+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -1325,16 +1325,24 @@
       "id": "I_kwDOEHrEP85UzBmh",
       "title": "Capsules and Port Reuse",
       "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/65",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "ehaydenr",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "With the introduction of capsules, a proxy receives request headers and client connection id separately. In order to reuse ports, a proxy must know the client connection id when selecting a socket so that it can properly demultiplex when receiving on that target-facing socket. We should clarify what clients and proxies should do to increase the likelihood of proxies being able to reuse target-facing ports.",
       "createdAt": "2022-10-25T15:31:06Z",
-      "updatedAt": "2022-10-25T15:31:06Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2025-03-03T21:45:29Z",
+      "closedAt": "2025-03-03T21:45:28Z",
+      "comments": [
+        {
+          "author": "ehaydenr",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Addressed by #121 ",
+          "createdAt": "2025-03-03T21:45:28Z",
+          "updatedAt": "2025-03-03T21:45:28Z"
+        }
+      ]
     },
     {
       "number": 67,
@@ -10545,7 +10553,7 @@
       "labels": [],
       "body": "closes #91 ",
       "createdAt": "2025-02-28T17:29:48Z",
-      "updatedAt": "2025-02-28T19:22:26Z",
+      "updatedAt": "2025-03-03T20:04:38Z",
       "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
       "baseRefName": "main",
       "baseRefOid": "e1f868a5c4153d17b532094b7c000c81513aa766",
@@ -10591,6 +10599,137 @@
           "body": "",
           "createdAt": "2025-02-28T19:19:17Z",
           "updatedAt": "2025-02-28T19:19:17Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOEHrEP86eQrxh",
+          "commit": {
+            "abbreviatedOid": "17cb9f8"
+          },
+          "author": "DavidSchinazi",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "LGTM",
+          "createdAt": "2025-03-03T20:04:38Z",
+          "updatedAt": "2025-03-03T20:04:38Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 120,
+      "id": "PR_kwDOEHrEP86NNUZ4",
+      "title": "proxy-quic-port-sharing header",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/120",
+      "state": "MERGED",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-03-03T20:52:18Z",
+      "updatedAt": "2025-03-03T22:16:10Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "df5be65ebaabe95748529531d151cf946bac4f10",
+      "headRepository": "ehaydenr/quic-proxy",
+      "headRefName": "issue-38",
+      "headRefOid": "594c2e2ab0e09333a147ef6b874ce5bcdbfda6ae",
+      "closedAt": "2025-03-03T21:34:37Z",
+      "mergedAt": "2025-03-03T21:34:37Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "84a68156383278de95c370b3ca65403188cd014f"
+      },
+      "comments": [
+        {
+          "author": "ehaydenr",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Addresses part of #38 ",
+          "createdAt": "2025-03-03T20:52:51Z",
+          "updatedAt": "2025-03-03T20:52:51Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP86eRCOM",
+          "commit": {
+            "abbreviatedOid": "594c2e2"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-03-03T20:54:27Z",
+          "updatedAt": "2025-03-03T20:54:27Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOEHrEP86eR2Np",
+          "commit": {
+            "abbreviatedOid": "594c2e2"
+          },
+          "author": "DavidSchinazi",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "LGTM",
+          "createdAt": "2025-03-03T22:16:10Z",
+          "updatedAt": "2025-03-03T22:16:10Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 121,
+      "id": "PR_kwDOEHrEP86NNlrX",
+      "title": "Port sharing guidance",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/121",
+      "state": "MERGED",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Addresses #84. Depends on #120 ",
+      "createdAt": "2025-03-03T21:32:13Z",
+      "updatedAt": "2025-03-03T22:16:39Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "84a68156383278de95c370b3ca65403188cd014f",
+      "headRepository": "ehaydenr/quic-proxy",
+      "headRefName": "issue-84",
+      "headRefOid": "63852b063a51d7c08a9fd92edebc52aedb890d48",
+      "closedAt": "2025-03-03T21:44:49Z",
+      "mergedAt": "2025-03-03T21:44:49Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "099c163983dd6512f7db641a36b09c0abb6d5368"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP86eRnuj",
+          "commit": {
+            "abbreviatedOid": "63852b0"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-03-03T21:43:46Z",
+          "updatedAt": "2025-03-03T21:43:46Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOEHrEP86eR2ZD",
+          "commit": {
+            "abbreviatedOid": "63852b0"
+          },
+          "author": "DavidSchinazi",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "LGTM",
+          "createdAt": "2025-03-03T22:16:39Z",
+          "updatedAt": "2025-03-03T22:16:39Z",
           "comments": []
         }
       ]
