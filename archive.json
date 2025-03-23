@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-03-20T00:37:00.222010+00:00",
+  "timestamp": "2025-03-23T00:41:08.779110+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -1477,9 +1477,17 @@
       ],
       "body": "One of the features of the [original MASQUE proposal](https://www.ietf.org/archive/id/draft-schinazi-masque-protocol-03.html#name-quic-proxying) was the ability to compress QUIC connection IDs to minimize encapsulation overhead. This might no longer be necessary now that we have \"forwarded mode\", but I'm filing this issue so we discuss whether CID compression is still relevant or not. This feature would be useful for use cases that cannot accept the reduced security properties of forwarded mode, but we should discuss as a WG whether such use cases exist in real life and whether we want to support them.",
       "createdAt": "2023-03-07T05:06:03Z",
-      "updatedAt": "2023-03-07T23:09:54Z",
+      "updatedAt": "2025-03-21T02:41:55Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "ehaydenr",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@DavidSchinazi, this was [discussed at 117](https://youtu.be/7MJkpBIWkV8?si=SX0Ey4t-6t9t9HdD&t=2130). My sense is this is probably still useful for non-forwarding mode cases, but that it likely makes more sense to define in a separate draft. Do you think we're good to close this out or should we consider this further?",
+          "createdAt": "2025-03-21T02:41:55Z",
+          "updatedAt": "2025-03-21T02:41:55Z"
+        }
+      ]
     },
     {
       "number": 79,
@@ -2347,6 +2355,54 @@
       "body": "https://csrc.nist.gov/News/2022/proposal-to-revise-sp-800-38a\r\n\r\nThat RFC 9001 says it uses ECB is a disaster. It have heard people stating several times that ECB is ok in other settings as it is used by QUIC.\r\n\r\nStating that you use ECB will soon be non-compliant as NIST will soon disallow ECB.\r\n\r\nhttps://csrc.nist.gov/News/2022/proposal-to-revise-sp-800-38a\r\n\r\n_\"the use of ECB to encrypt confidential information constitutes a severe security vulnerability\"\r\n\"In the revision, NIST proposes to limit the approval of ECB to instances that are specifically allowed by other NIST standards or guidance.\"_\r\n\r\nPlease reformulate to state that you use AES encryption or AES-CTR, AES-CBC, AES-OFB, or AES-CFB.\r\n",
       "createdAt": "2024-09-20T16:06:42Z",
       "updatedAt": "2024-09-20T16:07:44Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 122,
+      "id": "I_kwDOEHrEP86vGVpl",
+      "title": "Clarify if VCIDs can be equal to CIDs",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/122",
+      "state": "OPEN",
+      "author": "tfpauly",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "There are some cases where the proxy might want to have the VCID assigned to a client be the same as the client's original CID. If this is allowed, we should be clear.\n\nOne possible concern is around the CID looping prevention:\n\n> The client VCID MUST either be constructed such that it is unpredictable to the client or to guarantee no conflicts among all proxies sharing an IP address and port. See [Section 9](https://ietf-wg-masque.github.io/draft-ietf-masque-quic-proxy/draft-ietf-masque-quic-proxy.html#security) for more discussion on client VCID construction.",
+      "createdAt": "2025-03-21T08:29:24Z",
+      "updatedAt": "2025-03-21T08:29:24Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 123,
+      "id": "I_kwDOEHrEP86vGfLz",
+      "title": "Proxy-QUIC-Forwarding stuff",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/123",
+      "state": "OPEN",
+      "author": "LPardue",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "[Draft 05](https://www.ietf.org/archive/id/draft-ietf-masque-quic-proxy-05.html#section-3) says some stuff that I'll comment in line on:\n\n> \"Proxy-QUIC-Forwarding\" is an Item Structured Header [[RFC8941](https://www.ietf.org/archive/id/draft-ietf-masque-quic-proxy-05.html#RFC8941)]. Its value MUST be a Boolean.\n> If the client wants to enable QUIC packet forwarding for this request, it sets the value to \"?1\". If it doesn't want to enable forwarding, but instead only provide information about QUIC Connection IDs for the purpose of allowing the proxy to share a proxy-to-target 4-tuple, it sets the value to \"?0\".\n\nFine\n\n> The client MUST add an \"accept-transform\" parameter whose value is an sf-string containing the supported packet transforms ([Section 6.3](https://www.ietf.org/archive/id/draft-ietf-masque-quic-proxy-05.html#transforms)) in order of descending preference, separated by commas. If the proxy receives a \"Proxy-QUIC-Forwarding\" header without the \"accept-transform\" parameters, it MUST ignore the header and respond as if the client had not sent the \"Proxy-QUIC-Forwarding\" header.\n\nnit: `sf-string` is the old terminology we don't like please use `String`.\n\nmajor: IIUC the value is a comma-separated list of values. The only currently defined values are `identity` and `scramble-dt` (to be changed to `scramble` later). So a couple of point here:\n\n1. What does it mean to receive a value that is not known? For example, what if I send `poached`? I presume its not an issue and should be ignored but nothing lept out at me\n2. How are you going to deal with whitespace in these values? E.g. if I send `\"scramble, identity\"` or `\"   scramble, identity    \"`\n3. How do you deal with empty entries such as `\"scramble, , identity\"`?\n\n> If the proxy supports QUIC-aware proxying, it will include the \"Proxy-QUIC-Forwarding\" header in successful HTTP responses. The value indicates whether or not the proxy supports forwarding. If the client does not receive this header in responses, the client SHALL assume that the proxy does not support this extension.\n> The proxy MUST include a \"transform\" parameter whose value is an sf-string indicating the selected transform. If the proxy does not recognize or accept any of the transforms offered by the client, it MUST omit this parameter and set the header field value to \"?0\", or omit the header entirely.\n\nmajor: \n\n4. does the value have to be identical to one of the values that client sent? It seems implicit it should - what does a client do if the server is b0rked (i.e. should it abort the request?)\n\nGeneral\n\n5. What happens if client sends `transform` or server sends `accept-transform` ?\n\n6. Given that you have different rules for how these headers are used by client and server have you considered splitting these into two headers? That potentially make it clearer to say something like `Proxy-QUIC-Forwarding-Req is boolean and MUST have an accept-transform parameter otherwise it is malformed, and Proxy-QUIC-Forwarding-Resp is a boolean and MUST have a transform parameter otherwise it is malformed`.",
+      "createdAt": "2025-03-21T08:48:44Z",
+      "updatedAt": "2025-03-21T08:50:06Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 124,
+      "id": "I_kwDOEHrEP86vGvsN",
+      "title": "Add acknowledgments for SCRAMBLE design team",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/124",
+      "state": "OPEN",
+      "author": "tfpauly",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "We need to add acknowledgements for the whole design team on SCRAMBLE!\n\nAlso probably Martin Duke for the loops issue.",
+      "createdAt": "2025-03-21T09:16:40Z",
+      "updatedAt": "2025-03-21T09:16:40Z",
       "closedAt": null,
       "comments": []
     }
