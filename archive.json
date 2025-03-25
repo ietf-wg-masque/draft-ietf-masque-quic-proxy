@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-03-23T00:41:08.779110+00:00",
+  "timestamp": "2025-03-25T00:38:15.884201+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -826,7 +826,7 @@
       "labels": [],
       "body": "Lets pull out one issue from #35 that likely need separate treatment.\r\n\r\nSo the security consideration says: \r\n\r\n   Since proxies that forward QUIC packets do not perform any\r\n   cryptographic integrity check, it is possible that these packets are\r\n   either malformed, replays, or otherwise malicious.  This may result\r\n   in proxy targets rate limiting or decreasing the reputation of a\r\n   given proxy.\r\n\r\nSo this is indicating that you agree that forwarded traffic may misbehave and cause reactions in the network. Based on this I think any reuse of 5-tuples between the proxy and the target between multiple clients results in that one MASQUE client and its users could affect the flow of another MASQUE client through its traffic beyond traffic volume. I think that should most definitely be discussed, and I think this is to dangerous and should be recommended against. \r\n\r\nI further think client's need to have some control over re-use of target facing proxy-socket. This as a MASQUE client that represent multiple different users, for example some type of gateway from a network may not have trust in that all its users are good behaving citizens and thus one users traffic should not have fatesharing with another. ",
       "createdAt": "2020-11-19T16:18:04Z",
-      "updatedAt": "2025-02-06T02:28:58Z",
+      "updatedAt": "2025-03-24T09:41:31Z",
       "closedAt": null,
       "comments": [
         {
@@ -835,6 +835,13 @@
           "body": "While I see the concerns, I think we should describe them rather than prohibit anything. If the target is well-known, such as another proxy if we are doing multiple proxy hops, then the concerns about reuse may not apply.",
           "createdAt": "2020-11-19T20:44:05Z",
           "updatedAt": "2025-02-06T02:28:58Z"
+        },
+        {
+          "author": "gloinul",
+          "authorAssociation": "NONE",
+          "body": "Looking at #120 and what is in the current working copy it appears that the control is resolved. What I think has occurred is that the document has lost the potential downsides of performing socket sharing. Neither section 4 nor the Security Consideration discusses why one would not accept socket sharing. ",
+          "createdAt": "2025-03-24T09:41:29Z",
+          "updatedAt": "2025-03-24T09:41:29Z"
         }
       ]
     },
