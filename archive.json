@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-03-27T00:37:56.277361+00:00",
+  "timestamp": "2025-03-30T00:41:47.565597+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -1484,7 +1484,7 @@
       ],
       "body": "One of the features of the [original MASQUE proposal](https://www.ietf.org/archive/id/draft-schinazi-masque-protocol-03.html#name-quic-proxying) was the ability to compress QUIC connection IDs to minimize encapsulation overhead. This might no longer be necessary now that we have \"forwarded mode\", but I'm filing this issue so we discuss whether CID compression is still relevant or not. This feature would be useful for use cases that cannot accept the reduced security properties of forwarded mode, but we should discuss as a WG whether such use cases exist in real life and whether we want to support them.",
       "createdAt": "2023-03-07T05:06:03Z",
-      "updatedAt": "2025-03-21T02:41:55Z",
+      "updatedAt": "2025-03-28T00:41:19Z",
       "closedAt": null,
       "comments": [
         {
@@ -1493,6 +1493,13 @@
           "body": "@DavidSchinazi, this was [discussed at 117](https://youtu.be/7MJkpBIWkV8?si=SX0Ey4t-6t9t9HdD&t=2130). My sense is this is probably still useful for non-forwarding mode cases, but that it likely makes more sense to define in a separate draft. Do you think we're good to close this out or should we consider this further?",
           "createdAt": "2025-03-21T02:41:55Z",
           "updatedAt": "2025-03-21T02:41:55Z"
+        },
+        {
+          "author": "DavidSchinazi",
+          "authorAssociation": "COLLABORATOR",
+          "body": "117, that was while back :-)\nYeah closing this out is fine, we can always add it back in a future document.",
+          "createdAt": "2025-03-28T00:41:18Z",
+          "updatedAt": "2025-03-28T00:41:18Z"
         }
       ]
     },
