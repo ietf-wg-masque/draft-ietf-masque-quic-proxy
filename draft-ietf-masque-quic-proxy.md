@@ -455,8 +455,8 @@ the value to "?1". If it doesn't want to enable forwarding, but instead only
 provide information about QUIC Connection IDs for the purpose of allowing
 the proxy to share a proxy-to-target 4-tuple, it sets the value to "?0".
 
-The client MUST add an "accept-transform" parameter whose value is an
-`sf-string` containing the supported packet transforms ({{transforms}})
+The client MUST add an "accept-transform" parameter whose value is a
+Token containing the supported packet transforms ({{transforms}})
 in order of descending preference, separated by commas. If the proxy receives a
 "Proxy-QUIC-Forwarding" header without the "accept-transform" parameters, it
 MUST ignore the header and respond as if the client had not sent the
@@ -466,9 +466,10 @@ If the proxy supports QUIC-aware proxying, it will include the
 "Proxy-QUIC-Forwarding" header in successful HTTP responses. The value
 indicates whether or not the proxy supports forwarding. If the client does
 not receive this header in responses, the client SHALL assume that the proxy
-does not support this extension.
+does not support this extension. If the client receives a transform that it did
+not advertise support for, it MUST abort the request.
 
-The proxy MUST include a "transform" parameter whose value is an `sf-string`
+The proxy MUST include a "transform" parameter whose value is a Token
 indicating the selected transform. If the proxy does not recognize or accept
 any of the transforms offered by the client, it MUST omit this parameter and
 set the header field value to "?0", or omit the header entirely.
