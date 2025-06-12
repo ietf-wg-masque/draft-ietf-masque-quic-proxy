@@ -555,6 +555,9 @@ Table of Contents
    this parameter and set the header field value to "?0", or omit the
    header entirely.
 
+   A client receiving an "accept-transform" parameter and a server
+   receiving a "transform" parameter are both undefined.
+
 4.  Proxy-QUIC-Port-Sharing Header
 
    A client may include the "Proxy-QUIC-Port-Sharing" header to indicate
