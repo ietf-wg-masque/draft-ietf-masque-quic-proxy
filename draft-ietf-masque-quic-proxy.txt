@@ -5,9 +5,9 @@
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
 Intended status: Experimental                                 Apple Inc.
-Expires: 4 September 2025                                    D. Schinazi
+Expires: 14 December 2025                                    D. Schinazi
                                                               Google LLC
-                                                            3 March 2025
+                                                            12 June 2025
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 4 September 2025.
+   This Internet-Draft will expire on 14 December 2025.
 
 Copyright Notice
 
@@ -534,8 +534,8 @@ Table of Contents
    Connection IDs for the purpose of allowing the proxy to share a
    proxy-to-target 4-tuple, it sets the value to "?0".
 
-   The client MUST add an "accept-transform" parameter whose value is an
-   sf-string containing the supported packet transforms (Section 6.3) in
+   The client MUST add an "accept-transform" parameter whose value is a
+   Token containing the supported packet transforms (Section 6.3) in
    order of descending preference, separated by commas.  If the proxy
    receives a "Proxy-QUIC-Forwarding" header without the "accept-
    transform" parameters, it MUST ignore the header and respond as if
@@ -545,13 +545,15 @@ Table of Contents
    "Proxy-QUIC-Forwarding" header in successful HTTP responses.  The
    value indicates whether or not the proxy supports forwarding.  If the
    client does not receive this header in responses, the client SHALL
-   assume that the proxy does not support this extension.
+   assume that the proxy does not support this extension.  If the client
+   receives a transform that it did not advertise support for, it MUST
+   abort the request.
 
-   The proxy MUST include a "transform" parameter whose value is an sf-
-   string indicating the selected transform.  If the proxy does not
-   recognize or accept any of the transforms offered by the client, it
-   MUST omit this parameter and set the header field value to "?0", or
-   omit the header entirely.
+   The proxy MUST include a "transform" parameter whose value is a Token
+   indicating the selected transform.  If the proxy does not recognize
+   or accept any of the transforms offered by the client, it MUST omit
+   this parameter and set the header field value to "?0", or omit the
+   header entirely.
 
 4.  Proxy-QUIC-Port-Sharing Header
 
