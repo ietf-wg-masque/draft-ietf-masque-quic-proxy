@@ -1587,4 +1587,8 @@ Notes:
 {:numbered="false"}
 
 Thanks to Lucas Pardue, Ryan Hamilton, and Mirja Kühlewind for their inputs
-on this document.
+on this document. The scramble transform design came out of the encryption
+design team whose members were Antoine Fressancourt, Mirja Kuehlwind, Tiru Reddy,
+Ben Schwartz, and the authors of this document. The authors would also like to
+thank Martin Duke for identifying a proxy looping vulnerability that influenced
+the capsule registration design.
