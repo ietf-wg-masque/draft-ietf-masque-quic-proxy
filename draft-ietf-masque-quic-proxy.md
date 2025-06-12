@@ -474,6 +474,9 @@ indicating the selected transform. If the proxy does not recognize or accept
 any of the transforms offered by the client, it MUST omit this parameter and
 set the header field value to "?0", or omit the header entirely.
 
+A client receiving an "accept-transform" parameter and a server receiving a
+"transform" parameter are both undefined.
+
 # Proxy-QUIC-Port-Sharing Header {#port-sharing-header}
 
 A client may include the "Proxy-QUIC-Port-Sharing" header to indicate whether
