@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-12T00:41:45.864816+00:00",
+  "timestamp": "2025-06-15T00:47:18.189588+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -2115,7 +2115,7 @@
       "labels": [],
       "body": "This might be a crazy idea: Loop detection could be implemented using a Bloom filter.\r\n\r\nOver a certain period of time, the proxy would insert every packet it forwards into a bloom filter. How big would this filter need to be? Let's say you want to insert all packets seen within a time frame of 5s at a speed of 10 Gbps (assuming an MTU of ~1400). At a false positive rate of 1e-6 (rejecting 1 packet in a million), you'd need ~120 MB: https://hur.st/bloomfilter/?n=35M&p=1.0E-6&m=&k=. \r\n\r\nThis would allow the proxy to detect all loops with an RTT of less than 5s. This period can be extended by either enlarging the size of the bloom filter, or by keeping the N most recent bloom filters around.\r\n\r\nProxies could also get a bit more advanced in their detection logic. For example, they could decide to only drop duplicate packets once the rate of duplicates surpasses a certain threshold (there's no harm in forwarding a few looped packets, as long as the volume is low enough).\r\n\r\n",
       "createdAt": "2024-05-21T13:32:16Z",
-      "updatedAt": "2024-05-28T17:00:31Z",
+      "updatedAt": "2025-06-12T20:35:03Z",
       "closedAt": null,
       "comments": [
         {
@@ -2124,6 +2124,13 @@
           "body": "Interesting idea!\r\n\r\nBut doesn't the packet transform make it hard to detect duplicate packets?",
           "createdAt": "2024-05-28T17:00:30Z",
           "updatedAt": "2024-05-28T17:00:30Z"
+        },
+        {
+          "author": "ehaydenr",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@marten-seemann , I think we've resolved the issue via #104. Are we good to close this out?",
+          "createdAt": "2025-06-12T20:35:03Z",
+          "updatedAt": "2025-06-12T20:35:03Z"
         }
       ]
     },
@@ -2400,7 +2407,7 @@
       "labels": [],
       "body": "[Draft 05](https://www.ietf.org/archive/id/draft-ietf-masque-quic-proxy-05.html#section-3) says some stuff that I'll comment in line on:\n\n> \"Proxy-QUIC-Forwarding\" is an Item Structured Header [[RFC8941](https://www.ietf.org/archive/id/draft-ietf-masque-quic-proxy-05.html#RFC8941)]. Its value MUST be a Boolean.\n> If the client wants to enable QUIC packet forwarding for this request, it sets the value to \"?1\". If it doesn't want to enable forwarding, but instead only provide information about QUIC Connection IDs for the purpose of allowing the proxy to share a proxy-to-target 4-tuple, it sets the value to \"?0\".\n\nFine\n\n> The client MUST add an \"accept-transform\" parameter whose value is an sf-string containing the supported packet transforms ([Section 6.3](https://www.ietf.org/archive/id/draft-ietf-masque-quic-proxy-05.html#transforms)) in order of descending preference, separated by commas. If the proxy receives a \"Proxy-QUIC-Forwarding\" header without the \"accept-transform\" parameters, it MUST ignore the header and respond as if the client had not sent the \"Proxy-QUIC-Forwarding\" header.\n\nnit: `sf-string` is the old terminology we don't like please use `String`.\n\nmajor: IIUC the value is a comma-separated list of values. The only currently defined values are `identity` and `scramble-dt` (to be changed to `scramble` later). So a couple of point here:\n\n1. What does it mean to receive a value that is not known? For example, what if I send `poached`? I presume its not an issue and should be ignored but nothing lept out at me\n2. How are you going to deal with whitespace in these values? E.g. if I send `\"scramble, identity\"` or `\"   scramble, identity    \"`\n3. How do you deal with empty entries such as `\"scramble, , identity\"`?\n\n> If the proxy supports QUIC-aware proxying, it will include the \"Proxy-QUIC-Forwarding\" header in successful HTTP responses. The value indicates whether or not the proxy supports forwarding. If the client does not receive this header in responses, the client SHALL assume that the proxy does not support this extension.\n> The proxy MUST include a \"transform\" parameter whose value is an sf-string indicating the selected transform. If the proxy does not recognize or accept any of the transforms offered by the client, it MUST omit this parameter and set the header field value to \"?0\", or omit the header entirely.\n\nmajor: \n\n4. does the value have to be identical to one of the values that client sent? It seems implicit it should - what does a client do if the server is b0rked (i.e. should it abort the request?)\n\nGeneral\n\n5. What happens if client sends `transform` or server sends `accept-transform` ?\n\n6. Given that you have different rules for how these headers are used by client and server have you considered splitting these into two headers? That potentially make it clearer to say something like `Proxy-QUIC-Forwarding-Req is boolean and MUST have an accept-transform parameter otherwise it is malformed, and Proxy-QUIC-Forwarding-Resp is a boolean and MUST have a transform parameter otherwise it is malformed`.",
       "createdAt": "2025-03-21T08:48:44Z",
-      "updatedAt": "2025-06-11T00:12:17Z",
+      "updatedAt": "2025-06-12T17:55:44Z",
       "closedAt": null,
       "comments": [
         {
@@ -2416,6 +2423,13 @@
           "body": "- I agree that we should state that we should ignore unknown transforms as non-supported. That's a good call-out.\n- I would expect that for whitespace the list should be using the structured field version of a list, like in https://www.rfc-editor.org/rfc/rfc8941.html#name-lists. That has an optional whitespace handling.\n- For empty transform names... if we're saying it is a String, then it actually technically needs double quotes around it, which we're not doing. Otherwise we should define it as a Token. Either way, that should tell us if empty is part of it.\n- If there isn't a matching transform, it's like none is picked, and we abort doing the forwarding?\n- I expect we should ignore the peer sending the other header field generally\n- I also don't have a strong opinion on splitting the header, but I have a slight preference to not split",
           "createdAt": "2025-06-11T00:12:17Z",
           "updatedAt": "2025-06-11T00:12:17Z"
+        },
+        {
+          "author": "ehaydenr",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@LPardue , I think #125 and #126 address most of your feedback. The part I didn't change was splitting the header up. Do you feel strongly that it should be split? ",
+          "createdAt": "2025-06-12T17:55:43Z",
+          "updatedAt": "2025-06-12T17:55:43Z"
         }
       ]
     },
@@ -2424,15 +2438,15 @@
       "id": "I_kwDOEHrEP86vGvsN",
       "title": "Add acknowledgments for SCRAMBLE design team",
       "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/124",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "tfpauly",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "We need to add acknowledgements for the whole design team on SCRAMBLE!\n\nAlso probably Martin Duke for the loops issue.",
       "createdAt": "2025-03-21T09:16:40Z",
-      "updatedAt": "2025-03-21T09:16:40Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-12T20:33:53Z",
+      "closedAt": "2025-06-12T20:33:53Z",
       "comments": []
     }
   ],
@@ -10815,6 +10829,132 @@
           "body": "LGTM",
           "createdAt": "2025-03-03T22:16:39Z",
           "updatedAt": "2025-03-03T22:16:39Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 125,
+      "id": "PR_kwDOEHrEP86aQbho",
+      "title": "make transform parameter a Token, add guidance for unsupported transform",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/125",
+      "state": "MERGED",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "addressing feedback in #123 ",
+      "createdAt": "2025-06-12T17:02:34Z",
+      "updatedAt": "2025-06-12T17:05:30Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "099c163983dd6512f7db641a36b09c0abb6d5368",
+      "headRepository": "ehaydenr/quic-proxy",
+      "headRefName": "token",
+      "headRefOid": "1dce25594986f6b1994b54ebdfdd129114c89f58",
+      "closedAt": "2025-06-12T17:05:25Z",
+      "mergedAt": "2025-06-12T17:05:25Z",
+      "mergedBy": "ehaydenr",
+      "mergeCommit": {
+        "oid": "6538165da771925adf48cd020b02f5bb7888d2fa"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP86uKiUv",
+          "commit": {
+            "abbreviatedOid": "1dce255"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-06-12T17:04:56Z",
+          "updatedAt": "2025-06-12T17:04:56Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 126,
+      "id": "PR_kwDOEHrEP86aQsix",
+      "title": "make receiving the wrong parameter undefined",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/126",
+      "state": "MERGED",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "addresses feedback from #123 ",
+      "createdAt": "2025-06-12T17:30:25Z",
+      "updatedAt": "2025-06-12T17:54:36Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "6538165da771925adf48cd020b02f5bb7888d2fa",
+      "headRepository": "ehaydenr/quic-proxy",
+      "headRefName": "undefined",
+      "headRefOid": "a8006cadf51791c5ff00a50ca93b25239e3dbea5",
+      "closedAt": "2025-06-12T17:54:33Z",
+      "mergedAt": "2025-06-12T17:54:33Z",
+      "mergedBy": "ehaydenr",
+      "mergeCommit": {
+        "oid": "d63ef334385d603e8dfdc77ab9b892303699af7c"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP86uK1tL",
+          "commit": {
+            "abbreviatedOid": "a8006ca"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-06-12T17:35:32Z",
+          "updatedAt": "2025-06-12T17:35:32Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 127,
+      "id": "PR_kwDOEHrEP86aSDqh",
+      "title": "acknowledge design team and martin",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/127",
+      "state": "MERGED",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "closes #124 ",
+      "createdAt": "2025-06-12T20:29:00Z",
+      "updatedAt": "2025-06-12T20:33:56Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "d63ef334385d603e8dfdc77ab9b892303699af7c",
+      "headRepository": "ehaydenr/quic-proxy",
+      "headRefName": "acknowledgements",
+      "headRefOid": "9290be21d5e146b4efcb6edaf98bfb8426b6b7aa",
+      "closedAt": "2025-06-12T20:33:52Z",
+      "mergedAt": "2025-06-12T20:33:52Z",
+      "mergedBy": "ehaydenr",
+      "mergeCommit": {
+        "oid": "5afd1cfdf28153ad918769c50f8b81b57eed66ff"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP86uMv6m",
+          "commit": {
+            "abbreviatedOid": "9290be2"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-06-12T20:33:03Z",
+          "updatedAt": "2025-06-12T20:33:03Z",
           "comments": []
         }
       ]
