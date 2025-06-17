@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-15T00:47:18.189588+00:00",
+  "timestamp": "2025-06-17T00:42:13.600038+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -2407,7 +2407,7 @@
       "labels": [],
       "body": "[Draft 05](https://www.ietf.org/archive/id/draft-ietf-masque-quic-proxy-05.html#section-3) says some stuff that I'll comment in line on:\n\n> \"Proxy-QUIC-Forwarding\" is an Item Structured Header [[RFC8941](https://www.ietf.org/archive/id/draft-ietf-masque-quic-proxy-05.html#RFC8941)]. Its value MUST be a Boolean.\n> If the client wants to enable QUIC packet forwarding for this request, it sets the value to \"?1\". If it doesn't want to enable forwarding, but instead only provide information about QUIC Connection IDs for the purpose of allowing the proxy to share a proxy-to-target 4-tuple, it sets the value to \"?0\".\n\nFine\n\n> The client MUST add an \"accept-transform\" parameter whose value is an sf-string containing the supported packet transforms ([Section 6.3](https://www.ietf.org/archive/id/draft-ietf-masque-quic-proxy-05.html#transforms)) in order of descending preference, separated by commas. If the proxy receives a \"Proxy-QUIC-Forwarding\" header without the \"accept-transform\" parameters, it MUST ignore the header and respond as if the client had not sent the \"Proxy-QUIC-Forwarding\" header.\n\nnit: `sf-string` is the old terminology we don't like please use `String`.\n\nmajor: IIUC the value is a comma-separated list of values. The only currently defined values are `identity` and `scramble-dt` (to be changed to `scramble` later). So a couple of point here:\n\n1. What does it mean to receive a value that is not known? For example, what if I send `poached`? I presume its not an issue and should be ignored but nothing lept out at me\n2. How are you going to deal with whitespace in these values? E.g. if I send `\"scramble, identity\"` or `\"   scramble, identity    \"`\n3. How do you deal with empty entries such as `\"scramble, , identity\"`?\n\n> If the proxy supports QUIC-aware proxying, it will include the \"Proxy-QUIC-Forwarding\" header in successful HTTP responses. The value indicates whether or not the proxy supports forwarding. If the client does not receive this header in responses, the client SHALL assume that the proxy does not support this extension.\n> The proxy MUST include a \"transform\" parameter whose value is an sf-string indicating the selected transform. If the proxy does not recognize or accept any of the transforms offered by the client, it MUST omit this parameter and set the header field value to \"?0\", or omit the header entirely.\n\nmajor: \n\n4. does the value have to be identical to one of the values that client sent? It seems implicit it should - what does a client do if the server is b0rked (i.e. should it abort the request?)\n\nGeneral\n\n5. What happens if client sends `transform` or server sends `accept-transform` ?\n\n6. Given that you have different rules for how these headers are used by client and server have you considered splitting these into two headers? That potentially make it clearer to say something like `Proxy-QUIC-Forwarding-Req is boolean and MUST have an accept-transform parameter otherwise it is malformed, and Proxy-QUIC-Forwarding-Resp is a boolean and MUST have a transform parameter otherwise it is malformed`.",
       "createdAt": "2025-03-21T08:48:44Z",
-      "updatedAt": "2025-06-12T17:55:44Z",
+      "updatedAt": "2025-06-16T23:16:54Z",
       "closedAt": null,
       "comments": [
         {
@@ -2430,6 +2430,13 @@
           "body": "@LPardue , I think #125 and #126 address most of your feedback. The part I didn't change was splitting the header up. Do you feel strongly that it should be split? ",
           "createdAt": "2025-06-12T17:55:43Z",
           "updatedAt": "2025-06-12T17:55:43Z"
+        },
+        {
+          "author": "DavidSchinazi",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Since #126 is merged already and this issue is still open, I'll copy my comment here:\n\n> I really don't like using undefined here, as that's the worst of all worlds: it burns the codepoint forever with no benefit. Can we instead make this explicit? Either of these would work:\n>\n> * MUST NOT send, and MUST ignore on receipt\n> * MUST NOT send, and MUST error on receipt",
+          "createdAt": "2025-06-16T23:16:53Z",
+          "updatedAt": "2025-06-16T23:16:53Z"
         }
       ]
     },
@@ -10887,7 +10894,7 @@
       "labels": [],
       "body": "addresses feedback from #123 ",
       "createdAt": "2025-06-12T17:30:25Z",
-      "updatedAt": "2025-06-12T17:54:36Z",
+      "updatedAt": "2025-06-16T23:16:01Z",
       "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
       "baseRefName": "main",
       "baseRefOid": "6538165da771925adf48cd020b02f5bb7888d2fa",
@@ -10900,7 +10907,15 @@
       "mergeCommit": {
         "oid": "d63ef334385d603e8dfdc77ab9b892303699af7c"
       },
-      "comments": [],
+      "comments": [
+        {
+          "author": "DavidSchinazi",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I really don't like using undefined here, as that's the worst of all worlds: it burns the codepoint forever with no benefit. Can we instead make this explicit? Either of these would work:\r\n* MUST NOT send, and MUST ignore on receipt\r\n* MUST NOT send, and MUST error on receipt",
+          "createdAt": "2025-06-16T23:16:01Z",
+          "updatedAt": "2025-06-16T23:16:01Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOEHrEP86uK1tL",
