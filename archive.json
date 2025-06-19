@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-17T00:42:13.600038+00:00",
+  "timestamp": "2025-06-19T00:42:13.141034+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -10894,7 +10894,7 @@
       "labels": [],
       "body": "addresses feedback from #123 ",
       "createdAt": "2025-06-12T17:30:25Z",
-      "updatedAt": "2025-06-16T23:16:01Z",
+      "updatedAt": "2025-06-17T19:03:25Z",
       "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
       "baseRefName": "main",
       "baseRefOid": "6538165da771925adf48cd020b02f5bb7888d2fa",
@@ -10914,6 +10914,20 @@
           "body": "I really don't like using undefined here, as that's the worst of all worlds: it burns the codepoint forever with no benefit. Can we instead make this explicit? Either of these would work:\r\n* MUST NOT send, and MUST ignore on receipt\r\n* MUST NOT send, and MUST error on receipt",
           "createdAt": "2025-06-16T23:16:01Z",
           "updatedAt": "2025-06-16T23:16:01Z"
+        },
+        {
+          "author": "ehaydenr",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@DavidSchinazi , would it be acceptable to say it's not defined by this document?",
+          "createdAt": "2025-06-17T16:49:12Z",
+          "updatedAt": "2025-06-17T16:49:12Z"
+        },
+        {
+          "author": "DavidSchinazi",
+          "authorAssociation": "COLLABORATOR",
+          "body": "That's the same thing as undefined :)\r\n\r\nThe issue is that if you don't define it, then some implementations might end up sending it to mean something and others to mean something else. And then various implementations will react differently when receiving it.\r\n\r\nIsn't it just simpler to specify it?",
+          "createdAt": "2025-06-17T19:03:25Z",
+          "updatedAt": "2025-06-17T19:03:25Z"
         }
       ],
       "reviews": [
