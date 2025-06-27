@@ -2687,7 +2687,10 @@ the <code>scramble</code> transform is in use, a global passive adversary cannot
 contents on both sides of the proxy
 to link the client and target.  However, the <code>scramble</code> transform does not defend against
 analysis of packet sizes and timing, nor does it protect privacy against an
-active attacker.<a href="#section-6.3.2-1" class="pilcrow">¶</a></p>
+active attacker. For example, an active attacker that is able to modify packets prior to being
+scrambled by the proxy can manipulate the packets in ways that will cause them to be recognizable
+(either by interfering with the material that is used for the IV, or by changing sizes or timing
+of packets).<a href="#section-6.3.2-1" class="pilcrow">¶</a></p>
 <p id="section-6.3.2-2">Deployments that implement the version of the <code>scramble</code> transform defined in this
 document MUST use the value "scramble-dt". The finalized version is expected
 to use the reserved value "scramble" <a href="#iana-transforms" class="auto internal xref">Section 10.3</a>.<a href="#section-6.3.2-2" class="pilcrow">¶</a></p>
