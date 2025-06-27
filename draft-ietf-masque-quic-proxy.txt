@@ -5,9 +5,9 @@
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
 Intended status: Experimental                                 Apple Inc.
-Expires: 14 December 2025                                    D. Schinazi
+Expires: 29 December 2025                                    D. Schinazi
                                                               Google LLC
-                                                            12 June 2025
+                                                            27 June 2025
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 14 December 2025.
+   This Internet-Draft will expire on 29 December 2025.
 
 Copyright Notice
 
@@ -555,8 +555,10 @@ Table of Contents
    this parameter and set the header field value to "?0", or omit the
    header entirely.
 
-   A client receiving an "accept-transform" parameter and a server
-   receiving a "transform" parameter are both undefined.
+   Clients MUST NOT send the "transform" parameter and servers MUST NOT
+   send the "accept-transform" parameter.  Clients MUST ignore receipt
+   of an "accept-transform" parameter and servers MUST ignore receipt of
+   a "transform" parameter.
 
 4.  Proxy-QUIC-Port-Sharing Header
 

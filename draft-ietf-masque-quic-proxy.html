@@ -15,7 +15,7 @@ proxied connections, and adds a mode of proxying in which QUIC short header pack
 can be forwarded and transformed through a HTTP/3 proxy rather than being fully
 re-encapsulated and re-encrypted. 
     " name="description">
-<meta content="xml2rfc 3.28.1" name="generator">
+<meta content="xml2rfc 3.29.0" name="generator">
 <meta content="quic" name="keyword">
 <meta content="http" name="keyword">
 <meta content="datagram" name="keyword">
@@ -28,8 +28,8 @@ re-encapsulated and re-encrypted.
 <meta content="http-ng" name="keyword">
 <meta content="draft-ietf-masque-quic-proxy-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.28.1
-    Python 3.12.10
+  xml2rfc 3.29.0
+    Python 3.12.11
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
     intervaltree 3.1.0
@@ -38,7 +38,7 @@ re-encapsulated and re-encrypted.
     platformdirs 4.3.8
     pycountry 24.6.1
     PyYAML 6.0.2
-    requests 2.32.3
+    requests 2.32.4
     setuptools 80.9.0
     wcwidth 0.2.13
 -->
@@ -1063,7 +1063,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Pauly, et al.</td>
-<td class="center">Expires 14 December 2025</td>
+<td class="center">Expires 29 December 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1076,12 +1076,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-masque-quic-proxy-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-06-12" class="published">12 June 2025</time>
+<time datetime="2025-06-27" class="published">27 June 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Experimental</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-12-14">14 December 2025</time></dd>
+<dd class="expires"><time datetime="2025-12-29">29 December 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1143,7 +1143,7 @@ re-encapsulated and re-encrypted.<a href="#section-abstract-1" class="pilcrow">�
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 14 December 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 29 December 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1911,8 +1911,9 @@ not advertise support for, it MUST abort the request.<a href="#section-3-5" clas
 indicating the selected transform. If the proxy does not recognize or accept
 any of the transforms offered by the client, it MUST omit this parameter and
 set the header field value to "?0", or omit the header entirely.<a href="#section-3-6" class="pilcrow">¶</a></p>
-<p id="section-3-7">A client receiving an "accept-transform" parameter and a server receiving a
-"transform" parameter are both undefined.<a href="#section-3-7" class="pilcrow">¶</a></p>
+<p id="section-3-7">Clients MUST NOT send the "transform" parameter and servers MUST NOT send the
+"accept-transform" parameter. Clients MUST ignore receipt of an "accept-transform"
+parameter and servers MUST ignore receipt of a "transform" parameter.<a href="#section-3-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="port-sharing-header">
