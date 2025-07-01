@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-29T00:48:48.801682+00:00",
+  "timestamp": "2025-07-01T00:49:42.358922+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -2352,15 +2352,15 @@
       "id": "I_kwDOEHrEP86XV-1h",
       "title": "Active attack on IV for SCRAMBLE transform",
       "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/115",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "gloinul",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "An attacker that has access and capability to modify packets part of an end-to-end QUIC connection prior to QUIC aware forwarding with SCRAMBLE transform can enable defeating the scramble transform. This is done by manipulating the part of the QUIC packet that will be used as IV. The attack modify some packets prior to reaching either the MASQUE client or the MASQUE proxy so this set of packets all have the same bit-value in the parts that will be used as IV. This will result in the E2E packet will be dropped at arrival at the endpoint. \r\n\r\nBy setting the same IV two effects will be achieved:\r\n1) The scrambled IV after AES-ECB application will have the same value in all the packets, enabling an attacker that captures all packets after the Masque tunnel ingress's forwarding and transformation to look for the packet with the same but unknown bit-pattern in a given location within the packet\r\n2) Due to the use of the same IV in AES-CTR mode between the multiple packet that actual scrambling can be defeated. Although I think this in most cases would have limited value as it would only allow recovering the End-to-End packet that this attacker already have access to. I think 1) is sufficient to enable the important linking of input and output 5-tuples and CIDs. \r\n\r\nThe weakness here is that the attacker can chose the IV, which is not true in the QUIC header protection application of using part of the packet as IV. But, in this case the MASQUE proxy or client can't verify the end-to-end forwarded packets integrity before choosing to use it as IV. \r\n\r\nI don't know if this attack is serious enough for scramble to change its solution, but at a minimal the potential attack and the weakness it creates needs to be documented. But likely a bit of thought should be put into if another solution can be found to avoid this attack.  ",
       "createdAt": "2024-09-20T15:41:37Z",
-      "updatedAt": "2025-06-27T16:33:05Z",
-      "closedAt": null,
+      "updatedAt": "2025-06-30T13:31:53Z",
+      "closedAt": "2025-06-30T13:31:53Z",
       "comments": [
         {
           "author": "ehaydenr",
@@ -2368,6 +2368,13 @@
           "body": "@gloinul, I think this is probably covered by the existing language around not protecting against active attacks, but this is a good example to include. I opened #129 to call this out. Please let me know if we can close out this issue once that text is merged.",
           "createdAt": "2025-06-27T16:33:05Z",
           "updatedAt": "2025-06-27T16:33:05Z"
+        },
+        {
+          "author": "gloinul",
+          "authorAssociation": "NONE",
+          "body": "I think the merged text looks good and is sufficient warning for the issue. So lets close this issue. ",
+          "createdAt": "2025-06-30T13:31:53Z",
+          "updatedAt": "2025-06-30T13:31:53Z"
         }
       ]
     },
