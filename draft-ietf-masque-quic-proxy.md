@@ -1218,8 +1218,8 @@ address.
 
 When a client using a proxy wants to migrate to the preferred address of the
 target server, it needs to create a new CONNECT request to the proxy (using
-the method defined in {{CONNECT-UDP}}) targeting the preferred address of the
-target. This is the behavior clients using a proxy will have regardless of using
+the method defined in {{CONNECT-UDP}}) and using the preferred IP address of the
+target as the host to which to connect. This is the behavior clients using a proxy will have regardless of using
 the QUIC-aware mechanisms defined in this document. From the proxy's perspective,
 the migrating request is separate from the original request.
 
