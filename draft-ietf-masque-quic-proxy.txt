@@ -5,9 +5,9 @@
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
 Intended status: Experimental                                 Apple Inc.
-Expires: 29 December 2025                                    D. Schinazi
+Expires: 8 January 2026                                      D. Schinazi
                                                               Google LLC
-                                                            27 June 2025
+                                                             7 July 2025
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 29 December 2025.
+   This Internet-Draft will expire on 8 January 2026.
 
 Copyright Notice
 
@@ -446,7 +446,7 @@ Table of Contents
    any parameters for specific transforms.  Clients or proxies that
    don't support forwarded mode will not include this header field.
 
-     proxy-quic-forwarding = ?1; accept-transform=scramble,identity; \
+     proxy-quic-forwarding = ?1; accept-transform="scramble,identity"; \
          scramble-key=:abc...789=:
 
    If neither header is supplied with a value of "?1", none of the
@@ -535,7 +535,7 @@ Table of Contents
    proxy-to-target 4-tuple, it sets the value to "?0".
 
    The client MUST add an "accept-transform" parameter whose value is a
-   Token containing the supported packet transforms (Section 6.3) in
+   String containing the supported packet transforms (Section 6.3) in
    order of descending preference, separated by commas.  If the proxy
    receives a "Proxy-QUIC-Forwarding" header without the "accept-
    transform" parameters, it MUST ignore the header and respond as if
@@ -549,11 +549,11 @@ Table of Contents
    receives a transform that it did not advertise support for, it MUST
    abort the request.
 
-   The proxy MUST include a "transform" parameter whose value is a Token
-   indicating the selected transform.  If the proxy does not recognize
-   or accept any of the transforms offered by the client, it MUST omit
-   this parameter and set the header field value to "?0", or omit the
-   header entirely.
+   The proxy MUST include a "transform" parameter whose value is a
+   String indicating the selected transform.  If the proxy does not
+   recognize or accept any of the transforms offered by the client, it
+   MUST omit this parameter and set the header field value to "?0", or
+   omit the header entirely.
 
    Clients MUST NOT send the "transform" parameter and servers MUST NOT
    send the "accept-transform" parameter.  Clients MUST ignore receipt
@@ -1433,7 +1433,7 @@ Table of Contents
      :path = /target.example.com/443/
      :authority = proxy.example.org
      proxy-quic-port-sharing = ?1
-     proxy-quic-forwarding = ?1; accept-transform=scramble,identity; \
+     proxy-quic-forwarding = ?1; accept-transform="scramble,identity"; \
          scramble-key=:abc...789=:
      capsule-protocol = ?1
 
@@ -1454,7 +1454,7 @@ Table of Contents
               <--------  STREAM(44): HEADERS
                            :status = 200
                            proxy-quic-forwarding = ?1; \
-                               transform=scramble; \
+                               transform="scramble"; \
                                scramble-key=:ABC...321=:
                            capsule-protocol = ?1
 

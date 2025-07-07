@@ -1059,11 +1059,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">QUIC Proxy</td>
-<td class="right">June 2025</td>
+<td class="right">July 2025</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Pauly, et al.</td>
-<td class="center">Expires 29 December 2025</td>
+<td class="center">Expires 8 January 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1076,12 +1076,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-masque-quic-proxy-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-06-27" class="published">27 June 2025</time>
+<time datetime="2025-07-07" class="published">7 July 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Experimental</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-12-29">29 December 2025</time></dd>
+<dd class="expires"><time datetime="2026-01-08">8 January 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1143,7 +1143,7 @@ re-encapsulated and re-encrypted.<a href="#section-abstract-1" class="pilcrow">�
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 29 December 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 8 January 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1796,7 +1796,7 @@ with any parameters for specific transforms. Clients or proxies that
 don't support forwarded mode will not include this header field.<a href="#section-2.3-5" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-2.3-6">
 <pre>
-  proxy-quic-forwarding = ?1; accept-transform=scramble,identity; \
+  proxy-quic-forwarding = ?1; accept-transform="scramble,identity"; \
       scramble-key=:abc...789=:
 </pre><a href="#section-2.3-6" class="pilcrow">¶</a>
 </div>
@@ -1896,7 +1896,7 @@ the value to "?1". If it doesn't want to enable forwarding, but instead only
 provide information about QUIC Connection IDs for the purpose of allowing
 the proxy to share a proxy-to-target 4-tuple, it sets the value to "?0".<a href="#section-3-3" class="pilcrow">¶</a></p>
 <p id="section-3-4">The client MUST add an "accept-transform" parameter whose value is a
-Token containing the supported packet transforms (<a href="#transforms" class="auto internal xref">Section 6.3</a>)
+String containing the supported packet transforms (<a href="#transforms" class="auto internal xref">Section 6.3</a>)
 in order of descending preference, separated by commas. If the proxy receives a
 "Proxy-QUIC-Forwarding" header without the "accept-transform" parameters, it
 MUST ignore the header and respond as if the client had not sent the
@@ -1907,7 +1907,7 @@ indicates whether or not the proxy supports forwarding. If the client does
 not receive this header in responses, the client SHALL assume that the proxy
 does not support this extension. If the client receives a transform that it did
 not advertise support for, it MUST abort the request.<a href="#section-3-5" class="pilcrow">¶</a></p>
-<p id="section-3-6">The proxy MUST include a "transform" parameter whose value is a Token
+<p id="section-3-6">The proxy MUST include a "transform" parameter whose value is a String
 indicating the selected transform. If the proxy does not recognize or accept
 any of the transforms offered by the client, it MUST omit this parameter and
 set the header field value to "?0", or omit the header entirely.<a href="#section-3-6" class="pilcrow">¶</a></p>
@@ -2901,7 +2901,7 @@ STREAM(44): HEADERS             --------&gt;
   :path = /target.example.com/443/
   :authority = proxy.example.org
   proxy-quic-port-sharing = ?1
-  proxy-quic-forwarding = ?1; accept-transform=scramble,identity; \
+  proxy-quic-forwarding = ?1; accept-transform="scramble,identity"; \
       scramble-key=:abc...789=:
   capsule-protocol = ?1
 
@@ -2922,7 +2922,7 @@ DATAGRAM                        --------&gt;
            &lt;--------  STREAM(44): HEADERS
                         :status = 200
                         proxy-quic-forwarding = ?1; \
-                            transform=scramble; \
+                            transform="scramble"; \
                             scramble-key=:ABC...321=:
                         capsule-protocol = ?1
 
