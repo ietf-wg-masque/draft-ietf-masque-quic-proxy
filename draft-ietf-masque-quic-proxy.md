@@ -1003,7 +1003,8 @@ into VCIDs, and the contents of packets are either left the same, or modified
 
 Forwarded mode also raises special considerations for handling connection
 maintenance ({{maintenance}}), connection migration ({{migration}}),
-ECN markings ({{ecn}}), and stateless resets ({{resets}}).
+server preferred addresses ({{preferred-address}}), ECN markings ({{ecn}}),
+and stateless resets ({{resets}}).
 
 ## Sending With Forwarded Mode
 
@@ -1208,6 +1209,27 @@ REGISTER_TARGET_CID capsules. Each of the acknowledging capsules will contain ne
 virtual connection IDs to prevent packets with the same connection ID bytes being
 used over multiple network paths. Note that the client CID and target CID
 can stay the same while the target VCID and client VCID change.
+
+## Handling Server Preferred Addresses {#preferred-address}
+
+QUIC allows servers to tell clients about a preferred address the server
+would like to use ({{Section 9.6 of QUIC}}). When this happens, the client can migrate to the preferred
+address.
+
+When a client using a proxy wants to migrate to the preferred address of the
+target server, it needs to create a new UDP proxying request to the proxy (using
+the method defined in {{CONNECT-UDP}}) and using the preferred IP address of the
+target as the host to which to connect. This is the behavior clients using a proxy will have regardless of using
+the QUIC-aware mechanisms defined in this document. From the proxy's perspective,
+the migrating request is separate from the original request.
+
+Note that clients can be aware of the target address being used for the original
+proxy request by looking at `next-hop` parameter on a `Proxy-Status` header
+sent by the proxy in its response ({{Section 2.1.2 of ?RFC9209}}). This allows
+a client to know if it ought to migrate to the preferred address, or is already
+connected to the preferred address. To support the ability of clients to do this, proxies
+implementing this specification SHOULD send the `Proxy-Status` header in responses
+and include the `next-hop` parameter.
 
 ## Handling ECN Marking {#ecn}
 
