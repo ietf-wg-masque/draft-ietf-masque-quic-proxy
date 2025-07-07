@@ -2828,8 +2828,8 @@ would like to use. When this happens, the client can migrate to the preferred
 address.<a href="#section-6.6-1" class="pilcrow">¶</a></p>
 <p id="section-6.6-2">When a client using a proxy wants to migrate to the preferred address of the
 target server, it needs to create a new CONNECT request to the proxy (using
-the method defined in <span>[<a href="#CONNECT-UDP" class="cite xref">CONNECT-UDP</a>]</span>) targeting the preferred address of the
-target. This is the behavior clients using a proxy will have regardless of using
+the method defined in <span>[<a href="#CONNECT-UDP" class="cite xref">CONNECT-UDP</a>]</span>) and using the preferred IP address of the
+target as the host to which to connect. This is the behavior clients using a proxy will have regardless of using
 the QUIC-aware mechanisms defined in this document. From the proxy's perspective,
 the migrating request is separate from the original request.<a href="#section-6.6-2" class="pilcrow">¶</a></p>
 <p id="section-6.6-3">Note that clients can be aware of the target address being used for the original
