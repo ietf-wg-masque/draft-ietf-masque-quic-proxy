@@ -1278,13 +1278,16 @@ re-encapsulated and re-encrypted.<a href="#section-abstract-1" class="pilcrow">�
                 <p id="section-toc.1-1.6.2.5.1"><a href="#section-6.5" class="auto internal xref">6.5</a>.  <a href="#name-handling-connection-migrati" class="internal xref">Handling Connection Migration</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.6">
-                <p id="section-toc.1-1.6.2.6.1"><a href="#section-6.6" class="auto internal xref">6.6</a>.  <a href="#name-handling-ecn-marking" class="internal xref">Handling ECN Marking</a></p>
+                <p id="section-toc.1-1.6.2.6.1"><a href="#section-6.6" class="auto internal xref">6.6</a>.  <a href="#name-handling-server-preferred-a" class="internal xref">Handling Server Preferred Addresses</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.7">
-                <p id="section-toc.1-1.6.2.7.1"><a href="#section-6.7" class="auto internal xref">6.7</a>.  <a href="#name-stateless-resets-for-forwar" class="internal xref">Stateless Resets for Forwarded Mode QUIC Packets</a></p>
+                <p id="section-toc.1-1.6.2.7.1"><a href="#section-6.7" class="auto internal xref">6.7</a>.  <a href="#name-handling-ecn-marking" class="internal xref">Handling ECN Marking</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.8">
+                <p id="section-toc.1-1.6.2.8.1"><a href="#section-6.8" class="auto internal xref">6.8</a>.  <a href="#name-stateless-resets-for-forwar" class="internal xref">Stateless Resets for Forwarded Mode QUIC Packets</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.7.2.1">
-                    <p id="section-toc.1-1.6.2.7.2.1.1"><a href="#section-6.7.1" class="auto internal xref">6.7.1</a>.  <a href="#name-stateless-resets-from-the-t" class="internal xref">Stateless Resets from the Target</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.8.2.1">
+                    <p id="section-toc.1-1.6.2.8.2.1.1"><a href="#section-6.8.1" class="auto internal xref">6.8.1</a>.  <a href="#name-stateless-resets-from-the-t" class="internal xref">Stateless Resets from the Target</a></p>
 </li>
                 </ul>
 </li>
@@ -2569,7 +2572,8 @@ into VCIDs, and the contents of packets are either left the same, or modified
 (<a href="#transforms" class="auto internal xref">Section 6.3</a>).<a href="#section-6-1" class="pilcrow">¶</a></p>
 <p id="section-6-2">Forwarded mode also raises special considerations for handling connection
 maintenance (<a href="#maintenance" class="auto internal xref">Section 6.4</a>), connection migration (<a href="#migration" class="auto internal xref">Section 6.5</a>),
-ECN markings (<a href="#ecn" class="auto internal xref">Section 6.6</a>), and stateless resets (<a href="#resets" class="auto internal xref">Section 6.7</a>).<a href="#section-6-2" class="pilcrow">¶</a></p>
+server preferred addresses (<a href="#preferred-address" class="auto internal xref">Section 6.6</a>), ECN markings (<a href="#ecn" class="auto internal xref">Section 6.7</a>),
+and stateless resets (<a href="#resets" class="auto internal xref">Section 6.8</a>).<a href="#section-6-2" class="pilcrow">¶</a></p>
 <div id="sending-with-forwarded-mode">
 <section id="section-6.1">
         <h3 id="name-sending-with-forwarded-mode">
@@ -2814,38 +2818,61 @@ used over multiple network paths. Note that the client CID and target CID
 can stay the same while the target VCID and client VCID change.<a href="#section-6.5-3" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="ecn">
+<div id="preferred-address">
 <section id="section-6.6">
-        <h3 id="name-handling-ecn-marking">
-<a href="#section-6.6" class="section-number selfRef">6.6. </a><a href="#name-handling-ecn-marking" class="section-name selfRef">Handling ECN Marking</a>
+        <h3 id="name-handling-server-preferred-a">
+<a href="#section-6.6" class="section-number selfRef">6.6. </a><a href="#name-handling-server-preferred-a" class="section-name selfRef">Handling Server Preferred Addresses</a>
         </h3>
-<p id="section-6.6-1">Explicit Congestion Notification marking <span>[<a href="#ECN" class="cite xref">ECN</a>]</span> uses two bits in the IP
+<p id="section-6.6-1">QUIC allows servers to tell clients about a preferred address the server
+would like to use (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-9.6" class="relref">Section 9.6</a> of [<a href="#QUIC" class="cite xref">QUIC</a>]</span>). When this happens, the client can migrate to the preferred
+address.<a href="#section-6.6-1" class="pilcrow">¶</a></p>
+<p id="section-6.6-2">When a client using a proxy wants to migrate to the preferred address of the
+target server, it needs to create a new UDP proxying request to the proxy (using
+the method defined in <span>[<a href="#CONNECT-UDP" class="cite xref">CONNECT-UDP</a>]</span>) and using the preferred IP address of the
+target as the host to which to connect. This is the behavior clients using a proxy will have regardless of using
+the QUIC-aware mechanisms defined in this document. From the proxy's perspective,
+the migrating request is separate from the original request.<a href="#section-6.6-2" class="pilcrow">¶</a></p>
+<p id="section-6.6-3">Note that clients can be aware of the target address being used for the original
+proxy request by looking at <code>next-hop</code> parameter on a <code>Proxy-Status</code> header
+sent by the proxy in its response (<span><a href="https://rfc-editor.org/rfc/rfc9209#section-2.1.2" class="relref">Section 2.1.2</a> of [<a href="#RFC9209" class="cite xref">RFC9209</a>]</span>). This allows
+a client to know if it ought to migrate to the preferred address, or is already
+connected to the preferred address. To support the ability of clients to do this, proxies
+implementing this specification SHOULD send the <code>Proxy-Status</code> header in responses
+and include the <code>next-hop</code> parameter.<a href="#section-6.6-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="ecn">
+<section id="section-6.7">
+        <h3 id="name-handling-ecn-marking">
+<a href="#section-6.7" class="section-number selfRef">6.7. </a><a href="#name-handling-ecn-marking" class="section-name selfRef">Handling ECN Marking</a>
+        </h3>
+<p id="section-6.7-1">Explicit Congestion Notification marking <span>[<a href="#ECN" class="cite xref">ECN</a>]</span> uses two bits in the IP
 header to signal congestion from a network to endpoints. When using forwarded mode,
 the proxy replaces IP headers for packets exchanged between the client and target;
 these headers can include ECN markings. Proxies SHOULD preserve ECN markings on
 forwarded packets in both directions, to allow ECN to function end-to-end. If the proxy does not
-preserve ECN markings, it MUST set ECN marks to zero on the IP headers it generates.<a href="#section-6.6-1" class="pilcrow">¶</a></p>
-<p id="section-6.6-2">Forwarded mode does not create an IP-in-IP tunnel, so the guidance in
+preserve ECN markings, it MUST set ECN marks to zero on the IP headers it generates.<a href="#section-6.7-1" class="pilcrow">¶</a></p>
+<p id="section-6.7-2">Forwarded mode does not create an IP-in-IP tunnel, so the guidance in
 <span>[<a href="#ECN-TUNNEL" class="cite xref">ECN-TUNNEL</a>]</span> about transferring ECN markings between inner and outer IP
-headers does not apply.<a href="#section-6.6-2" class="pilcrow">¶</a></p>
-<p id="section-6.6-3">A proxy MAY additionally add ECN markings to signal congestion being experienced
-on the proxy itself.<a href="#section-6.6-3" class="pilcrow">¶</a></p>
+headers does not apply.<a href="#section-6.7-2" class="pilcrow">¶</a></p>
+<p id="section-6.7-3">A proxy MAY additionally add ECN markings to signal congestion being experienced
+on the proxy itself.<a href="#section-6.7-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="resets">
-<section id="section-6.7">
+<section id="section-6.8">
         <h3 id="name-stateless-resets-for-forwar">
-<a href="#section-6.7" class="section-number selfRef">6.7. </a><a href="#name-stateless-resets-for-forwar" class="section-name selfRef">Stateless Resets for Forwarded Mode QUIC Packets</a>
+<a href="#section-6.8" class="section-number selfRef">6.8. </a><a href="#name-stateless-resets-for-forwar" class="section-name selfRef">Stateless Resets for Forwarded Mode QUIC Packets</a>
         </h3>
-<p id="section-6.7-1">While the lifecycle of forwarding rules are bound to the lifecycle of the
+<p id="section-6.8-1">While the lifecycle of forwarding rules are bound to the lifecycle of the
 client-to-proxy HTTP stream, a peer may not be aware that the stream has
 terminated. If the above mappings are lost or removed without the peer's
 knowledge, they may send forwarded mode packets even though the client
 or proxy no longer has state for that connection. To allow the client or
 proxy to reset the client-to-target connection in the absence of the mappings
 above, a stateless reset token corresponding to the Virtual Connection ID
-can be provided.<a href="#section-6.7-1" class="pilcrow">¶</a></p>
-<p id="section-6.7-2">Consider a proxy that initiates closure of a client-to-proxy QUIC connection.
+can be provided.<a href="#section-6.8-1" class="pilcrow">¶</a></p>
+<p id="section-6.8-2">Consider a proxy that initiates closure of a client-to-proxy QUIC connection.
 If the client is temporarily unresponsive or unreachable, the proxy might have
 considered the connection closed and removed all connection state (including
 the stream mappings used for forwarding). If the client never learned about the closure, it
@@ -2855,13 +2882,13 @@ forwarded mode packets, but won't have any state corresponding to the
 destination connection ID in the packet. If the proxy has provided a stateless
 reset token for the target VCID, it can send a stateless reset
 packet to quickly notify the client that the client-to-target connection is
-broken.<a href="#section-6.7-2" class="pilcrow">¶</a></p>
+broken.<a href="#section-6.8-2" class="pilcrow">¶</a></p>
 <div id="stateless-resets-from-the-target">
-<section id="section-6.7.1">
+<section id="section-6.8.1">
           <h4 id="name-stateless-resets-from-the-t">
-<a href="#section-6.7.1" class="section-number selfRef">6.7.1. </a><a href="#name-stateless-resets-from-the-t" class="section-name selfRef">Stateless Resets from the Target</a>
+<a href="#section-6.8.1" class="section-number selfRef">6.8.1. </a><a href="#name-stateless-resets-from-the-t" class="section-name selfRef">Stateless Resets from the Target</a>
           </h4>
-<p id="section-6.7.1-1">Reuse of proxy-to-target 4-tuples is only possible because QUIC connection IDs
+<p id="section-6.8.1-1">Reuse of proxy-to-target 4-tuples is only possible because QUIC connection IDs
 allow distinguishing packets for multiple QUIC connections received with the
 same 5-tuple. One exception to this is Stateless Reset packets, in which the
 connection ID is not used, but rather populated with unpredictable bits followed
@@ -2871,7 +2898,7 @@ Reset packets, the client SHOULD share the Stateless Reset token for each
 registered target CID. When the proxy receives a Stateless Reset packet,
 it can send the packet to the client as a tunnelled datagram. Although Stateless Reset packets
 look like short header packets, they are not technically short header packets and do not contain
-negotiated connection IDs, and thus are not eligible for forwarded mode.<a href="#section-6.7.1-1" class="pilcrow">¶</a></p>
+negotiated connection IDs, and thus are not eligible for forwarded mode.<a href="#section-6.8.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -3391,8 +3418,12 @@ will be replaced with lower values before publication.<a href="#section-10.4-1" 
 <span class="refAuthor">Thomson, M.</span>, <span class="refTitle">"Version-Independent Properties of QUIC"</span>, <span class="seriesInfo">RFC 8999</span>, <span class="seriesInfo">DOI 10.17487/RFC8999</span>, <time datetime="2021-05" class="refDate">May 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8999">https://www.rfc-editor.org/rfc/rfc8999</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9001">[RFC9001]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Thomson, M., Ed.</span> and <span class="refAuthor">S. Turner, Ed.</span>, <span class="refTitle">"Using TLS to Secure QUIC"</span>, <span class="seriesInfo">RFC 9001</span>, <span class="seriesInfo">DOI 10.17487/RFC9001</span>, <time datetime="2021-05" class="refDate">May 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9001">https://www.rfc-editor.org/rfc/rfc9001</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9209">[RFC9209]</dt>
+      <dd>
+<span class="refAuthor">Nottingham, M.</span> and <span class="refAuthor">P. Sikora</span>, <span class="refTitle">"The Proxy-Status HTTP Response Header Field"</span>, <span class="seriesInfo">RFC 9209</span>, <span class="seriesInfo">DOI 10.17487/RFC9209</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9209">https://www.rfc-editor.org/rfc/rfc9209</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>

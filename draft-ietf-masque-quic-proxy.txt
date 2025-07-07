@@ -103,9 +103,10 @@ Table of Contents
        6.3.2.  The scramble transform
      6.4.  Connection Maintenance in Forwarded Mode
      6.5.  Handling Connection Migration
-     6.6.  Handling ECN Marking
-     6.7.  Stateless Resets for Forwarded Mode QUIC Packets
-       6.7.1.  Stateless Resets from the Target
+     6.6.  Handling Server Preferred Addresses
+     6.7.  Handling ECN Marking
+     6.8.  Stateless Resets for Forwarded Mode QUIC Packets
+       6.8.1.  Stateless Resets from the Target
    7.  Example Exchange
    8.  Packet Size Considerations
    9.  Security Considerations
@@ -1107,8 +1108,8 @@ Table of Contents
 
    Forwarded mode also raises special considerations for handling
    connection maintenance (Section 6.4), connection migration
-   (Section 6.5), ECN markings (Section 6.6), and stateless resets
-   (Section 6.7).
+   (Section 6.5), server preferred addresses (Section 6.6), ECN markings
+   (Section 6.7), and stateless resets (Section 6.8).
 
 6.1.  Sending With Forwarded Mode
 
@@ -1353,7 +1354,31 @@ Table of Contents
    CID and target CID can stay the same while the target VCID and client
    VCID change.
 
-6.6.  Handling ECN Marking
+6.6.  Handling Server Preferred Addresses
+
+   QUIC allows servers to tell clients about a preferred address the
+   server would like to use (Section 9.6 of [QUIC]).  When this happens,
+   the client can migrate to the preferred address.
+
+   When a client using a proxy wants to migrate to the preferred address
+   of the target server, it needs to create a new UDP proxying request
+   to the proxy (using the method defined in [CONNECT-UDP]) and using
+   the preferred IP address of the target as the host to which to
+   connect.  This is the behavior clients using a proxy will have
+   regardless of using the QUIC-aware mechanisms defined in this
+   document.  From the proxy's perspective, the migrating request is
+   separate from the original request.
+
+   Note that clients can be aware of the target address being used for
+   the original proxy request by looking at next-hop parameter on a
+   Proxy-Status header sent by the proxy in its response (Section 2.1.2
+   of [RFC9209]).  This allows a client to know if it ought to migrate
+   to the preferred address, or is already connected to the preferred
+   address.  To support the ability of clients to do this, proxies
+   implementing this specification SHOULD send the Proxy-Status header
+   in responses and include the next-hop parameter.
+
+6.7.  Handling ECN Marking
 
    Explicit Congestion Notification marking [ECN] uses two bits in the
    IP header to signal congestion from a network to endpoints.  When
@@ -1371,7 +1396,7 @@ Table of Contents
    A proxy MAY additionally add ECN markings to signal congestion being
    experienced on the proxy itself.
 
-6.7.  Stateless Resets for Forwarded Mode QUIC Packets
+6.8.  Stateless Resets for Forwarded Mode QUIC Packets
 
    While the lifecycle of forwarding rules are bound to the lifecycle of
    the client-to-proxy HTTP stream, a peer may not be aware that the
@@ -1396,7 +1421,7 @@ Table of Contents
    can send a stateless reset packet to quickly notify the client that
    the client-to-target connection is broken.
 
-6.7.1.  Stateless Resets from the Target
+6.8.1.  Stateless Resets from the Target
 
    Reuse of proxy-to-target 4-tuples is only possible because QUIC
    connection IDs allow distinguishing packets for multiple QUIC
@@ -1811,6 +1836,10 @@ Table of Contents
    [RFC9001]  Thomson, M., Ed. and S. Turner, Ed., "Using TLS to Secure
               QUIC", RFC 9001, DOI 10.17487/RFC9001, May 2021,
               <https://www.rfc-editor.org/rfc/rfc9001>.
+
+   [RFC9209]  Nottingham, M. and P. Sikora, "The Proxy-Status HTTP
+              Response Header Field", RFC 9209, DOI 10.17487/RFC9209,
+              June 2022, <https://www.rfc-editor.org/rfc/rfc9209>.
 
 Acknowledgments
 
