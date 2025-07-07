@@ -1213,11 +1213,11 @@ can stay the same while the target VCID and client VCID change.
 ## Handling Server Preferred Addresses {#preferred-address}
 
 QUIC allows servers to tell clients about a preferred address the server
-would like to use. When this happens, the client can migrate to the preferred
+would like to use ({{Section 9.6 of QUIC}}). When this happens, the client can migrate to the preferred
 address.
 
 When a client using a proxy wants to migrate to the preferred address of the
-target server, it needs to create a new CONNECT request to the proxy (using
+target server, it needs to create a new UDP proxying request to the proxy (using
 the method defined in {{CONNECT-UDP}}) and using the preferred IP address of the
 target as the host to which to connect. This is the behavior clients using a proxy will have regardless of using
 the QUIC-aware mechanisms defined in this document. From the proxy's perspective,
