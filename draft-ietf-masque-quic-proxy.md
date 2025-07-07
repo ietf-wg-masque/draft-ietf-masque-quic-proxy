@@ -1227,7 +1227,9 @@ Note that clients can be aware of the target address being used for the original
 proxy request by looking at `next-hop` parameter on a `Proxy-Status` header
 sent by the proxy in its response ({{Section 2.1.2 of ?RFC9209}}). This allows
 a client to know if it ought to migrate to the preferred address, or is already
-connected to the preferred address.
+connected to the preferred address. To support the ability of clients to do this, proxies
+implementing this specification SHOULD send the `Proxy-Status` header in responses
+and include the `next-hop` parameter.
 
 ## Handling ECN Marking {#ecn}
 
