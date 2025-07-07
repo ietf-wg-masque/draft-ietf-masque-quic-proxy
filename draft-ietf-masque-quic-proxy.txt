@@ -415,7 +415,9 @@ Table of Contents
    conflict with the proxy-chosen client VCID.  The client VCID MUST
    either be constructed such that it is unpredictable to the client or
    to guarantee no conflicts among all proxies sharing an IP address and
-   port.  See Section 9 for more discussion on client VCID construction.
+   port.  For this reason, a non-empty client VCID MUST NOT be equal to
+   the original client CID.  See Section 9 for more discussion on client
+   VCID construction.
 
    Clients and Proxies not implementing forwarded mode do not need to
    consider VCIDs since all client-to-target datagrams will be
