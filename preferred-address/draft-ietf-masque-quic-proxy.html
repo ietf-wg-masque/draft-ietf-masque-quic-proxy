@@ -2836,7 +2836,9 @@ the migrating request is separate from the original request.<a href="#section-6.
 proxy request by looking at <code>next-hop</code> parameter on a <code>Proxy-Status</code> header
 sent by the proxy in its response (<span><a href="https://rfc-editor.org/rfc/rfc9209#section-2.1.2" class="relref">Section 2.1.2</a> of [<a href="#RFC9209" class="cite xref">RFC9209</a>]</span>). This allows
 a client to know if it ought to migrate to the preferred address, or is already
-connected to the preferred address.<a href="#section-6.6-3" class="pilcrow">¶</a></p>
+connected to the preferred address. To support the ability of clients to do this, proxies
+implementing this specification SHOULD send the <code>Proxy-Status</code> header in responses
+and include the <code>next-hop</code> parameter.<a href="#section-6.6-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="ecn">
