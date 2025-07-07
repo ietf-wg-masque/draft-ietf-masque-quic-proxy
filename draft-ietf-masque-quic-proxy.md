@@ -373,7 +373,7 @@ with any parameters for specific transforms. Clients or proxies that
 don't support forwarded mode will not include this header field.
 
 ~~~
-  proxy-quic-forwarding = ?1; accept-transform=scramble,identity; \
+  proxy-quic-forwarding = ?1; accept-transform="scramble,identity"; \
       scramble-key=:abc...789=:
 ~~~
 
@@ -456,7 +456,7 @@ provide information about QUIC Connection IDs for the purpose of allowing
 the proxy to share a proxy-to-target 4-tuple, it sets the value to "?0".
 
 The client MUST add an "accept-transform" parameter whose value is a
-Token containing the supported packet transforms ({{transforms}})
+String containing the supported packet transforms ({{transforms}})
 in order of descending preference, separated by commas. If the proxy receives a
 "Proxy-QUIC-Forwarding" header without the "accept-transform" parameters, it
 MUST ignore the header and respond as if the client had not sent the
@@ -469,7 +469,7 @@ not receive this header in responses, the client SHALL assume that the proxy
 does not support this extension. If the client receives a transform that it did
 not advertise support for, it MUST abort the request.
 
-The proxy MUST include a "transform" parameter whose value is a Token
+The proxy MUST include a "transform" parameter whose value is a String
 indicating the selected transform. If the proxy does not recognize or accept
 any of the transforms offered by the client, it MUST omit this parameter and
 set the header field value to "?0", or omit the header entirely.
@@ -1283,7 +1283,7 @@ STREAM(44): HEADERS             -------->
   :path = /target.example.com/443/
   :authority = proxy.example.org
   proxy-quic-port-sharing = ?1
-  proxy-quic-forwarding = ?1; accept-transform=scramble,identity; \
+  proxy-quic-forwarding = ?1; accept-transform="scramble,identity"; \
       scramble-key=:abc...789=:
   capsule-protocol = ?1
 
@@ -1304,7 +1304,7 @@ DATAGRAM                        -------->
            <--------  STREAM(44): HEADERS
                         :status = 200
                         proxy-quic-forwarding = ?1; \
-                            transform=scramble; \
+                            transform="scramble"; \
                             scramble-key=:ABC...321=:
                         capsule-protocol = ?1
 
