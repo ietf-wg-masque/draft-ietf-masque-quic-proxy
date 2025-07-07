@@ -1357,17 +1357,17 @@ Table of Contents
 6.6.  Handling Server Preferred Addresses
 
    QUIC allows servers to tell clients about a preferred address the
-   server would like to use.  When this happens, the client can migrate
-   to the preferred address.
+   server would like to use (Section 9.6 of [QUIC]).  When this happens,
+   the client can migrate to the preferred address.
 
    When a client using a proxy wants to migrate to the preferred address
-   of the target server, it needs to create a new CONNECT request to the
-   proxy (using the method defined in [CONNECT-UDP]) and using the
-   preferred IP address of the target as the host to which to connect.
-   This is the behavior clients using a proxy will have regardless of
-   using the QUIC-aware mechanisms defined in this document.  From the
-   proxy's perspective, the migrating request is separate from the
-   original request.
+   of the target server, it needs to create a new UDP proxying request
+   to the proxy (using the method defined in [CONNECT-UDP]) and using
+   the preferred IP address of the target as the host to which to
+   connect.  This is the behavior clients using a proxy will have
+   regardless of using the QUIC-aware mechanisms defined in this
+   document.  From the proxy's perspective, the migrating request is
+   separate from the original request.
 
    Note that clients can be aware of the target address being used for
    the original proxy request by looking at next-hop parameter on a
