@@ -337,8 +337,8 @@ choose a client CID that's sufficiently long to reduce the likelihood
 of a conflict with the proxy-chosen client VCID. The client VCID MUST either be
 constructed such that it is unpredictable to the client or to guarantee no
 conflicts among all proxies sharing an IP address
-and port. See {{security}} for more discussion on client VCID
-construction.
+and port. For this reason, a non-empty client VCID MUST NOT be equal to the
+original client CID. See {{security}} for more discussion on client VCID construction.
 
 Clients and Proxies not implementing forwarded mode do not need to consider
 VCIDs since all client-to-target datagrams will be encapsulated
