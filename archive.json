@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-07-01T00:49:42.358922+00:00",
+  "timestamp": "2025-07-08T00:42:37.847014+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -22,6 +22,11 @@
       "name": "Future work",
       "description": "",
       "color": "DDB4F5"
+    },
+    {
+      "name": "Ready to Close",
+      "description": "",
+      "color": "e98d42"
     }
   ],
   "issues": [
@@ -1532,15 +1537,15 @@
       "id": "I_kwDOEHrEP85iCt8e",
       "title": "Padding",
       "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/80",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "martinthomson",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "Traffic analysis remains the biggest exposure with this design.  Encryption and virtual CIDs help obscure the pattern of bits, but packet size and timing are harder to defend.\r\n\r\nFor packet size, it might be useful if there was a way to pad before encryption.  However, padding will necessarily expand packets.  Also, it would help if the padding were on a per-packet basis.  As things approach MTU, the relative information they leak through size diminishes, but smaller packets can be highly identifying.\r\n\r\nPadding would be applied by the client when sending to the proxy and by the proxy when forwarding to the client.\r\n\r\nTo indicate when padding is in use I think that we should look to steal one of the public bits in the first byte of the QUIC header.  I see just a few options:\r\n\r\n1. The short/long flag (0x80).  This is available because we only ever set a value to 0.  This would violate QUIC invariants, but ...... \u00af\\\\\\_( \u0361\u00b0 \u035c\u0296 \u0361\u00b0)\\_/\u00af\r\n2. The QUIC bit (0x40).  This is available, but if we ever find another use for it this use might conflict with that use.  We wouldn't be able to negotiate the use of this bit for other purposes (including grease) unless we were willing to do two-way trial decryption.\r\n3. The spin bit (0x20).  This is basically already in use, but we might conclude that not spinning the bit is OK for this application.\r\n\r\nOnce we have that bit, we can toggle it to indicate that there is padding.  I would suggest that we pad at the end of the packet, so that we don't need to move packet contents around.  Standard padding schemes are to include a run of zeros from the last octet, with padding ending on a non-zero octet (this is the TLS padding scheme).  There are, of course, many equally-valid alternatives.\r\n",
       "createdAt": "2023-03-29T01:13:34Z",
-      "updatedAt": "2024-07-18T22:16:22Z",
-      "closedAt": null,
+      "updatedAt": "2025-07-07T18:57:29Z",
+      "closedAt": "2025-07-07T18:57:29Z",
       "comments": [
         {
           "author": "tfpauly",
@@ -1562,6 +1567,13 @@
           "body": "Related to https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/92",
           "createdAt": "2024-07-18T22:16:21Z",
           "updatedAt": "2024-07-18T22:16:21Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I think this is mainly a dup of #92 ",
+          "createdAt": "2025-07-07T18:57:29Z",
+          "updatedAt": "2025-07-07T18:57:29Z"
         }
       ]
     },
@@ -1722,15 +1734,15 @@
       "id": "I_kwDOEHrEP85saTM2",
       "title": "Recommendations for Address Migration",
       "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/86",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "martinduke",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "The best practice when clients migrate is not immediately obvious.\r\n\r\nAs the proxy's source IP does not change, changing the connection ID is not strictly necessary between proxy and target.\r\n\r\nIf a client migrates, clearly the virtual connection ID should change, to avoid linkability along the client/proxy path. But it's not totally clear to me if the \"real\" connection IDs should change.\r\n\r\nIf the connection IDs do not change, and an attacker is otherwise able to correlate client-proxy flows with proxy-target flows, then that makes things linkable.\r\n\r\nHowever, changing the connection ID means short header packets start with a new connection ID, which is the signature of a migrating connection. This could actually allow an observer to correlate a client-proxy flow with a proxy-target flow.\r\n\r\nI don't have a solution but I'm happy to help think through the tradeoffs here.",
       "createdAt": "2023-07-24T17:25:52Z",
-      "updatedAt": "2024-07-19T00:10:10Z",
-      "closedAt": null,
+      "updatedAt": "2025-07-07T18:50:16Z",
+      "closedAt": "2025-07-07T18:50:16Z",
       "comments": [
         {
           "author": "huitema",
@@ -2112,10 +2124,12 @@
       "author": "marten-seemann",
       "authorAssociation": "NONE",
       "assignees": [],
-      "labels": [],
+      "labels": [
+        "Ready to Close"
+      ],
       "body": "This might be a crazy idea: Loop detection could be implemented using a Bloom filter.\r\n\r\nOver a certain period of time, the proxy would insert every packet it forwards into a bloom filter. How big would this filter need to be? Let's say you want to insert all packets seen within a time frame of 5s at a speed of 10 Gbps (assuming an MTU of ~1400). At a false positive rate of 1e-6 (rejecting 1 packet in a million), you'd need ~120 MB: https://hur.st/bloomfilter/?n=35M&p=1.0E-6&m=&k=. \r\n\r\nThis would allow the proxy to detect all loops with an RTT of less than 5s. This period can be extended by either enlarging the size of the bloom filter, or by keeping the N most recent bloom filters around.\r\n\r\nProxies could also get a bit more advanced in their detection logic. For example, they could decide to only drop duplicate packets once the rate of duplicates surpasses a certain threshold (there's no harm in forwarding a few looped packets, as long as the volume is low enough).\r\n\r\n",
       "createdAt": "2024-05-21T13:32:16Z",
-      "updatedAt": "2025-06-12T20:35:03Z",
+      "updatedAt": "2025-07-07T15:30:49Z",
       "closedAt": null,
       "comments": [
         {
@@ -2195,7 +2209,7 @@
       "id": "I_kwDOEHrEP86PgMT4",
       "title": "How to handle preferred address migration?",
       "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/113",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "huitema",
       "authorAssociation": "NONE",
       "assignees": [
@@ -2206,8 +2220,8 @@
       ],
       "body": "I am wondering what is supposed to happen if the server sends a \"preferred address\" parameter. My understanding of the draft is that all packets produced by the client are sent to the IP address and port specified in the CONNECT-UDP request. It follows that if the client wants to heed the \"preferred address\" parameter, it should set up a new proxy connection for that. Is that a correct understanding? Should we explain that in the draft?",
       "createdAt": "2024-07-14T20:11:39Z",
-      "updatedAt": "2024-11-03T13:21:38Z",
-      "closedAt": null,
+      "updatedAt": "2025-07-07T18:50:15Z",
+      "closedAt": "2025-07-07T18:50:15Z",
       "comments": [
         {
           "author": "tfpauly",
@@ -2290,10 +2304,12 @@
       "author": "huitema",
       "authorAssociation": "NONE",
       "assignees": [],
-      "labels": [],
+      "labels": [
+        "Ready to Close"
+      ],
       "body": "Do we request that a client establishes a new QUIC/H3 connection to the proxy for each target, or is it OK to simply create multiple proxy connections by sending multiple CONNECT-UDP requests on the same connection? ",
       "createdAt": "2024-07-14T20:15:59Z",
-      "updatedAt": "2024-07-18T21:52:08Z",
+      "updatedAt": "2025-07-07T18:50:31Z",
       "closedAt": null,
       "comments": [
         {
@@ -2390,24 +2406,32 @@
       "labels": [],
       "body": "https://csrc.nist.gov/News/2022/proposal-to-revise-sp-800-38a\r\n\r\nThat RFC 9001 says it uses ECB is a disaster. It have heard people stating several times that ECB is ok in other settings as it is used by QUIC.\r\n\r\nStating that you use ECB will soon be non-compliant as NIST will soon disallow ECB.\r\n\r\nhttps://csrc.nist.gov/News/2022/proposal-to-revise-sp-800-38a\r\n\r\n_\"the use of ECB to encrypt confidential information constitutes a severe security vulnerability\"\r\n\"In the revision, NIST proposes to limit the approval of ECB to instances that are specifically allowed by other NIST standards or guidance.\"_\r\n\r\nPlease reformulate to state that you use AES encryption or AES-CTR, AES-CBC, AES-OFB, or AES-CFB.\r\n",
       "createdAt": "2024-09-20T16:06:42Z",
-      "updatedAt": "2024-09-20T16:07:44Z",
+      "updatedAt": "2025-07-07T18:56:52Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "This is mainly quoting the format for pseudocode in RFC 9001. We'll want more discussion on the right way to represent this.",
+          "createdAt": "2025-07-07T18:56:51Z",
+          "updatedAt": "2025-07-07T18:56:51Z"
+        }
+      ]
     },
     {
       "number": 122,
       "id": "I_kwDOEHrEP86vGVpl",
       "title": "Clarify if VCIDs can be equal to CIDs",
       "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/122",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "tfpauly",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "There are some cases where the proxy might want to have the VCID assigned to a client be the same as the client's original CID. If this is allowed, we should be clear.\n\nOne possible concern is around the CID looping prevention:\n\n> The client VCID MUST either be constructed such that it is unpredictable to the client or to guarantee no conflicts among all proxies sharing an IP address and port. See [Section 9](https://ietf-wg-masque.github.io/draft-ietf-masque-quic-proxy/draft-ietf-masque-quic-proxy.html#security) for more discussion on client VCID construction.",
       "createdAt": "2025-03-21T08:29:24Z",
-      "updatedAt": "2025-03-21T08:29:24Z",
-      "closedAt": null,
+      "updatedAt": "2025-07-07T19:00:54Z",
+      "closedAt": "2025-07-07T19:00:54Z",
       "comments": []
     },
     {
@@ -2419,10 +2443,12 @@
       "author": "LPardue",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
-      "labels": [],
+      "labels": [
+        "Ready to Close"
+      ],
       "body": "[Draft 05](https://www.ietf.org/archive/id/draft-ietf-masque-quic-proxy-05.html#section-3) says some stuff that I'll comment in line on:\n\n> \"Proxy-QUIC-Forwarding\" is an Item Structured Header [[RFC8941](https://www.ietf.org/archive/id/draft-ietf-masque-quic-proxy-05.html#RFC8941)]. Its value MUST be a Boolean.\n> If the client wants to enable QUIC packet forwarding for this request, it sets the value to \"?1\". If it doesn't want to enable forwarding, but instead only provide information about QUIC Connection IDs for the purpose of allowing the proxy to share a proxy-to-target 4-tuple, it sets the value to \"?0\".\n\nFine\n\n> The client MUST add an \"accept-transform\" parameter whose value is an sf-string containing the supported packet transforms ([Section 6.3](https://www.ietf.org/archive/id/draft-ietf-masque-quic-proxy-05.html#transforms)) in order of descending preference, separated by commas. If the proxy receives a \"Proxy-QUIC-Forwarding\" header without the \"accept-transform\" parameters, it MUST ignore the header and respond as if the client had not sent the \"Proxy-QUIC-Forwarding\" header.\n\nnit: `sf-string` is the old terminology we don't like please use `String`.\n\nmajor: IIUC the value is a comma-separated list of values. The only currently defined values are `identity` and `scramble-dt` (to be changed to `scramble` later). So a couple of point here:\n\n1. What does it mean to receive a value that is not known? For example, what if I send `poached`? I presume its not an issue and should be ignored but nothing lept out at me\n2. How are you going to deal with whitespace in these values? E.g. if I send `\"scramble, identity\"` or `\"   scramble, identity    \"`\n3. How do you deal with empty entries such as `\"scramble, , identity\"`?\n\n> If the proxy supports QUIC-aware proxying, it will include the \"Proxy-QUIC-Forwarding\" header in successful HTTP responses. The value indicates whether or not the proxy supports forwarding. If the client does not receive this header in responses, the client SHALL assume that the proxy does not support this extension.\n> The proxy MUST include a \"transform\" parameter whose value is an sf-string indicating the selected transform. If the proxy does not recognize or accept any of the transforms offered by the client, it MUST omit this parameter and set the header field value to \"?0\", or omit the header entirely.\n\nmajor: \n\n4. does the value have to be identical to one of the values that client sent? It seems implicit it should - what does a client do if the server is b0rked (i.e. should it abort the request?)\n\nGeneral\n\n5. What happens if client sends `transform` or server sends `accept-transform` ?\n\n6. Given that you have different rules for how these headers are used by client and server have you considered splitting these into two headers? That potentially make it clearer to say something like `Proxy-QUIC-Forwarding-Req is boolean and MUST have an accept-transform parameter otherwise it is malformed, and Proxy-QUIC-Forwarding-Resp is a boolean and MUST have a transform parameter otherwise it is malformed`.",
       "createdAt": "2025-03-21T08:48:44Z",
-      "updatedAt": "2025-06-27T16:34:15Z",
+      "updatedAt": "2025-07-07T18:56:18Z",
       "closedAt": null,
       "comments": [
         {
@@ -2459,6 +2485,34 @@
           "body": "Leaving a comment here to note that we updated guidance in #128 to follow David's suggestion.",
           "createdAt": "2025-06-27T16:34:15Z",
           "updatedAt": "2025-06-27T16:34:15Z"
+        },
+        {
+          "author": "LPardue",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I'm really sorry for the late reply here, I don't think the change to use `Token`s in #125 is valid (but happy to be corrected). Token's definition doesn't include `,` right? https://www.rfc-editor.org/rfc/rfc9110.html#section-5.6.2-3\n\n> Delimiters are chosen from the set of US-ASCII visual characters not allowed in a [token](https://www.rfc-editor.org/rfc/rfc9110.html#rule.token.separators) (DQUOTE and \"(),/:;<=>?@[\\]{}\").\n\nAs it stands, I'd expect an example like in https://ietf-wg-masque.github.io/draft-ietf-masque-quic-proxy/draft-ietf-masque-quic-proxy.html#section-2.3-6 to be parsed as a `List` (of two things (bool true wih params, identity) and therefore immediately fail the Structured Fields expection for Item\n\n> proxy-quic-forwarding = ?1; accept-transform=scramble,identity;\n\n",
+          "createdAt": "2025-07-07T01:29:42Z",
+          "updatedAt": "2025-07-07T01:29:53Z"
+        },
+        {
+          "author": "LPardue",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> Do you feel strongly that it should be split?\n\nNo, I think I'm in the rough here and can live with the single header design following the changes to address my other points.",
+          "createdAt": "2025-07-07T01:32:02Z",
+          "updatedAt": "2025-07-07T01:32:02Z"
+        },
+        {
+          "author": "LPardue",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> * I would expect that for whitespace the list should be using the structured field version of a list, like in https://www.rfc-editor.org/rfc/rfc8941.html#name-lists. That has an optional whitespace handling.\n\n> * For empty transform names... if we're saying it is a String, then it actually technically needs double quotes around it, which we're not doing. Otherwise we should define it as a Token. Either way, that should tell us if empty is part of it.\n\nSo I think my issue is that you're actually defining a new sub-type - a parameter who's value is a comma-separated list, encoded as a string (Token doesn't cut it). If you want to use the `List` parsing rules from https://httpwg.org/specs/rfc9651.html#rfc.section.4.2.1, that seems entirely sensible. However, I don't believe there are freebies here, the structured fields libraries I'm familiar with will let me extract the parameter value as primitive type e.g. String. Yet further processing of parameter values is left as a job for the application.",
+          "createdAt": "2025-07-07T01:39:50Z",
+          "updatedAt": "2025-07-07T01:40:03Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Changed to a String (with inner commas for the app to parse) with #130 ",
+          "createdAt": "2025-07-07T17:20:10Z",
+          "updatedAt": "2025-07-07T17:20:10Z"
         }
       ]
     },
@@ -11125,6 +11179,275 @@
           "body": "",
           "createdAt": "2025-06-27T16:34:25Z",
           "updatedAt": "2025-06-27T16:34:25Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 130,
+      "id": "PR_kwDOEHrEP86dzGwb",
+      "title": "Fix Token -> String for transforms",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/130",
+      "state": "MERGED",
+      "author": "tfpauly",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "tfpauly"
+      ],
+      "labels": [],
+      "body": "Fixing based on comment in #123 from Lucas \u2014 we can't have tokens separated by commas in a parameter",
+      "createdAt": "2025-07-07T17:10:14Z",
+      "updatedAt": "2025-07-07T17:19:40Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "112520e916ad93dd72d614ce6900814579acf16a",
+      "headRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "headRefName": "tfp/fix-sf-type",
+      "headRefOid": "632f99ddae776abde57a5554a0a3f256ec3294bc",
+      "closedAt": "2025-07-07T17:19:40Z",
+      "mergedAt": "2025-07-07T17:19:40Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "c3a62519b41967955d6565783d377890a0ccadf1"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP86ygBDq",
+          "commit": {
+            "abbreviatedOid": "632f99d"
+          },
+          "author": "LPardue",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-07T17:11:24Z",
+          "updatedAt": "2025-07-07T17:11:24Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 131,
+      "id": "PR_kwDOEHrEP86dzSES",
+      "title": "Add section explaining server preferred addresses",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/131",
+      "state": "MERGED",
+      "author": "tfpauly",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "tfpauly"
+      ],
+      "labels": [],
+      "body": "Closes #113\r\nCloses #86 ",
+      "createdAt": "2025-07-07T17:33:17Z",
+      "updatedAt": "2025-07-07T18:50:15Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "c3a62519b41967955d6565783d377890a0ccadf1",
+      "headRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "headRefName": "preferred-address",
+      "headRefOid": "b84674925150022f3e890d778b6b2b686a6a11db",
+      "closedAt": "2025-07-07T18:50:14Z",
+      "mergedAt": "2025-07-07T18:50:14Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "16a18874dc688c5318c527e672863dd3282190a9"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP86ygRkw",
+          "commit": {
+            "abbreviatedOid": "8b69d7b"
+          },
+          "author": "LPardue",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T17:39:42Z",
+          "updatedAt": "2025-07-07T17:39:43Z",
+          "comments": [
+            {
+              "originalPosition": 23,
+              "body": "I'm a bit out of date but how does it indicate the preferred address, by passing an IP rather than a name?",
+              "createdAt": "2025-07-07T17:39:42Z",
+              "updatedAt": "2025-07-07T17:39:43Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOEHrEP86ygVNA",
+          "commit": {
+            "abbreviatedOid": "8b69d7b"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T17:46:06Z",
+          "updatedAt": "2025-07-07T17:46:06Z",
+          "comments": [
+            {
+              "originalPosition": 23,
+              "body": "Yeah it would just connect to the address. I can spell that out.",
+              "createdAt": "2025-07-07T17:46:06Z",
+              "updatedAt": "2025-07-07T17:46:06Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOEHrEP86ygVa0",
+          "commit": {
+            "abbreviatedOid": "8b69d7b"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T17:46:29Z",
+          "updatedAt": "2025-07-07T17:46:29Z",
+          "comments": [
+            {
+              "originalPosition": 22,
+              "body": "```suggestion\r\nthe method defined in {{CONNECT-UDP}}) and using the preferred IP address of the\r\n```",
+              "createdAt": "2025-07-07T17:46:29Z",
+              "updatedAt": "2025-07-07T17:46:29Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOEHrEP86ygVjB",
+          "commit": {
+            "abbreviatedOid": "8b69d7b"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T17:46:44Z",
+          "updatedAt": "2025-07-07T17:46:44Z",
+          "comments": [
+            {
+              "originalPosition": 23,
+              "body": "```suggestion\r\ntarget as the host to which to connect. This is the behavior clients using a proxy will have regardless of using\r\n```",
+              "createdAt": "2025-07-07T17:46:44Z",
+              "updatedAt": "2025-07-07T17:46:44Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOEHrEP86ygmRH",
+          "commit": {
+            "abbreviatedOid": "dd497a4"
+          },
+          "author": "DavidSchinazi",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-07T18:16:07Z",
+          "updatedAt": "2025-07-07T18:22:48Z",
+          "comments": [
+            {
+              "originalPosition": 17,
+              "body": "nit: add reference to Section 9.6 of RFC 9000",
+              "createdAt": "2025-07-07T18:16:07Z",
+              "updatedAt": "2025-07-07T18:22:48Z"
+            },
+            {
+              "originalPosition": 21,
+              "body": "nit: this would match the title of 9298 better\r\n\r\n```suggestion\r\ntarget server, it needs to create a new UDP proxying request to the proxy (using\r\n```",
+              "createdAt": "2025-07-07T18:18:06Z",
+              "updatedAt": "2025-07-07T18:22:48Z"
+            },
+            {
+              "originalPosition": 31,
+              "body": "Maybe it would help to add something here like \"For this reason, proxies implementing this specification SHOULD send the `Proxy-Status` header and include the `next-hop` parameter.",
+              "createdAt": "2025-07-07T18:22:43Z",
+              "updatedAt": "2025-07-07T18:22:48Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOEHrEP86ygtwP",
+          "commit": {
+            "abbreviatedOid": "dd497a4"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T18:28:50Z",
+          "updatedAt": "2025-07-07T18:28:50Z",
+          "comments": [
+            {
+              "originalPosition": 17,
+              "body": "```suggestion\r\nwould like to use ({{Section 9.6 of QUIC}}). When this happens, the client can migrate to the preferred\r\n```",
+              "createdAt": "2025-07-07T18:28:50Z",
+              "updatedAt": "2025-07-07T18:28:50Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOEHrEP86yg5Qb",
+          "commit": {
+            "abbreviatedOid": "70a64b0"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-07T18:49:40Z",
+          "updatedAt": "2025-07-07T18:49:40Z",
+          "comments": [
+            {
+              "originalPosition": 31,
+              "body": "```suggestion\r\nconnected to the preferred address. To support the ability of clients to do this, proxies\r\nimplementing this specification SHOULD send the `Proxy-Status` header in responses\r\nand include the `next-hop` parameter.\r\n```",
+              "createdAt": "2025-07-07T18:49:40Z",
+              "updatedAt": "2025-07-07T18:49:40Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 132,
+      "id": "PR_kwDOEHrEP86dz5Qd",
+      "title": "Don't allow VCID == CID",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/132",
+      "state": "MERGED",
+      "author": "tfpauly",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #122 ",
+      "createdAt": "2025-07-07T18:55:36Z",
+      "updatedAt": "2025-07-07T19:00:53Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "16a18874dc688c5318c527e672863dd3282190a9",
+      "headRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "headRefName": "not-equal",
+      "headRefOid": "1fbff51775b10b2c749dff24ca425b02a1f5186e",
+      "closedAt": "2025-07-07T19:00:53Z",
+      "mergedAt": "2025-07-07T19:00:53Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "3de452f77617f80a2bfcc895eb69fb14bc4603a3"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP86yg_Ky",
+          "commit": {
+            "abbreviatedOid": "1fbff51"
+          },
+          "author": "DavidSchinazi",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-07T19:00:11Z",
+          "updatedAt": "2025-07-07T19:00:11Z",
           "comments": []
         }
       ]
