@@ -1123,7 +1123,7 @@ to use the reserved value "scramble" {{iana-transforms}}.
 The `scramble` transform is initialized using a 32-byte random symmetric key.
 When offering or selecting this transform, the client and server each
 generate the key that they will use to encrypt scrambled packets and MUST add it to the
-"Proxy-QUIC-Transform" header in an `sf-binary` parameter named "scramble-key".
+"Proxy-QUIC-Forwarding" header in an `sf-binary` parameter named "scramble-key".
 If either side receives a `scramble` transform without the "scramble-key" parameter,
 forwarded mode MUST be disabled.
 
