@@ -5,9 +5,9 @@
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
 Intended status: Experimental                                 Apple Inc.
-Expires: 8 January 2026                                      D. Schinazi
+Expires: 16 January 2026                                     D. Schinazi
                                                               Google LLC
-                                                             7 July 2025
+                                                            15 July 2025
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 8 January 2026.
+   This Internet-Draft will expire on 16 January 2026.
 
 Copyright Notice
 
@@ -99,7 +99,7 @@ Table of Contents
      6.1.  Sending With Forwarded Mode
      6.2.  Receiving With Forwarded Mode
      6.3.  Packet Transforms
-       6.3.1.  The identify transform
+       6.3.1.  The identity transform
        6.3.2.  The scramble transform
      6.4.  Connection Maintenance in Forwarded Mode
      6.5.  Handling Connection Migration
@@ -1209,7 +1209,7 @@ Table of Contents
    defines two initial transforms: the identity transform and the
    scramble transform.
 
-6.3.1.  The identify transform
+6.3.1.  The identity transform
 
    The identity transform does not modify the packet in any way.  When
    this transform is in use, a global passive adversary can trivially
