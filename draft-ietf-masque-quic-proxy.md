@@ -1089,7 +1089,7 @@ Packet transforms are identified by an IANA-registered name, and negotiated in
 the HTTP headers (see {{forwarding-header}}).  This document defines two initial
 transforms: the `identity` transform and the `scramble` transform.
 
-### The identify transform {#identity-transform}
+### The identity transform {#identity-transform}
 
 The `identity` transform does not modify the packet in any way.  When this transform
 is in use, a global passive adversary can trivially correlate pairs of packets
