@@ -565,6 +565,17 @@ receiving an ACK_CLIENT_CID. When port sharing is supported, a proxy SHOULD buff
 reasonable number of incoming packets while waiting for the first REGISTER_CLIENT_CID
 capsule.
 
+Importantly, registering connection IDs does not introduce any delay in
+communication between client and target unless port sharing is supported and
+there is an unlikely client CID collision. The client and target can always
+communicate over the tunnel without having to wait for registrations to be
+acknowledged. Forwarded mode requires CID/VCID mappings be communicated and
+acknowledged, and, as a consequence, cannot be leveraged without a round
+trip. This is particularly pronounced when chaining proxies because
+registration happens sequentially. While waiting for forwarded mode to become
+enabled, clients SHOULD communicate over tunneled mode to avoid end to end
+delays.
+
 ## REGISTER_CLIENT_CID {#capsule-reg-client}
 
 The REGISTER_CLIENT_CID capsule is sent by the client and contains a single
