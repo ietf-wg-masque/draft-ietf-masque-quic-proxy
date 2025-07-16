@@ -5,9 +5,9 @@
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
 Intended status: Experimental                                 Apple Inc.
-Expires: 16 January 2026                                     D. Schinazi
+Expires: 17 January 2026                                     D. Schinazi
                                                               Google LLC
-                                                            15 July 2025
+                                                            16 July 2025
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 16 January 2026.
+   This Internet-Draft will expire on 17 January 2026.
 
 Copyright Notice
 
@@ -1247,7 +1247,7 @@ Table of Contents
    The scramble transform is initialized using a 32-byte random
    symmetric key.  When offering or selecting this transform, the client
    and server each generate the key that they will use to encrypt
-   scrambled packets and MUST add it to the "Proxy-QUIC-Transform"
+   scrambled packets and MUST add it to the "Proxy-QUIC-Forwarding"
    header in an sf-binary parameter named "scramble-key".  If either
    side receives a scramble transform without the "scramble-key"
    parameter, forwarded mode MUST be disabled.
