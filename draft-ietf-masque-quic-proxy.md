@@ -573,7 +573,7 @@ acknowledged. Forwarded mode requires CID/VCID mappings be communicated and
 acknowledged, and, as a consequence, cannot be leveraged without a round
 trip. This is particularly pronounced when chaining proxies because
 registration happens sequentially. While waiting for forwarded mode to become
-enabled, clients SHOULD communicate over tunneled mode to avoid end to end
+enabled, clients SHOULD communicate over tunneled mode to avoid end-to-end
 delays.
 
 ## REGISTER_CLIENT_CID {#capsule-reg-client}
