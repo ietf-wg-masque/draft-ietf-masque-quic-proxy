@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-07-08T00:42:37.847014+00:00",
+  "timestamp": "2025-07-17T00:44:38.012366+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -1671,7 +1671,7 @@
       "id": "I_kwDOEHrEP85qZoW_",
       "title": "recommend registering client-issued CIDs with the proxy first",
       "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/84",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "marten-seemann",
       "authorAssociation": "NONE",
       "assignees": [],
@@ -1680,8 +1680,8 @@
       ],
       "body": "When the client wishes to issue a new CID for the target, it might be advantageous to register it with the proxy first (and wait for acknowledgement), before actually sending it to the target. That way, if the proxy rejects the CID, there\u2019s no risk that the target already started using that CID, which would lead to the loss of all packets sent using that CID, until that CID is retired (which takes at least 1 RTT).",
       "createdAt": "2023-07-03T01:18:13Z",
-      "updatedAt": "2025-02-13T22:22:14Z",
-      "closedAt": null,
+      "updatedAt": "2025-07-15T15:39:22Z",
+      "closedAt": "2025-07-15T15:39:21Z",
       "comments": [
         {
           "author": "marten-seemann",
@@ -1710,6 +1710,13 @@
           "body": "Option:\n- If the proxy sends a close client CID capsule, it will drop all packets sent by the client until the proxy sends an acknowledgement of a new client CID. This regresses us into a slower case when we have a conflict. The client can be told to only send the initial flight before getting the ack or close, and to then not send anything more until it gets an ack.",
           "createdAt": "2025-02-13T22:22:12Z",
           "updatedAt": "2025-02-13T22:22:12Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Fixed by #121 ",
+          "createdAt": "2025-07-15T15:39:21Z",
+          "updatedAt": "2025-07-15T15:39:21Z"
         }
       ]
     },
@@ -1722,10 +1729,12 @@
       "author": "enygren",
       "authorAssociation": "NONE",
       "assignees": [],
-      "labels": [],
+      "labels": [
+        "Discuss"
+      ],
       "body": "As we do work to decouple the potential risks on correlation between the incoming/outgoing connections, the forwarding of ECN has potential risk.  An active attacker could embed signals over a series of packets by clearing+setting ECN bits and observing the same signal on the output side. \r\n\r\nThe end-to-end QUIC congestion control makes it so we really do want to forward ECN, so it's unclear what can be done about this risk in a way that also allows ECN to be applied on any of the hops. \r\n\r\nThis might be something to just capture as a known potential risk and downside for this use-case.",
       "createdAt": "2023-07-24T17:20:07Z",
-      "updatedAt": "2023-07-24T17:20:07Z",
+      "updatedAt": "2025-07-16T20:35:03Z",
       "closedAt": null,
       "comments": []
     },
@@ -2403,10 +2412,12 @@
       "author": "emanjon",
       "authorAssociation": "NONE",
       "assignees": [],
-      "labels": [],
+      "labels": [
+        "Discuss"
+      ],
       "body": "https://csrc.nist.gov/News/2022/proposal-to-revise-sp-800-38a\r\n\r\nThat RFC 9001 says it uses ECB is a disaster. It have heard people stating several times that ECB is ok in other settings as it is used by QUIC.\r\n\r\nStating that you use ECB will soon be non-compliant as NIST will soon disallow ECB.\r\n\r\nhttps://csrc.nist.gov/News/2022/proposal-to-revise-sp-800-38a\r\n\r\n_\"the use of ECB to encrypt confidential information constitutes a severe security vulnerability\"\r\n\"In the revision, NIST proposes to limit the approval of ECB to instances that are specifically allowed by other NIST standards or guidance.\"_\r\n\r\nPlease reformulate to state that you use AES encryption or AES-CTR, AES-CBC, AES-OFB, or AES-CFB.\r\n",
       "createdAt": "2024-09-20T16:06:42Z",
-      "updatedAt": "2025-07-07T18:56:52Z",
+      "updatedAt": "2025-07-16T20:34:47Z",
       "closedAt": null,
       "comments": [
         {
@@ -11449,6 +11460,152 @@
           "createdAt": "2025-07-07T19:00:11Z",
           "updatedAt": "2025-07-07T19:00:11Z",
           "comments": []
+        }
+      ]
+    },
+    {
+      "number": 133,
+      "id": "PR_kwDOEHrEP86fB3_z",
+      "title": "Fix identity transform title",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/133",
+      "state": "MERGED",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "typo fix",
+      "createdAt": "2025-07-15T17:03:00Z",
+      "updatedAt": "2025-07-15T21:24:43Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "3de452f77617f80a2bfcc895eb69fb14bc4603a3",
+      "headRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "headRefName": "ehaydenr-patch-1",
+      "headRefOid": "216860919da8df4e4ac00d97168b1291265b1ca9",
+      "closedAt": "2025-07-15T21:23:27Z",
+      "mergedAt": "2025-07-15T21:23:27Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "68d126e5748835c23178ca44341489fc60da6041"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP860FjIL",
+          "commit": {
+            "abbreviatedOid": "2168609"
+          },
+          "author": "DavidSchinazi",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-15T17:09:19Z",
+          "updatedAt": "2025-07-15T17:09:19Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOEHrEP860JbKh",
+          "commit": {
+            "abbreviatedOid": "2168609"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-15T21:22:52Z",
+          "updatedAt": "2025-07-15T21:22:52Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 134,
+      "id": "PR_kwDOEHrEP86fFCtu",
+      "title": "Fix header field name",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/134",
+      "state": "MERGED",
+      "author": "tfpauly",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "tfpauly"
+      ],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-07-15T23:13:21Z",
+      "updatedAt": "2025-07-16T15:22:03Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "68d126e5748835c23178ca44341489fc60da6041",
+      "headRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "headRefName": "tfpauly-patch-13",
+      "headRefOid": "f75f0d2e88030e63f527a0b562e307aea4227513",
+      "closedAt": "2025-07-16T15:22:03Z",
+      "mergedAt": "2025-07-16T15:22:03Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "22c4232d5c6bb132d64f2b0e2bf34952530bfb3d"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP860KdWT",
+          "commit": {
+            "abbreviatedOid": "f75f0d2"
+          },
+          "author": "ehaydenr",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-15T23:50:21Z",
+          "updatedAt": "2025-07-15T23:50:21Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 135,
+      "id": "PR_kwDOEHrEP86fQ62Y",
+      "title": "highlight how registration does not introduce delays",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/135",
+      "state": "OPEN",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "addresses #103 ",
+      "createdAt": "2025-07-16T21:28:52Z",
+      "updatedAt": "2025-07-17T00:13:10Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "22c4232d5c6bb132d64f2b0e2bf34952530bfb3d",
+      "headRepository": "ehaydenr/quic-proxy",
+      "headRefName": "delays",
+      "headRefOid": "7f098cdf70b4fa6e45504522f2de97358eebc210",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP860cGUX",
+          "commit": {
+            "abbreviatedOid": "33df218"
+          },
+          "author": "DavidSchinazi",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-16T23:45:17Z",
+          "updatedAt": "2025-07-16T23:45:21Z",
+          "comments": [
+            {
+              "originalPosition": 12,
+              "body": "```suggestion\r\nenabled, clients SHOULD communicate over tunneled mode to avoid end-to-end\r\n```",
+              "createdAt": "2025-07-16T23:45:17Z",
+              "updatedAt": "2025-07-16T23:45:21Z"
+            }
+          ]
         }
       ]
     }
