@@ -1247,6 +1247,9 @@ headers does not apply.
 A proxy MAY additionally add ECN markings to signal congestion being experienced
 on the proxy itself.
 
+Forwarding ECN markings introduces certain active attacks. See
+{{active-attacks}} for more detail.
+
 ## Stateless Resets for Forwarded Mode QUIC Packets {#resets}
 
 While the lifecycle of forwarding rules are bound to the lifecycle of the
@@ -1473,7 +1476,7 @@ they are communicating with on each connection to passive attackers that can
 observe the client-to-proxy traffic. This additional metadata revealed on each
 packet simplifies size and timing attacks.
 
-## Active Attacks
+## Active Attacks {#active-attacks}
 
 An active attacker is an adversary that can inject, modify, drop, and view
 packets in the network. Some active attacks have different effects between
