@@ -1006,6 +1006,9 @@ maintenance ({{maintenance}}), connection migration ({{migration}}),
 server preferred addresses ({{preferred-address}}), ECN markings ({{ecn}}),
 and stateless resets ({{resets}}).
 
+Forwarded mode packets are not part of the QUIC connection the tunnel is
+managed by, but instead an independent flow of QUIC packets.
+
 ## Sending With Forwarded Mode
 
 Support for forwarded mode is determined by the "Proxy-QUIC-Forwarding" header,
