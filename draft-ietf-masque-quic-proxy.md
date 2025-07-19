@@ -154,6 +154,13 @@ fields from packets in client-to-target QUIC connections. Since these fields
 are all in the QUIC invariants header {{!INVARIANTS=RFC8999}}, QUIC proxies can
 proxy all versions of QUIC.
 
+While Forwarded mode may improve overhead of per-packet processing, this
+doesn't necessarily imply overall throughput is improved. Unlike tunneled packets,
+packets sent in Forwarded mode are not congestion controlled between client and
+proxy. Deployments should consider whether or not the overhead advantages
+outweigh potentially superior throughput afforded by client-to-proxy congestion
+control.
+
 ## Conventions and Definitions {#conventions}
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
