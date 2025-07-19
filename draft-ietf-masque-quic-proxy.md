@@ -1247,6 +1247,9 @@ headers does not apply.
 A proxy MAY additionally add ECN markings to signal congestion being experienced
 on the proxy itself.
 
+Forwarding ECN markings introduces certain active attacks. See
+{{active-attacks}} for more detail.
+
 ## Stateless Resets for Forwarded Mode QUIC Packets {#resets}
 
 While the lifecycle of forwarding rules are bound to the lifecycle of the
@@ -1473,7 +1476,7 @@ they are communicating with on each connection to passive attackers that can
 observe the client-to-proxy traffic. This additional metadata revealed on each
 packet simplifies size and timing attacks.
 
-## Active Attacks
+## Active Attacks {#active-attacks}
 
 An active attacker is an adversary that can inject, modify, drop, and view
 packets in the network. Some active attacks have different effects between
@@ -1485,7 +1488,8 @@ vulnerable to packet injection in the target-to-client direction. An attacker
 can inject a burst of packets with a known QUIC Connection ID and see which
 Connection ID is used for the corresponding burst on the proxy-to-client network path.
 
-Packet injection with a known QUIC Connection ID can also happen in the
+Forwarded mode is vulnerable to some active attacks that tunneled mode is not.
+For example, packet injection with a known QUIC Connection ID can also happen in the
 client-to-proxy direction, which only affects forwarded mode since
 tunnelled mode sends packets within an authenticated and integrity protected
 QUIC connection to the proxy (see {{?RFC9001}}). None of the packet transforms
@@ -1493,12 +1497,18 @@ defined in this document provide integrity protection. Even if a packet
 transform did provide integrity protection, attackers can inject replayed
 packets. Protection against replayed packets is similarly provided by QUIC in
 tunnelled mode, but not provided by any of the forwarded mode packet transforms
-defined in this document.
+defined in this document. Similarly, Forwarded mode packets are vulnerable to
+active attacks when {{!ECN=RFC3168}} markings are forwarded. Specifically, an
+attacker could embed a signal over a series of packets by clearing or setting
+ECN bits. This attack is possible without injecting, dropping, or modifying the
+QUIC packet, but instead modifying the packet's IP header.
 
 An active attacker can modify packets in the client-to-proxy direction, which
 would cause a tunnelling proxy to silently drop packets, while a forwarding proxy
 would forward the packets. In this way, forwarded mode is less vulnerable to
 flow recognition based on corrupting a portion of packets in a burst.
+
+## Connection ID Registration Attacks
 
 Chaining of proxies using forwarded mode introduces the risk of forwarding loop
 attacks. Preventing client VCID conflicts across proxies
