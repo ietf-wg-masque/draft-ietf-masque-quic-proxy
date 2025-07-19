@@ -1498,7 +1498,7 @@ transform did provide integrity protection, attackers can inject replayed
 packets. Protection against replayed packets is similarly provided by QUIC in
 tunnelled mode, but not provided by any of the forwarded mode packet transforms
 defined in this document. Similarly, Forwarded mode packets are vulnerable to
-active attacks when  {{!ECN=RFC3168}} markings are forwarded. Specifically, an
+active attacks when {{!ECN=RFC3168}} markings are forwarded. Specifically, an
 attacker could embed a signal over a series of packets by clearing or setting
 ECN bits. This attack is possible without injecting, dropping, or modifying the
 QUIC packet, but instead modifying the packet's IP header.
