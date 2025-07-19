@@ -5,9 +5,9 @@
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
 Intended status: Experimental                                 Apple Inc.
-Expires: 16 January 2026                                     D. Schinazi
+Expires: 20 January 2026                                     D. Schinazi
                                                               Google LLC
-                                                            15 July 2025
+                                                            19 July 2025
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 16 January 2026.
+   This Internet-Draft will expire on 20 January 2026.
 
 Copyright Notice
 
@@ -112,6 +112,7 @@ Table of Contents
    9.  Security Considerations
      9.1.  Passive Attacks
      9.2.  Active Attacks
+     9.3.  Connection ID Registration Attacks
    10. IANA Considerations
      10.1.  HTTP Header Field
      10.2.  Proxy QUIC Forwarding Parameter Names
@@ -805,7 +806,7 @@ Table of Contents
 5.5.  ACK_CLIENT_VCID
 
    The ACK_CLIENT_VCID capsule type is sent by the client in response to
-   an ACK_TARGET_CID capsule that contains a virtual connection ID.
+   an ACK_CLIENT_CID capsule that contains a virtual connection ID.
 
    Acknowledge Client VCID Capsule {
      Type (i) = see {{iana}} for the value of the capsule type
@@ -1247,7 +1248,7 @@ Table of Contents
    The scramble transform is initialized using a 32-byte random
    symmetric key.  When offering or selecting this transform, the client
    and server each generate the key that they will use to encrypt
-   scrambled packets and MUST add it to the "Proxy-QUIC-Transform"
+   scrambled packets and MUST add it to the "Proxy-QUIC-Forwarding"
    header in an sf-binary parameter named "scramble-key".  If either
    side receives a scramble transform without the "scramble-key"
    parameter, forwarded mode MUST be disabled.
@@ -1397,6 +1398,9 @@ Table of Contents
 
    A proxy MAY additionally add ECN markings to signal congestion being
    experienced on the proxy itself.
+
+   Forwarding ECN markings introduces certain active attacks.  See
+   Section 9.2 for more detail.
 
 6.8.  Stateless Resets for Forwarded Mode QUIC Packets
 
@@ -1639,22 +1643,30 @@ Table of Contents
    QUIC Connection ID and see which Connection ID is used for the
    corresponding burst on the proxy-to-client network path.
 
-   Packet injection with a known QUIC Connection ID can also happen in
-   the client-to-proxy direction, which only affects forwarded mode
-   since tunnelled mode sends packets within an authenticated and
-   integrity protected QUIC connection to the proxy (see [RFC9001]).
-   None of the packet transforms defined in this document provide
-   integrity protection.  Even if a packet transform did provide
-   integrity protection, attackers can inject replayed packets.
-   Protection against replayed packets is similarly provided by QUIC in
-   tunnelled mode, but not provided by any of the forwarded mode packet
-   transforms defined in this document.
+   Forwarded mode is vulnerable to some active attacks that tunneled
+   mode is not.  For example, packet injection with a known QUIC
+   Connection ID can also happen in the client-to-proxy direction, which
+   only affects forwarded mode since tunnelled mode sends packets within
+   an authenticated and integrity protected QUIC connection to the proxy
+   (see [RFC9001]).  None of the packet transforms defined in this
+   document provide integrity protection.  Even if a packet transform
+   did provide integrity protection, attackers can inject replayed
+   packets.  Protection against replayed packets is similarly provided
+   by QUIC in tunnelled mode, but not provided by any of the forwarded
+   mode packet transforms defined in this document.  Similarly,
+   Forwarded mode packets are vulnerable to active attacks when [ECN]
+   markings are forwarded.  Specifically, an attacker could embed a
+   signal over a series of packets by clearing or setting ECN bits.
+   This attack is possible without injecting, dropping, or modifying the
+   QUIC packet, but instead modifying the packet's IP header.
 
    An active attacker can modify packets in the client-to-proxy
    direction, which would cause a tunnelling proxy to silently drop
    packets, while a forwarding proxy would forward the packets.  In this
    way, forwarded mode is less vulnerable to flow recognition based on
    corrupting a portion of packets in a burst.
+
+9.3.  Connection ID Registration Attacks
 
    Chaining of proxies using forwarded mode introduces the risk of
    forwarding loop attacks.  Preventing client VCID conflicts across
