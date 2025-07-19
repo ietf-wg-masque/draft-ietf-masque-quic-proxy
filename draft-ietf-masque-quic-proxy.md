@@ -716,7 +716,7 @@ response to client-to-target forwarded mode packets.
 ## ACK_CLIENT_VCID {#capsule-ack-virtual}
 
 The ACK_CLIENT_VCID capsule type is sent by the client in
-response to an ACK_TARGET_CID capsule that contains a virtual connection ID.
+response to an ACK_CLIENT_CID capsule that contains a virtual connection ID.
 
 ~~~
 Acknowledge Client VCID Capsule {
