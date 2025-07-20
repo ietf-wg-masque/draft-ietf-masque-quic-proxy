@@ -149,10 +149,7 @@ any client-to-target connection.
 The forwarded mode of proxying is only defined for HTTP/3 {{HTTP3}} and not
 any earlier versions of HTTP.
 
-QUIC proxies only need to understand the Header Form bit, and the connection ID
-fields from packets in client-to-target QUIC connections. Since these fields
-are all in the QUIC invariants header {{!INVARIANTS=RFC8999}}, QUIC proxies can
-proxy all versions of QUIC.
+QUIC proxies can proxy all versions of QUIC. See {{invariance}} for more information.
 
 ## Conventions and Definitions {#conventions}
 
@@ -1454,6 +1451,21 @@ QUIC packets.
 
 Once a proxied QUIC connections moves into forwarded mode, the client SHOULD
 initiate Path MTU discovery to increase its end-to-end MTU.
+
+# QUIC Version Invariance {#invariance}
+
+QUIC proxies only need to understand the Header Form bit, and the connection ID
+fields from packets in client-to-target QUIC connections. Since these fields
+are all invariant across future QUIC versions {{!INVARIANTS=RFC8999}}, QUIC proxies can
+proxy all versions of QUIC.
+
+While QUIC proxies can proxy all versions of QUIC, some optional capabilities
+are limited to certain versions. Specifically, some of the connection ID
+registration capsules in {{cid-capsules}} include a Stateless Reset Token field.
+This field is defined in {{!QUIC=RFC9000}} and not part of
+{{!INVARIANTS=RFC8999}}. If a future QUIC version removes or changes the
+behavior of Stateless Reset Tokens, the Stateless Reset Token field in each
+capsule MUST have a length of zero.
 
 # Security Considerations {#security}
 
