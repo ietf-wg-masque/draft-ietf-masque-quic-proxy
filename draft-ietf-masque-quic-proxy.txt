@@ -5,9 +5,9 @@
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
 Intended status: Experimental                                 Apple Inc.
-Expires: 20 January 2026                                     D. Schinazi
+Expires: 21 January 2026                                     D. Schinazi
                                                               Google LLC
-                                                            19 July 2025
+                                                            20 July 2025
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 20 January 2026.
+   This Internet-Draft will expire on 21 January 2026.
 
 Copyright Notice
 
@@ -806,7 +806,7 @@ Table of Contents
 5.5.  ACK_CLIENT_VCID
 
    The ACK_CLIENT_VCID capsule type is sent by the client in response to
-   an ACK_TARGET_CID capsule that contains a virtual connection ID.
+   an ACK_CLIENT_CID capsule that contains a virtual connection ID.
 
    Acknowledge Client VCID Capsule {
      Type (i) = see {{iana}} for the value of the capsule type
