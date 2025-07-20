@@ -1126,6 +1126,9 @@ Table of Contents
    (Section 6.5), server preferred addresses (Section 6.6), ECN markings
    (Section 6.7), and stateless resets (Section 6.8).
 
+   Forwarded mode packets are not part of the QUIC connection the tunnel
+   is managed by, but instead an independent flow of QUIC packets.
+
 6.1.  Sending With Forwarded Mode
 
    Support for forwarded mode is determined by the "Proxy-QUIC-
