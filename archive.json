@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-07-17T00:44:38.012366+00:00",
+  "timestamp": "2025-07-20T00:51:05.078018+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -2541,6 +2541,22 @@
       "createdAt": "2025-03-21T09:16:40Z",
       "updatedAt": "2025-06-12T20:33:53Z",
       "closedAt": "2025-06-12T20:33:53Z",
+      "comments": []
+    },
+    {
+      "number": 136,
+      "id": "I_kwDOEHrEP87BMZGQ",
+      "title": "Add test vectors for scramble transform",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/136",
+      "state": "OPEN",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-07-17T23:28:02Z",
+      "updatedAt": "2025-07-17T23:28:02Z",
+      "closedAt": null,
       "comments": []
     }
   ],
@@ -11608,6 +11624,172 @@
           ]
         }
       ]
+    },
+    {
+      "number": 137,
+      "id": "PR_kwDOEHrEP86fgVmC",
+      "title": "mention that forwarded mode isnt always better",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/137",
+      "state": "OPEN",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Addresses #81 ",
+      "createdAt": "2025-07-18T05:25:19Z",
+      "updatedAt": "2025-07-18T05:25:20Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "22c4232d5c6bb132d64f2b0e2bf34952530bfb3d",
+      "headRepository": "ehaydenr/quic-proxy",
+      "headRefName": "control-loops",
+      "headRefOid": "be4ae830bfdc737da533918133c05c6abe09922f",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 138,
+      "id": "PR_kwDOEHrEP86fgbtA",
+      "title": "unambiguously state forwarded mode packets are independent",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/138",
+      "state": "OPEN",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "addresses #79 ",
+      "createdAt": "2025-07-18T05:36:44Z",
+      "updatedAt": "2025-07-18T05:37:13Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "22c4232d5c6bb132d64f2b0e2bf34952530bfb3d",
+      "headRepository": "ehaydenr/quic-proxy",
+      "headRefName": "external",
+      "headRefOid": "d979f4fe2c623af8ae3d22ec3c55c5a397422254",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 139,
+      "id": "PR_kwDOEHrEP86fgpbg",
+      "title": "add section about QUIC version invariance",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/139",
+      "state": "OPEN",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "addresses #83 ",
+      "createdAt": "2025-07-18T06:02:05Z",
+      "updatedAt": "2025-07-18T06:02:06Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "22c4232d5c6bb132d64f2b0e2bf34952530bfb3d",
+      "headRepository": "ehaydenr/quic-proxy",
+      "headRefName": "version",
+      "headRefOid": "917b32925a659d9e1ff29fb5e3dfd54e71b1db6c",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 140,
+      "id": "PR_kwDOEHrEP86fmfRq",
+      "title": "consider ECN active attacks",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/140",
+      "state": "MERGED",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "addresses #85 ",
+      "createdAt": "2025-07-18T16:08:32Z",
+      "updatedAt": "2025-07-19T09:45:25Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "22c4232d5c6bb132d64f2b0e2bf34952530bfb3d",
+      "headRepository": "ehaydenr/quic-proxy",
+      "headRefName": "ecn-active-attack",
+      "headRefOid": "5b61ab965a5df7234aa10d7a38049d0309c12682",
+      "closedAt": "2025-07-19T09:45:18Z",
+      "mergedAt": "2025-07-19T09:45:18Z",
+      "mergedBy": "ehaydenr",
+      "mergeCommit": {
+        "oid": "b25d33464cd8f1e7461ed5a49837babf9244416b"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP8604A5-",
+          "commit": {
+            "abbreviatedOid": "1305f95"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-18T19:06:47Z",
+          "updatedAt": "2025-07-18T19:06:47Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOEHrEP8606yPS",
+          "commit": {
+            "abbreviatedOid": "1305f95"
+          },
+          "author": "DavidSchinazi",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-19T09:33:01Z",
+          "updatedAt": "2025-07-19T09:33:12Z",
+          "comments": [
+            {
+              "originalPosition": 35,
+              "body": "```suggestion\r\nactive attacks when {{!ECN=RFC3168}} markings are forwarded. Specifically, an\r\n```",
+              "createdAt": "2025-07-19T09:33:01Z",
+              "updatedAt": "2025-07-19T09:33:12Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 141,
+      "id": "PR_kwDOEHrEP86frXTc",
+      "title": "Fix ACK_CLIENT_VCID description",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/141",
+      "state": "OPEN",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "It's sent in response to ACK_CLIENT_CID, not ACK_TARGET_CID.",
+      "createdAt": "2025-07-19T10:14:12Z",
+      "updatedAt": "2025-07-19T10:14:13Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "b25d33464cd8f1e7461ed5a49837babf9244416b",
+      "headRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "headRefName": "ehaydenr-patch-1",
+      "headRefOid": "43515ab0d696ba47b867588c2abe17530f8e6ba6",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
