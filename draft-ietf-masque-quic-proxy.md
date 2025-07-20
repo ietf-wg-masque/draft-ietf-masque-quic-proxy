@@ -1439,7 +1439,7 @@ initiate Path MTU discovery to increase its end-to-end MTU.
 
 QUIC proxies only need to understand the Header Form bit, and the connection ID
 fields from packets in client-to-target QUIC connections. Since these fields
-are all in the QUIC invariants header {{!INVARIANTS=RFC8999}}, QUIC proxies can
+are all invariant across future QUIC versions {{!INVARIANTS=RFC8999}}, QUIC proxies can
 proxy all versions of QUIC.
 
 While QUIC proxies can proxy all versions of QUIC, some optional capabilities
