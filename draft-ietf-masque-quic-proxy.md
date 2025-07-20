@@ -1087,7 +1087,7 @@ Simple transforms can be modeled as a function as follows:
 
 Inputs:
 
-1. A QUIC short header packet (after Connection ID remapping).
+1. A QUIC short header packet with a VCID.
 1. The mode (encode or decode).
 1. The direction (client-to-proxy or proxy-to-client).
 1. Any configuration information negotiated at startup.
