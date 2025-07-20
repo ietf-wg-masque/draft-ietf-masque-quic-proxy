@@ -1205,7 +1205,7 @@ Table of Contents
 
    Inputs:
 
-   1.  A QUIC short header packet (after Connection ID remapping).
+   1.  A QUIC short header packet with a VCID.
 
    2.  The mode (encode or decode).
 
