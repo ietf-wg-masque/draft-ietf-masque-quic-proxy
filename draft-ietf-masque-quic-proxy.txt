@@ -109,18 +109,19 @@ Table of Contents
        6.8.1.  Stateless Resets from the Target
    7.  Example Exchange
    8.  Packet Size Considerations
-   9.  Security Considerations
-     9.1.  Passive Attacks
-     9.2.  Active Attacks
-     9.3.  Connection ID Registration Attacks
-   10. IANA Considerations
-     10.1.  HTTP Header Field
-     10.2.  Proxy QUIC Forwarding Parameter Names
-     10.3.  Packet Transform Names
-     10.4.  Capsule Types
-   11. References
-     11.1.  Normative References
-     11.2.  Informative References
+   9.  QUIC Version Invariance
+   10. Security Considerations
+     10.1.  Passive Attacks
+     10.2.  Active Attacks
+     10.3.  Connection ID Registration Attacks
+   11. IANA Considerations
+     11.1.  HTTP Header Field
+     11.2.  Proxy QUIC Forwarding Parameter Names
+     11.3.  Packet Transform Names
+     11.4.  Capsule Types
+   12. References
+     12.1.  Normative References
+     12.2.  Informative References
    Acknowledgments
    Authors' Addresses
 
@@ -197,7 +198,7 @@ Table of Contents
    Forwarded mode does not prevent correlation of packets on the link
    between client and proxy and the link between proxy and target by an
    entity that can observe both links.  The precise risks depend on the
-   negotiated transform (Section 6.3).  See Section 9 for further
+   negotiated transform (Section 6.3).  See Section 10 for further
    discussion.
 
    Both clients and proxies can unilaterally choose to disable forwarded
@@ -206,10 +207,8 @@ Table of Contents
    The forwarded mode of proxying is only defined for HTTP/3 [HTTP3] and
    not any earlier versions of HTTP.
 
-   QUIC proxies only need to understand the Header Form bit, and the
-   connection ID fields from packets in client-to-target QUIC
-   connections.  Since these fields are all in the QUIC invariants
-   header [INVARIANTS], QUIC proxies can proxy all versions of QUIC.
+   QUIC proxies can proxy all versions of QUIC.  See Section 9 for more
+   information.
 
 1.1.  Conventions and Definitions
 
@@ -417,8 +416,8 @@ Table of Contents
    either be constructed such that it is unpredictable to the client or
    to guarantee no conflicts among all proxies sharing an IP address and
    port.  For this reason, a non-empty client VCID MUST NOT be equal to
-   the original client CID.  See Section 9 for more discussion on client
-   VCID construction.
+   the original client CID.  See Section 10 for more discussion on
+   client VCID construction.
 
    Clients and Proxies not implementing forwarded mode do not need to
    consider VCIDs since all client-to-target datagrams will be
@@ -1234,7 +1233,7 @@ Table of Contents
    target.
 
    The identity transform is identified by the value "identity"
-   Section 10.3.
+   Section 11.3.
 
    Use of this transform is NOT RECOMMENDED if the scramble transform is
    supported by both the client and the proxy.  Implementations MAY
@@ -1258,7 +1257,7 @@ Table of Contents
    Deployments that implement the version of the scramble transform
    defined in this document MUST use the value "scramble-dt".  The
    finalized version is expected to use the reserved value "scramble"
-   Section 10.3.
+   Section 11.3.
 
    The scramble transform is initialized using a 32-byte random
    symmetric key.  When offering or selecting this transform, the client
@@ -1415,7 +1414,7 @@ Table of Contents
    experienced on the proxy itself.
 
    Forwarding ECN markings introduces certain active attacks.  See
-   Section 9.2 for more detail.
+   Section 10.2 for more detail.
 
 6.8.  Stateless Resets for Forwarded Mode QUIC Packets
 
@@ -1605,7 +1604,22 @@ Table of Contents
    Once a proxied QUIC connections moves into forwarded mode, the client
    SHOULD initiate Path MTU discovery to increase its end-to-end MTU.
 
-9.  Security Considerations
+9.  QUIC Version Invariance
+
+   QUIC proxies only need to understand the Header Form bit, and the
+   connection ID fields from packets in client-to-target QUIC
+   connections.  Since these fields are all invariant across future QUIC
+   versions [INVARIANTS], QUIC proxies can proxy all versions of QUIC.
+
+   While QUIC proxies can proxy all versions of QUIC, some optional
+   capabilities are limited to certain versions.  Specifically, some of
+   the connection ID registration capsules in Section 5 include a
+   Stateless Reset Token field.  This field is defined in [QUIC] and not
+   part of [INVARIANTS].  If a future QUIC version removes or changes
+   the behavior of Stateless Reset Tokens, the Stateless Reset Token
+   field in each capsule MUST have a length of zero.
+
+10.  Security Considerations
 
    Proxies that support this extension SHOULD provide protections to
    rate-limit or restrict clients from opening an excessive number of
@@ -1620,7 +1634,7 @@ Table of Contents
    proxy.  The following sections highlight deanonymization risks with
    using forwarded mode.
 
-9.1.  Passive Attacks
+10.1.  Passive Attacks
 
    A passive attacker aims to deanonymize a client by correlating
    traffic across both sides of the proxy.  When using forwarded mode
@@ -1645,7 +1659,7 @@ Table of Contents
    proxy traffic.  This additional metadata revealed on each packet
    simplifies size and timing attacks.
 
-9.2.  Active Attacks
+10.2.  Active Attacks
 
    An active attacker is an adversary that can inject, modify, drop, and
    view packets in the network.  Some active attacks have different
@@ -1681,7 +1695,7 @@ Table of Contents
    way, forwarded mode is less vulnerable to flow recognition based on
    corrupting a portion of packets in a burst.
 
-9.3.  Connection ID Registration Attacks
+10.3.  Connection ID Registration Attacks
 
    Chaining of proxies using forwarded mode introduces the risk of
    forwarding loop attacks.  Preventing client VCID conflicts across
@@ -1690,9 +1704,9 @@ Table of Contents
    VCID space across proxies, using sufficiently long and random values,
    or by other means.
 
-10.  IANA Considerations
+11.  IANA Considerations
 
-10.1.  HTTP Header Field
+11.1.  HTTP Header Field
 
    This document registers the "Proxy-QUIC-Forwarding" header field in
    the "Hypertext Transfer Protocol (HTTP) Field Name Registry"
@@ -1706,7 +1720,7 @@ Table of Contents
 
                Figure 11: Registered HTTP Header Field
 
-10.2.  Proxy QUIC Forwarding Parameter Names
+11.2.  Proxy QUIC Forwarding Parameter Names
 
    This document establishes a new registry, "Proxy QUIC Forwarding
    Parameter Names", for parameter names to use with the "Proxy-QUIC-
@@ -1727,7 +1741,7 @@ Table of Contents
 
        Figure 12: Initial Proxy QUIC Forwarding Parameter Names
 
-10.3.  Packet Transform Names
+11.3.  Packet Transform Names
 
    This document establishes a new registry for packet transform names
    in <https://www.iana.org/assignments/masque/masque.xhtml> and defines
@@ -1753,7 +1767,7 @@ Table of Contents
 
                  Table 1: Initial Packet Transform Names
 
-10.4.  Capsule Types
+11.4.  Capsule Types
 
    This document registers six new values in the "HTTP Capsule Types"
    registry established by [HTTP-CAPSULES].  Note that the codepoints
@@ -1789,9 +1803,9 @@ Table of Contents
    Contact:  masque@ietf.org
    Notes:  None
 
-11.  References
+12.  References
 
-11.1.  Normative References
+12.1.  Normative References
 
    [CONNECT-UDP]
               Schinazi, D., "Proxying UDP in HTTP", RFC 9298,
@@ -1845,7 +1859,7 @@ Table of Contents
               <https://nvlpubs.nist.gov/nistpubs/legacy/sp/
               nistspecialpublication800-38a.pdf>.
 
-11.2.  Informative References
+12.2.  Informative References
 
    [ECN-TUNNEL]
               Briscoe, B., "Tunnelling of Explicit Congestion
