@@ -493,7 +493,12 @@ MUST be a Boolean.
 
 Clients SHOULD send this with a value of "?1" unless the client wishes to prohibit
 this behavior. Permitting the proxy to share ports may allow the proxy to conserve
-resources and support more clients.
+resources and support more clients. Clients should not advertise support for port
+sharing unless they are willing to share the same 4-tuple when communicating with
+the target. Sharing ports with other QUIC connections may result in fate-sharing
+with clients that might be considered to be untrusted or malicious by the target. Such
+fate-sharing may impact performance or may lead to being misclassified as
+malicious.
 
 A proxy that does not support port sharing, SHOULD send "Proxy-QUIC-Port-Sharing"
 with a value of "?0". Doing so allows clients to stop sending capsules for this
