@@ -2665,34 +2665,37 @@ client CID before processing the packet further.<a href="#section-6.2-3" class="
         </h3>
 <p id="section-6.3-1">A packet transform is the procedure applied to encode packets as they are sent
 on the link between the client and proxy, along with the inverse decode step applied
-on receipt. Simple transforms can be modeled as a function as follows:<a href="#section-6.3-1" class="pilcrow">¶</a></p>
-<p id="section-6.3-2">Inputs:<a href="#section-6.3-2" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-6.3-3">
-<li id="section-6.3-3.1">
-            <p id="section-6.3-3.1.1">A QUIC short header packet (after Connection ID remapping).<a href="#section-6.3-3.1.1" class="pilcrow">¶</a></p>
+on receipt. When sending packets, the packet transform is applied after replacing
+a CID with a VCID. When receiving packets, the packet transform is applied before
+replacing a VCID with a CID.<a href="#section-6.3-1" class="pilcrow">¶</a></p>
+<p id="section-6.3-2">Simple transforms can be modeled as a function as follows:<a href="#section-6.3-2" class="pilcrow">¶</a></p>
+<p id="section-6.3-3">Inputs:<a href="#section-6.3-3" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.3-4">
+<li id="section-6.3-4.1">
+            <p id="section-6.3-4.1.1">A QUIC short header packet with a VCID.<a href="#section-6.3-4.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-6.3-3.2">
-            <p id="section-6.3-3.2.1">The mode (encode or decode).<a href="#section-6.3-3.2.1" class="pilcrow">¶</a></p>
+          <li id="section-6.3-4.2">
+            <p id="section-6.3-4.2.1">The mode (encode or decode).<a href="#section-6.3-4.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-6.3-3.3">
-            <p id="section-6.3-3.3.1">The direction (client-to-proxy or proxy-to-client).<a href="#section-6.3-3.3.1" class="pilcrow">¶</a></p>
+          <li id="section-6.3-4.3">
+            <p id="section-6.3-4.3.1">The direction (client-to-proxy or proxy-to-client).<a href="#section-6.3-4.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-6.3-3.4">
-            <p id="section-6.3-3.4.1">Any configuration information negotiated at startup.<a href="#section-6.3-3.4.1" class="pilcrow">¶</a></p>
+          <li id="section-6.3-4.4">
+            <p id="section-6.3-4.4.1">Any configuration information negotiated at startup.<a href="#section-6.3-4.4.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
-<p id="section-6.3-4">Output:<a href="#section-6.3-4" class="pilcrow">¶</a></p>
+<p id="section-6.3-5">Output:<a href="#section-6.3-5" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6.3-5.1">
-            <p id="section-6.3-5.1.1">A UDP payload that conforms to the QUIC invariants <span>[<a href="#RFC8999" class="cite xref">RFC8999</a>]</span> and does not
-modify the Connection ID.<a href="#section-6.3-5.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-6.3-6.1">
+            <p id="section-6.3-6.1.1">A UDP payload that conforms to the QUIC invariants <span>[<a href="#RFC8999" class="cite xref">RFC8999</a>]</span> and does not
+modify the Connection ID.<a href="#section-6.3-6.1.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-6.3-6">More complex transform behaviors could have internal state, but no such transforms
-are presented here.<a href="#section-6.3-6" class="pilcrow">¶</a></p>
-<p id="section-6.3-7">Packet transforms are identified by an IANA-registered name, and negotiated in
+<p id="section-6.3-7">More complex transform behaviors could have internal state, but no such transforms
+are presented here.<a href="#section-6.3-7" class="pilcrow">¶</a></p>
+<p id="section-6.3-8">Packet transforms are identified by an IANA-registered name, and negotiated in
 the HTTP headers (see <a href="#forwarding-header" class="auto internal xref">Section 3</a>).  This document defines two initial
-transforms: the <code>identity</code> transform and the <code>scramble</code> transform.<a href="#section-6.3-7" class="pilcrow">¶</a></p>
+transforms: the <code>identity</code> transform and the <code>scramble</code> transform.<a href="#section-6.3-8" class="pilcrow">¶</a></p>
 <div id="identity-transform">
 <section id="section-6.3.1">
           <h4 id="name-the-identity-transform">
@@ -2732,7 +2735,10 @@ When offering or selecting this transform, the client and server each
 generate the key that they will use to encrypt scrambled packets and MUST add it to the
 "Proxy-QUIC-Forwarding" header in an <code>sf-binary</code> parameter named "scramble-key".
 If either side receives a <code>scramble</code> transform without the "scramble-key" parameter,
-forwarded mode MUST be disabled.<a href="#section-6.3.2-3" class="pilcrow">¶</a></p>
+forwarded mode MUST be disabled. Note that each side (client and server) generates
+its own "scramble-key" that it uses when sending scrambled packets; the value
+received in the "scramble-key" parameter is thus used to unscramble packets
+received from the peer.<a href="#section-6.3.2-3" class="pilcrow">¶</a></p>
 <p id="section-6.3.2-4">This transform relies on the AES-128 block cipher, which is represented by the
 syntax <code>AES-ECB(key, plaintext_block)</code> as in <span>[<a href="#RFC9001" class="cite xref">RFC9001</a>]</span>.  The corresponding
 decryption operation is written here as <code>AES-ECB-inv(key, ciphertext_block)</code>.
