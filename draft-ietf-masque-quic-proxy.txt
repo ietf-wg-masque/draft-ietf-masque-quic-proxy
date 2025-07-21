@@ -1640,6 +1640,20 @@ Table of Contents
    the behavior of Stateless Reset Tokens, the Stateless Reset Token
    field in each capsule MUST have a length of zero.
 
+   When forwarding mode is enabled, the client and target MAY negotiate
+   any QUIC version, and MAY send packets of that version through the
+   forwarding path.  The proxy does not know what version they are
+   using, so it can only require that these packets conform to the QUIC
+   invariants for short-header packets ([RFC8999], Section 5.2).
+
+   QUIC version 1 specifies a Fixed Bit (a.k.a. the "QUIC bit") with a
+   fixed value to support sharing a 5-tuple with other protocols such as
+   DTLS, but the QUIC invariants do not guarantee the value of this bit.
+   Accordingly proxies with forwarding mode enabled MUST NOT rely on
+   this bit for protocol identification, and SHOULD send and accept the
+   grease_quic_bit transport parameter [QUIC-GREASE] to avoid
+   ossification of the forwarding mode path.
+
 10.  Security Considerations
 
    Proxies that support this extension SHOULD provide protections to
@@ -1886,6 +1900,11 @@ Table of Contents
               Briscoe, B., "Tunnelling of Explicit Congestion
               Notification", RFC 6040, DOI 10.17487/RFC6040, November
               2010, <https://www.rfc-editor.org/rfc/rfc6040>.
+
+   [QUIC-GREASE]
+              Schinazi, D. and L. Pardue, "HTTP Datagrams and the
+              Capsule Protocol", RFC 9297, DOI 10.17487/RFC9297, August
+              2022, <https://www.rfc-editor.org/rfc/rfc9297>.
 
    [QUIC-LB]  Duke, M., Banks, N., and C. Huitema, "QUIC-LB: Generating
               Routable QUIC Connection IDs", Work in Progress, Internet-
