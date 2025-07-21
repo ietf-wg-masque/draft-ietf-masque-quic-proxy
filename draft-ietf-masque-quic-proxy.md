@@ -1091,11 +1091,15 @@ client CID before processing the packet further.
 
 A packet transform is the procedure applied to encode packets as they are sent
 on the link between the client and proxy, along with the inverse decode step applied
-on receipt. Simple transforms can be modeled as a function as follows:
+on receipt. When sending packets, the packet transform is applied after replacing
+a CID with a VCID. When receiving packets, the packet transform is applied before
+replacing a VCID with a CID.
+
+Simple transforms can be modeled as a function as follows:
 
 Inputs:
 
-1. A QUIC short header packet (after Connection ID remapping).
+1. A QUIC short header packet with a VCID.
 1. The mode (encode or decode).
 1. The direction (client-to-proxy or proxy-to-client).
 1. Any configuration information negotiated at startup.
@@ -1148,7 +1152,10 @@ When offering or selecting this transform, the client and server each
 generate the key that they will use to encrypt scrambled packets and MUST add it to the
 "Proxy-QUIC-Forwarding" header in an `sf-binary` parameter named "scramble-key".
 If either side receives a `scramble` transform without the "scramble-key" parameter,
-forwarded mode MUST be disabled.
+forwarded mode MUST be disabled. Note that each side (client and server) generates
+its own "scramble-key" that it uses when sending scrambled packets; the value
+received in the "scramble-key" parameter is thus used to unscramble packets
+received from the peer.
 
 This transform relies on the AES-128 block cipher, which is represented by the
 syntax `AES-ECB(key, plaintext_block)` as in {{?RFC9001}}.  The corresponding
