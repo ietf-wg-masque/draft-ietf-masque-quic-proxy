@@ -1,0 +1,3 @@
+# Automatically generated CODEOWNERS
+# Regenerate with `make update-codeowners`
+draft-ietf-masque-quic-proxy.md tpauly@apple.com eric_rosenberg@apple.com dschinazi.ietf@gmail.com
