@@ -496,9 +496,9 @@ this behavior. Permitting the proxy to share ports may allow the proxy to conser
 resources and support more clients. Clients should not advertise support for port
 sharing unless they are willing to share the same 4-tuple when communicating with
 the target. Sharing ports with other QUIC connections may result in fate-sharing
-with misbehaving clients when traversing the proxy-target network path. Such
+with clients that might be considered to be untrusted or malicious by the target. Such
 fate-sharing may impact performance or may lead to being misclassified as
-misbehaving.
+malicious.
 
 A proxy that does not support port sharing, SHOULD send "Proxy-QUIC-Port-Sharing"
 with a value of "?0". Doing so allows clients to stop sending capsules for this
