@@ -338,11 +338,13 @@ To reduce the likelihood of connection ID conflicts, the proxy MUST choose a
 client VCID that is at least as long as the original client CID. Similarly,
 clients multiplexing connections on the same UDP 4-tuple SHOULD
 choose a client CID that's sufficiently long to reduce the likelihood
-of a conflict with the proxy-chosen client VCID. The client VCID MUST either be
+of a conflict with the proxy-chosen client VCID. For proxies that share a
+client-facing IP and port with other proxies, support target-facing port sharing,
+and cannot guarantee there are no proxies being proxied to, the client VCID MUST be
 constructed such that it is unpredictable to the client or to guarantee no
-conflicts among all proxies sharing an IP address
-and port. For this reason, a non-empty client VCID MUST NOT be equal to the
-original client CID. See {{security}} for more discussion on client VCID construction.
+conflicts among all proxies sharing an IP address and port. For such proxies, a
+non-empty client VCID MUST NOT be equal to the original client CID. See
+{{security}} for more discussion on client VCID construction.
 
 Clients and Proxies not implementing forwarded mode do not need to consider
 VCIDs since all client-to-target datagrams will be encapsulated
@@ -1569,9 +1571,11 @@ flow recognition based on corrupting a portion of packets in a burst.
 ## Connection ID Registration Attacks
 
 Chaining of proxies using forwarded mode introduces the risk of forwarding loop
-attacks. Preventing client VCID conflicts across proxies
-sharing an IP address and port mitigates one such forwarding loop attack.
-Conflicts can be avoided by partitioning the client VCID space
+attacks. Proxies are known to be vulnerable to one such forwarding loop attack
+when sharing an IP address and port with other proxies, supporting target-facing
+port sharing, and proxying to other proxies. Preventing client VCID conflicts
+across proxies sharing an IP address and port mitigates one such forwarding loop
+attack. Conflicts can be avoided by partitioning the client VCID space
 across proxies, using sufficiently long and random values, or by other means.
 
 [comment1]: # OPEN ISSUE: Figure out how clients and proxies could interact to
