@@ -5,9 +5,9 @@
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
 Intended status: Experimental                                 Apple Inc.
-Expires: 21 January 2026                                     D. Schinazi
+Expires: 22 January 2026                                     D. Schinazi
                                                               Google LLC
-                                                            20 July 2025
+                                                            21 July 2025
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 21 January 2026.
+   This Internet-Draft will expire on 22 January 2026.
 
 Copyright Notice
 
@@ -582,7 +582,12 @@ Table of Contents
    Clients SHOULD send this with a value of "?1" unless the client
    wishes to prohibit this behavior.  Permitting the proxy to share
    ports may allow the proxy to conserve resources and support more
-   clients.
+   clients.  Clients should not advertise support for port sharing
+   unless they are willing to share the same 4-tuple when communicating
+   with the target.  Sharing ports with other QUIC connections may
+   result in fate-sharing with clients that might be considered to be
+   untrusted or malicious by the target.  Such fate-sharing may impact
+   performance or may lead to being misclassified as malicious.
 
    A proxy that does not support port sharing, SHOULD send "Proxy-QUIC-
    Port-Sharing" with a value of "?0".  Doing so allows clients to stop
