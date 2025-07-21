@@ -1657,6 +1657,45 @@ Notes:
 
 --- back
 
+# Appendix A. Example of a Forwarded Mode QUIC Packet
+
+The following is an example of a QUIC packet that could have been sent by a
+client or proxy in Forwarded Mode.
+
+Original QUIC Destination Connection ID
+~~~ hex-dump
+002e9184cb0022ca7aecf1128c91d809e1b6853f
+~~~
+
+Virtual QUIC Destination Connection ID
+~~~
+0123456789abcdef0123456789abcdef01234567
+~~~
+
+Original QUIC Packet Generated for a Peer.
+
+~~~ hex-dump
+50002e9184cb0022ca7aecf1128c91d8
+09e1b6853f1ba3bed7043a2163202304
+8def32f4f8f260c290490413d24ea6
+~~~
+
+Forwarded mode packet with the identity transform
+
+~~~ hex-dump
+500123456789abcdef0123456789abcd
+ef012345671ba3bed7043a2163202304
+8def32f4f8f260c290490413d24ea6
+~~~
+
+Forwarded mode packet with scramble key `f13a915f96fb8919d9d8655488ffea5778cac8cffbc27cd38c173bcbad955cff`
+
+~~~ hex-dump
+320123456789abcdef0123456789abcd
+ef012345678ebe6906e16ec5fc90a02c
+0109994c3fed03f9d5d88c5f408bb6
+~~~
+
 # Acknowledgments {#acknowledgments}
 {:numbered="false"}
 
