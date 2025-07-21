@@ -1657,12 +1657,12 @@ Notes:
 The following is an example of a QUIC packet that could have been sent by a
 client or proxy in Forwarded Mode.
 
-Real QUIC Destination Connection ID
+Original QUIC Destination Connection ID
 ~~~ hex-dump
 002e9184cb0022ca7aecf1128c91d809e1b6853f
 ~~~
 
-Virtual QUIC Connection ID
+Virtual QUIC Destination Connection ID
 ~~~
 0123456789abcdef0123456789abcdef01234567
 ~~~
