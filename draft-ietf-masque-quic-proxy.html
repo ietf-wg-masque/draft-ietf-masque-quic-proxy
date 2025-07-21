@@ -1345,10 +1345,13 @@ re-encapsulated and re-encrypted.<a href="#section-abstract-1" class="pilcrow">�
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
-            <p id="section-toc.1-1.13.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.13.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-appendix-a-example-of-a-for" class="internal xref">Appendix A. Example of a Forwarded Mode QUIC Packet</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
-            <p id="section-toc.1-1.14.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+            <p id="section-toc.1-1.14.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
+            <p id="section-toc.1-1.15.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -3488,21 +3491,62 @@ will be replaced with lower values before publication.<a href="#section-11.4-1" 
 </div>
 </section>
 </div>
-<div id="acknowledgments">
+<div id="appendix-a-example-of-a-forwarded-mode-quic-packet">
 <section id="appendix-A">
+      <h2 id="name-appendix-a-example-of-a-for">
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-appendix-a-example-of-a-for" class="section-name selfRef">Appendix A. Example of a Forwarded Mode QUIC Packet</a>
+      </h2>
+<p id="appendix-A-1">The following is an example of a QUIC packet that could have been sent by a
+client or proxy in Forwarded Mode.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<p id="appendix-A-2">Original QUIC Destination Connection ID
+~~~ hex-dump
+002e9184cb0022ca7aecf1128c91d809e1b6853f
+~~~<a href="#appendix-A-2" class="pilcrow">¶</a></p>
+<p id="appendix-A-3">Virtual QUIC Destination Connection ID
+~~~
+0123456789abcdef0123456789abcdef01234567
+~~~<a href="#appendix-A-3" class="pilcrow">¶</a></p>
+<p id="appendix-A-4">Original QUIC Packet Generated for a Peer.<a href="#appendix-A-4" class="pilcrow">¶</a></p>
+<div class="alignLeft art-hex-dump art-text artwork" id="appendix-A-5">
+<pre>
+50002e9184cb0022ca7aecf1128c91d8
+09e1b6853f1ba3bed7043a2163202304
+8def32f4f8f260c290490413d24ea6
+</pre><a href="#appendix-A-5" class="pilcrow">¶</a>
+</div>
+<p id="appendix-A-6">Forwarded mode packet with the identity transform<a href="#appendix-A-6" class="pilcrow">¶</a></p>
+<div class="alignLeft art-hex-dump art-text artwork" id="appendix-A-7">
+<pre>
+500123456789abcdef0123456789abcd
+ef012345671ba3bed7043a2163202304
+8def32f4f8f260c290490413d24ea6
+</pre><a href="#appendix-A-7" class="pilcrow">¶</a>
+</div>
+<p id="appendix-A-8">Forwarded mode packet with scramble key <code>f13a915f96fb8919d9d8655488ffea5778cac8cffbc27cd38c173bcbad955cff</code><a href="#appendix-A-8" class="pilcrow">¶</a></p>
+<div class="alignLeft art-hex-dump art-text artwork" id="appendix-A-9">
+<pre>
+320123456789abcdef0123456789abcd
+ef012345678ebe6906e16ec5fc90a02c
+0109994c3fed03f9d5d88c5f408bb6
+</pre><a href="#appendix-A-9" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="acknowledgments">
+<section id="appendix-B">
       <h2 id="name-acknowledgments">
 <a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
       </h2>
-<p id="appendix-A-1">Thanks to Lucas Pardue, Ryan Hamilton, and Mirja Kühlewind for their inputs
+<p id="appendix-B-1">Thanks to Lucas Pardue, Ryan Hamilton, and Mirja Kühlewind for their inputs
 on this document. The scramble transform design came out of the encryption
 design team whose members were Antoine Fressancourt, Mirja Kuehlwind, Tiru Reddy,
 Ben Schwartz, and the authors of this document. The authors would also like to
 thank Martin Duke for identifying a proxy looping vulnerability that influenced
-the capsule registration design.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+the capsule registration design.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authors-addresses">
-<section id="appendix-B">
+<section id="appendix-C">
       <h2 id="name-authors-addresses">
 <a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
       </h2>
