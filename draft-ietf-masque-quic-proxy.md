@@ -968,7 +968,7 @@ and responds with an ACK_CLIENT_CID capsule. If forwarded mode is enabled, the
 capsule contains a proxy-chosen client VCID. If forwarded mode
 is enabled, and after receiving an ACK_CLIENT_VCID capsule from the client, any
 packets received by the proxy from the proxy-to-target 4-tuple that match the
-client CID can to be sent to the client after the proxy has replaced
+client CID can be sent to the client after the proxy has replaced
 the CID with the client VCID. If forwarded mode is
 not supported, the proxy MUST NOT send a client VCID by setting
 the length to zero. The proxy MUST use tunnelled mode (HTTP Datagram frames) for
