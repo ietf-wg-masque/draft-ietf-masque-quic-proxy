@@ -481,22 +481,13 @@ Table of Contents
        send the CLOSE_CLIENT_CID if it detects a conflict with another
        CID.
 
-   3.  The client sends the REGISTER_TARGET_CID capsule as soon as it
-       learns the target CID on the client-to-target connection.
-
-   4.  The proxy sends the ACK_TARGET_CID capsule to acknowledge that
-       CID, with no associated target VCID; alternatively, the proxy can
-       send the CLOSE_TARGET_CID if it detects a conflict with another
-       CID.
-
-   5.  The proxy sends the MAX_CONNECTION_IDS capsule to allow
+   3.  The proxy sends the MAX_CONNECTION_IDS capsule to allow
        additional registration of new connection IDs via future
        REGISTER_CLIENT_CID and REGISTER_TARGET_CID capsules.
 
-   6.  Whenever a client or target stops uses a particular CID, the
-       client sends a CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsule.  The
-       client can also initiate new REGISTER_CLIENT_CID or
-       REGISTER_TARGET_CID exchanges at any time.
+   4.  Whenever a client stops using a particular CID, the client sends
+       a CLOSE_CLIENT_CID.  The client can also initiate new
+       REGISTER_CLIENT_CID exchanges at any time.
 
    For QUIC-aware proxying with forwarded mode, the steps are as
    follows:
@@ -599,6 +590,11 @@ Table of Contents
    QUIC-Port-Sharing" header in response must assume that port sharing
    may be in effect and MUST continue register connection IDs in order
    for the proxied connection to continue to work.
+
+   When port sharing is supported and forwarded mode is not,
+   registration of target Connection IDs is permitted, but is not
+   required since port sharing only requires demultiplexing QUIC packets
+   in the target-to-client direction
 
 5.  Connection ID Capsules
 

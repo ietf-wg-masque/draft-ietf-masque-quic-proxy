@@ -1834,24 +1834,14 @@ with no associated client VCID; alternatively, the proxy can send the
 <code>CLOSE_CLIENT_CID</code> if it detects a conflict with another CID.<a href="#section-2.3-10.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-2.3-10.3">
-            <p id="section-2.3-10.3.1">The client sends the <code>REGISTER_TARGET_CID</code> capsule as soon as it learns
-the target CID on the client-to-target connection.<a href="#section-2.3-10.3.1" class="pilcrow">¶</a></p>
+            <p id="section-2.3-10.3.1">The proxy sends the <code>MAX_CONNECTION_IDS</code> capsule to allow additional
+registration of new connection IDs via future <code>REGISTER_CLIENT_CID</code> and
+<code>REGISTER_TARGET_CID</code> capsules.<a href="#section-2.3-10.3.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-2.3-10.4">
-            <p id="section-2.3-10.4.1">The proxy sends the <code>ACK_TARGET_CID</code> capsule to acknowledge that CID,
-with no associated target VCID; alternatively, the proxy can send the
-<code>CLOSE_TARGET_CID</code> if it detects a conflict with another CID.<a href="#section-2.3-10.4.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-2.3-10.5">
-            <p id="section-2.3-10.5.1">The proxy sends the <code>MAX_CONNECTION_IDS</code> capsule to allow additional
-registration of new connection IDs via future <code>REGISTER_CLIENT_CID</code> and
-<code>REGISTER_TARGET_CID</code> capsules.<a href="#section-2.3-10.5.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-2.3-10.6">
-            <p id="section-2.3-10.6.1">Whenever a client or target stops uses a particular CID, the client
-sends a <code>CLOSE_CLIENT_CID</code> or <code>CLOSE_TARGET_CID</code> capsule. The client
-can also initiate new <code>REGISTER_CLIENT_CID</code> or <code>REGISTER_TARGET_CID</code>
-exchanges at any time.<a href="#section-2.3-10.6.1" class="pilcrow">¶</a></p>
+            <p id="section-2.3-10.4.1">Whenever a client stops using a particular CID, the client
+sends a <code>CLOSE_CLIENT_CID</code>. The client can also initiate new
+<code>REGISTER_CLIENT_CID</code> exchanges at any time.<a href="#section-2.3-10.4.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
 <p id="section-2.3-11">For QUIC-aware proxying with forwarded mode, the steps are as follows:<a href="#section-2.3-11" class="pilcrow">¶</a></p>
@@ -1957,6 +1947,9 @@ extension if forwarding mode is also not supported. Clients who send "?1", but d
 not receive any "Proxy-QUIC-Port-Sharing" header in response must assume that port
 sharing may be in effect and MUST continue register connection IDs in order for
 the proxied connection to continue to work.<a href="#section-4-4" class="pilcrow">¶</a></p>
+<p id="section-4-5">When port sharing is supported and forwarded mode is not, registration of target
+Connection IDs is permitted, but is not required since port sharing only requires
+demultiplexing QUIC packets in the target-to-client direction<a href="#section-4-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="cid-capsules">
