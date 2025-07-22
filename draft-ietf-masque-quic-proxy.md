@@ -399,21 +399,13 @@ CID that it will use for receiving packets from a target.
 with no associated client VCID; alternatively, the proxy can send the
 `CLOSE_CLIENT_CID` if it detects a conflict with another CID.
 
-1. The client sends the `REGISTER_TARGET_CID` capsule as soon as it learns
-the target CID on the client-to-target connection.
-
-1. The proxy sends the `ACK_TARGET_CID` capsule to acknowledge that CID,
-with no associated target VCID; alternatively, the proxy can send the
-`CLOSE_TARGET_CID` if it detects a conflict with another CID.
-
 1. The proxy sends the `MAX_CONNECTION_IDS` capsule to allow additional
 registration of new connection IDs via future `REGISTER_CLIENT_CID` and
 `REGISTER_TARGET_CID` capsules.
 
-1. Whenever a client or target stops uses a particular CID, the client
-sends a `CLOSE_CLIENT_CID` or `CLOSE_TARGET_CID` capsule. The client
-can also initiate new `REGISTER_CLIENT_CID` or `REGISTER_TARGET_CID`
-exchanges at any time.
+1. Whenever a client stops using a particular CID, the client
+sends a `CLOSE_CLIENT_CID`. The client can also initiate new
+`REGISTER_CLIENT_CID` exchanges at any time.
 
 For QUIC-aware proxying with forwarded mode, the steps are as follows:
 
@@ -461,10 +453,10 @@ the value to "?1". If it doesn't want to enable forwarding, but instead only
 provide information about QUIC Connection IDs for the purpose of allowing
 the proxy to share a proxy-to-target 4-tuple, it sets the value to "?0".
 
-The client MUST add an "accept-transform" parameter whose value is a
+If advertising support for forwarding, the client MUST add an "accept-transform" parameter whose value is a
 String containing the supported packet transforms ({{transforms}})
 in order of descending preference, separated by commas. If the proxy receives a
-"Proxy-QUIC-Forwarding" header without the "accept-transform" parameters, it
+"Proxy-QUIC-Forwarding" header with a value of "?1" and without the "accept-transform" parameter, it
 MUST ignore the header and respond as if the client had not sent the
 "Proxy-QUIC-Forwarding" header.
 
@@ -508,6 +500,10 @@ extension if forwarding mode is also not supported. Clients who send "?1", but d
 not receive any "Proxy-QUIC-Port-Sharing" header in response must assume that port
 sharing may be in effect and MUST continue register connection IDs in order for
 the proxied connection to continue to work.
+
+When port sharing is supported and forwarded mode is not, registration of target
+Connection IDs is permitted, but is not required since port sharing only requires
+demultiplexing QUIC packets in the target-to-client direction
 
 # Connection ID Capsules {#cid-capsules}
 
@@ -968,7 +964,7 @@ and responds with an ACK_CLIENT_CID capsule. If forwarded mode is enabled, the
 capsule contains a proxy-chosen client VCID. If forwarded mode
 is enabled, and after receiving an ACK_CLIENT_VCID capsule from the client, any
 packets received by the proxy from the proxy-to-target 4-tuple that match the
-client CID can to be sent to the client after the proxy has replaced
+client CID can be sent to the client after the proxy has replaced
 the CID with the client VCID and executed the negotiated transform ({{transforms}}). If forwarded mode is
 not supported, the proxy MUST NOT send a client VCID by setting
 the length to zero. The proxy MUST use tunnelled mode (HTTP Datagram frames) for
@@ -1585,20 +1581,21 @@ across proxies, using sufficiently long and random values, or by other means.
 
 # IANA Considerations {#iana}
 
-## HTTP Header Field {#iana-header}
+## HTTP Header Fields {#iana-header}
 
-This document registers the "Proxy-QUIC-Forwarding" header field in the
+This document registers the "Proxy-QUIC-Forwarding" and "Proxy-QUIC-Port-Sharing" header fields in the
 "Hypertext Transfer Protocol (HTTP) Field Name Registry"
 <[](https://www.iana.org/assignments/http-fields)>.
 
 ~~~
-    +-----------------------+-----------+-----------------+---------------+----------+
-    |      Field Name       |  Status   | Structured Type |   Reference   | Comments |
-    +-----------------------+-----------+-----------------+---------------+----------+
-    | Proxy-QUIC-Forwarding | permanent |      Item       | This document |   None   |
-    +-----------------------+-----------+-----------------+---------------+----------+
+    +-------------------------+-----------+-----------------+---------------+----------+
+    |      Field Name         |  Status   | Structured Type |   Reference   | Comments |
+    +-------------------------+-----------+-----------------+---------------+----------+
+    | Proxy-QUIC-Forwarding   | permanent |      Item       | This document |   None   |
+    | Proxy-QUIC-Port-Sharing | permanent |      Item       | This document |   None   |
+    +-------------------------+-----------+-----------------+---------------+----------+
 ~~~
-{: #iana-header-type-table title="Registered HTTP Header Field"}
+{: #iana-header-type-table title="Registered HTTP Header Fields"}
 
 ## Proxy QUIC Forwarding Parameter Names
 
