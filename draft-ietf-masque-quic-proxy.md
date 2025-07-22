@@ -969,7 +969,7 @@ capsule contains a proxy-chosen client VCID. If forwarded mode
 is enabled, and after receiving an ACK_CLIENT_VCID capsule from the client, any
 packets received by the proxy from the proxy-to-target 4-tuple that match the
 client CID can to be sent to the client after the proxy has replaced
-the CID with the client VCID. If forwarded mode is
+the CID with the client VCID and executed the negotiated transform ({{transforms}}). If forwarded mode is
 not supported, the proxy MUST NOT send a client VCID by setting
 the length to zero. The proxy MUST use tunnelled mode (HTTP Datagram frames) for
 any long header packets. The proxy SHOULD forward directly to the client for any
@@ -988,7 +988,8 @@ client-to-proxy 4-tuple. The proxy creates the mapping and responds with an
 ACK_TARGET_CID capsule. Once the successful response is sent, the proxy will
 forward any short header packets received on the client-to-proxy 4-tuple that use
 the target VCID using the correct proxy-to-target 4-tuple after
-first rewriting the target VCID to be the correct target CID.
+first rewriting the target VCID to be the correct target CID and executing the
+negotiated transform.
 
 Proxies MUST choose unpredictable client and target VCIDs to
 avoid forwarding loop attacks.
