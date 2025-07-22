@@ -5,9 +5,9 @@
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
 Intended status: Experimental                                 Apple Inc.
-Expires: 22 January 2026                                     D. Schinazi
+Expires: 23 January 2026                                     D. Schinazi
                                                               Google LLC
-                                                            21 July 2025
+                                                            22 July 2025
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 22 January 2026.
+   This Internet-Draft will expire on 23 January 2026.
 
 Copyright Notice
 
@@ -1934,11 +1934,13 @@ Appendix A.  Appendix A.  Example of a Forwarded Mode QUIC Packet
    The following is an example of a QUIC packet that could have been
    sent by a client or proxy in Forwarded Mode.
 
-   Original QUIC Destination Connection ID ~~~ hex-dump
-   002e9184cb0022ca7aecf1128c91d809e1b6853f ~~~
+   Original QUIC Destination Connection ID
 
-   Virtual QUIC Destination Connection ID ~~~
-   0123456789abcdef0123456789abcdef01234567 ~~~
+   002e9184cb0022ca7aecf1128c91d809e1b6853f
+
+   Virtual QUIC Destination Connection ID
+
+   0123456789abcdef0123456789abcdef01234567
 
    Original QUIC Packet Generated for a Peer.
 
