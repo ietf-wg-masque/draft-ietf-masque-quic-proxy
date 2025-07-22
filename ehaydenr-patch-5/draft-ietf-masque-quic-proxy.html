@@ -1320,7 +1320,7 @@ re-encapsulated and re-encrypted.<a href="#section-abstract-1" class="pilcrow">�
             <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1">
-                <p id="section-toc.1-1.11.2.1.1"><a href="#section-11.1" class="auto internal xref">11.1</a>.  <a href="#name-http-header-field" class="internal xref">HTTP Header Field</a></p>
+                <p id="section-toc.1-1.11.2.1.1"><a href="#section-11.1" class="auto internal xref">11.1</a>.  <a href="#name-http-header-fields" class="internal xref">HTTP Header Fields</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.2">
                 <p id="section-toc.1-1.11.2.2.1"><a href="#section-11.2" class="auto internal xref">11.2</a>.  <a href="#name-proxy-quic-forwarding-param" class="internal xref">Proxy QUIC Forwarding Parameter Names</a></p>
@@ -1834,24 +1834,14 @@ with no associated client VCID; alternatively, the proxy can send the
 <code>CLOSE_CLIENT_CID</code> if it detects a conflict with another CID.<a href="#section-2.3-10.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-2.3-10.3">
-            <p id="section-2.3-10.3.1">The client sends the <code>REGISTER_TARGET_CID</code> capsule as soon as it learns
-the target CID on the client-to-target connection.<a href="#section-2.3-10.3.1" class="pilcrow">¶</a></p>
+            <p id="section-2.3-10.3.1">The proxy sends the <code>MAX_CONNECTION_IDS</code> capsule to allow additional
+registration of new connection IDs via future <code>REGISTER_CLIENT_CID</code> and
+<code>REGISTER_TARGET_CID</code> capsules.<a href="#section-2.3-10.3.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-2.3-10.4">
-            <p id="section-2.3-10.4.1">The proxy sends the <code>ACK_TARGET_CID</code> capsule to acknowledge that CID,
-with no associated target VCID; alternatively, the proxy can send the
-<code>CLOSE_TARGET_CID</code> if it detects a conflict with another CID.<a href="#section-2.3-10.4.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-2.3-10.5">
-            <p id="section-2.3-10.5.1">The proxy sends the <code>MAX_CONNECTION_IDS</code> capsule to allow additional
-registration of new connection IDs via future <code>REGISTER_CLIENT_CID</code> and
-<code>REGISTER_TARGET_CID</code> capsules.<a href="#section-2.3-10.5.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-2.3-10.6">
-            <p id="section-2.3-10.6.1">Whenever a client or target stops uses a particular CID, the client
-sends a <code>CLOSE_CLIENT_CID</code> or <code>CLOSE_TARGET_CID</code> capsule. The client
-can also initiate new <code>REGISTER_CLIENT_CID</code> or <code>REGISTER_TARGET_CID</code>
-exchanges at any time.<a href="#section-2.3-10.6.1" class="pilcrow">¶</a></p>
+            <p id="section-2.3-10.4.1">Whenever a client stops using a particular CID, the client
+sends a <code>CLOSE_CLIENT_CID</code>. The client can also initiate new
+<code>REGISTER_CLIENT_CID</code> exchanges at any time.<a href="#section-2.3-10.4.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
 <p id="section-2.3-11">For QUIC-aware proxying with forwarded mode, the steps are as follows:<a href="#section-2.3-11" class="pilcrow">¶</a></p>
@@ -1912,10 +1902,10 @@ value MUST be a Boolean.<a href="#section-3-2" class="pilcrow">¶</a></p>
 the value to "?1". If it doesn't want to enable forwarding, but instead only
 provide information about QUIC Connection IDs for the purpose of allowing
 the proxy to share a proxy-to-target 4-tuple, it sets the value to "?0".<a href="#section-3-3" class="pilcrow">¶</a></p>
-<p id="section-3-4">The client MUST add an "accept-transform" parameter whose value is a
+<p id="section-3-4">If advertising support for forwarding, the client MUST add an "accept-transform" parameter whose value is a
 String containing the supported packet transforms (<a href="#transforms" class="auto internal xref">Section 6.3</a>)
 in order of descending preference, separated by commas. If the proxy receives a
-"Proxy-QUIC-Forwarding" header without the "accept-transform" parameters, it
+"Proxy-QUIC-Forwarding" header with a value of "?1" and without the "accept-transform" parameter, it
 MUST ignore the header and respond as if the client had not sent the
 "Proxy-QUIC-Forwarding" header.<a href="#section-3-4" class="pilcrow">¶</a></p>
 <p id="section-3-5">If the proxy supports QUIC-aware proxying, it will include the
@@ -1957,6 +1947,9 @@ extension if forwarding mode is also not supported. Clients who send "?1", but d
 not receive any "Proxy-QUIC-Port-Sharing" header in response must assume that port
 sharing may be in effect and MUST continue register connection IDs in order for
 the proxied connection to continue to work.<a href="#section-4-4" class="pilcrow">¶</a></p>
+<p id="section-4-5">When port sharing is supported and forwarded mode is not, registration of target
+Connection IDs is permitted, but is not required since port sharing only requires
+demultiplexing QUIC packets in the target-to-client direction<a href="#section-4-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="cid-capsules">
@@ -2542,7 +2535,7 @@ and responds with an ACK_CLIENT_CID capsule. If forwarded mode is enabled, the
 capsule contains a proxy-chosen client VCID. If forwarded mode
 is enabled, and after receiving an ACK_CLIENT_VCID capsule from the client, any
 packets received by the proxy from the proxy-to-target 4-tuple that match the
-client CID can to be sent to the client after the proxy has replaced
+client CID can be sent to the client after the proxy has replaced
 the CID with the client VCID and executed the negotiated transform (<a href="#transforms" class="auto internal xref">Section 6.3</a>). If forwarded mode is
 not supported, the proxy MUST NOT send a client VCID by setting
 the length to zero. The proxy MUST use tunnelled mode (HTTP Datagram frames) for
@@ -3225,25 +3218,26 @@ across proxies, using sufficiently long and random values, or by other means.<a 
       </h2>
 <div id="iana-header">
 <section id="section-11.1">
-        <h3 id="name-http-header-field">
-<a href="#section-11.1" class="section-number selfRef">11.1. </a><a href="#name-http-header-field" class="section-name selfRef">HTTP Header Field</a>
+        <h3 id="name-http-header-fields">
+<a href="#section-11.1" class="section-number selfRef">11.1. </a><a href="#name-http-header-fields" class="section-name selfRef">HTTP Header Fields</a>
         </h3>
-<p id="section-11.1-1">This document registers the "Proxy-QUIC-Forwarding" header field in the
+<p id="section-11.1-1">This document registers the "Proxy-QUIC-Forwarding" and "Proxy-QUIC-Port-Sharing" header fields in the
 "Hypertext Transfer Protocol (HTTP) Field Name Registry"
 &lt;<span><a href="https://www.iana.org/assignments/http-fields">https://www.iana.org/assignments/http-fields</a></span>&gt;.<a href="#section-11.1-1" class="pilcrow">¶</a></p>
 <span id="name-registered-http-header-fiel"></span><div id="iana-header-type-table">
 <figure id="figure-11">
           <div class="alignLeft art-text artwork" id="section-11.1-2.1">
 <pre>
-    +-----------------------+-----------+-----------------+---------------+----------+
-    |      Field Name       |  Status   | Structured Type |   Reference   | Comments |
-    +-----------------------+-----------+-----------------+---------------+----------+
-    | Proxy-QUIC-Forwarding | permanent |      Item       | This document |   None   |
-    +-----------------------+-----------+-----------------+---------------+----------+
+    +-------------------------+-----------+-----------------+---------------+----------+
+    |      Field Name         |  Status   | Structured Type |   Reference   | Comments |
+    +-------------------------+-----------+-----------------+---------------+----------+
+    | Proxy-QUIC-Forwarding   | permanent |      Item       | This document |   None   |
+    | Proxy-QUIC-Port-Sharing | permanent |      Item       | This document |   None   |
+    +-------------------------+-----------+-----------------+---------------+----------+
 </pre>
 </div>
 <figcaption><a href="#figure-11" class="selfRef">Figure 11</a>:
-<a href="#name-registered-http-header-fiel" class="selfRef">Registered HTTP Header Field</a>
+<a href="#name-registered-http-header-fiel" class="selfRef">Registered HTTP Header Fields</a>
           </figcaption></figure>
 </div>
 </section>
