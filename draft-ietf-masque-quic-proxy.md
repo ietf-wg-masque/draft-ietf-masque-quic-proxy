@@ -1584,7 +1584,7 @@ across proxies, using sufficiently long and random values, or by other means.
 
 # IANA Considerations {#iana}
 
-## HTTP Header Field {#iana-header}
+## HTTP Header Fields {#iana-header}
 
 This document registers the "Proxy-QUIC-Forwarding" and "Proxy-QUIC-Port-Sharing" header fields in the
 "Hypertext Transfer Protocol (HTTP) Field Name Registry"
@@ -1598,7 +1598,7 @@ This document registers the "Proxy-QUIC-Forwarding" and "Proxy-QUIC-Port-Sharing
     | Proxy-QUIC-Port-Sharing | permanent |      Item       | This document |   None   |
     +-------------------------+-----------+-----------------+---------------+----------+
 ~~~
-{: #iana-header-type-table title="Registered HTTP Header Field"}
+{: #iana-header-type-table title="Registered HTTP Header Fields"}
 
 ## Proxy QUIC Forwarding Parameter Names
 
