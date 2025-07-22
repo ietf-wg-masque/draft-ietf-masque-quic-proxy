@@ -822,7 +822,7 @@ NOT be less than 1.
 
 In order to be able to route packets correctly in both tunnelled and forwarded
 mode, proxies check for conflicts before creating a new CID mapping. If a conflict
-is detected, the proxy will reject the client's request using a CLOSE_CLIENT_CID
+is detected, the proxy will reject the client's registration using a CLOSE_CLIENT_CID
 or CLOSE_TARGET_CID capsule.
 
 Two 4-tuples conflict if and only if all members of the 4-tuple (local IP
@@ -841,7 +841,7 @@ for all elements on the left side of the mapping diagrams above.
 
 Since very short Connection IDs are more likely to lead to conflicts,
 particularly zero-length Connection IDs, a proxy MAY choose to reject all
-requests for very short Connection IDs as conflicts, in anticipation of future
+registrations for very short Connection IDs as conflicts, in anticipation of future
 conflicts.
 
 ## Client Considerations
@@ -898,7 +898,7 @@ NOT be sent.
 Since clients are always aware whether or not they are using a QUIC proxy,
 clients are expected to cooperate with proxies in selecting client CIDs.
 A proxy detects a conflict when it is not able to create a unique mapping
-using the client CID ({{conflicts}}). It can reject requests that
+using the client CID ({{conflicts}}). It can reject registrations that
 would cause a conflict and indicate this to the client by replying with a
 CLOSE_CLIENT_CID capsule. In order to avoid conflicts, clients SHOULD select
 client CIDs of at least 8 bytes in length with unpredictable values.
@@ -1049,7 +1049,7 @@ some short header packets even after receiving the successful response.
 
 If the target CID registration is rejected, for example with a
 CLOSE_TARGET_CID capsule, it MUST NOT forward packets to the requested target CID,
-but only use tunnelled mode. The request might also be rejected
+but only use tunnelled mode. The registration might also be rejected
 if the proxy does not support forwarded mode or has it disabled by policy.
 
 QUIC long header packets MUST NOT be forwarded. These packets can only be
