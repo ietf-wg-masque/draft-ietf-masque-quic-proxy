@@ -915,7 +915,7 @@ Table of Contents
    In order to be able to route packets correctly in both tunnelled and
    forwarded mode, proxies check for conflicts before creating a new CID
    mapping.  If a conflict is detected, the proxy will reject the
-   client's request using a CLOSE_CLIENT_CID or CLOSE_TARGET_CID
+   client's registration using a CLOSE_CLIENT_CID or CLOSE_TARGET_CID
    capsule.
 
    Two 4-tuples conflict if and only if all members of the 4-tuple
@@ -937,7 +937,7 @@ Table of Contents
 
    Since very short Connection IDs are more likely to lead to conflicts,
    particularly zero-length Connection IDs, a proxy MAY choose to reject
-   all requests for very short Connection IDs as conflicts, in
+   all registrations for very short Connection IDs as conflicts, in
    anticipation of future conflicts.
 
 5.9.  Client Considerations
@@ -999,8 +999,8 @@ Table of Contents
    proxy, clients are expected to cooperate with proxies in selecting
    client CIDs.  A proxy detects a conflict when it is not able to
    create a unique mapping using the client CID (Section 5.8).  It can
-   reject requests that would cause a conflict and indicate this to the
-   client by replying with a CLOSE_CLIENT_CID capsule.  In order to
+   reject registrations that would cause a conflict and indicate this to
+   the client by replying with a CLOSE_CLIENT_CID capsule.  In order to
    avoid conflicts, clients SHOULD select client CIDs of at least 8
    bytes in length with unpredictable values.  A client also SHOULD NOT
    select a client CID that matches the ID used for the QUIC connection
@@ -1163,9 +1163,9 @@ Table of Contents
 
    If the target CID registration is rejected, for example with a
    CLOSE_TARGET_CID capsule, it MUST NOT forward packets to the
-   requested target CID, but only use tunnelled mode.  The request might
-   also be rejected if the proxy does not support forwarded mode or has
-   it disabled by policy.
+   requested target CID, but only use tunnelled mode.  The registration
+   might also be rejected if the proxy does not support forwarded mode
+   or has it disabled by policy.
 
    QUIC long header packets MUST NOT be forwarded.  These packets can
    only be tunnelled within HTTP Datagram frames to avoid exposing

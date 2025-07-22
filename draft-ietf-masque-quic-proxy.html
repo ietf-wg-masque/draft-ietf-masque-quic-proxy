@@ -2399,7 +2399,7 @@ NOT be less than 1.<a href="#section-5.7-3.2.1" class="pilcrow">¶</a></p>
         </h3>
 <p id="section-5.8-1">In order to be able to route packets correctly in both tunnelled and forwarded
 mode, proxies check for conflicts before creating a new CID mapping. If a conflict
-is detected, the proxy will reject the client's request using a CLOSE_CLIENT_CID
+is detected, the proxy will reject the client's registration using a CLOSE_CLIENT_CID
 or CLOSE_TARGET_CID capsule.<a href="#section-5.8-1" class="pilcrow">¶</a></p>
 <p id="section-5.8-2">Two 4-tuples conflict if and only if all members of the 4-tuple (local IP
 address, local UDP port, remote IP address, and remote UDP port) are identical.<a href="#section-5.8-2" class="pilcrow">¶</a></p>
@@ -2414,7 +2414,7 @@ the receiver from identifying which mapping this corresponds to.<a href="#sectio
 for all elements on the left side of the mapping diagrams above.<a href="#section-5.8-4" class="pilcrow">¶</a></p>
 <p id="section-5.8-5">Since very short Connection IDs are more likely to lead to conflicts,
 particularly zero-length Connection IDs, a proxy MAY choose to reject all
-requests for very short Connection IDs as conflicts, in anticipation of future
+registrations for very short Connection IDs as conflicts, in anticipation of future
 conflicts.<a href="#section-5.8-5" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2471,7 +2471,7 @@ NOT be sent.<a href="#section-5.9.1-3" class="pilcrow">¶</a></p>
 <p id="section-5.9.1-4">Since clients are always aware whether or not they are using a QUIC proxy,
 clients are expected to cooperate with proxies in selecting client CIDs.
 A proxy detects a conflict when it is not able to create a unique mapping
-using the client CID (<a href="#conflicts" class="auto internal xref">Section 5.8</a>). It can reject requests that
+using the client CID (<a href="#conflicts" class="auto internal xref">Section 5.8</a>). It can reject registrations that
 would cause a conflict and indicate this to the client by replying with a
 CLOSE_CLIENT_CID capsule. In order to avoid conflicts, clients SHOULD select
 client CIDs of at least 8 bytes in length with unpredictable values.
@@ -2622,7 +2622,7 @@ packets tunnelled in HTTP Datagram frames. The client MAY also choose to tunnel
 some short header packets even after receiving the successful response.<a href="#section-6.1-4" class="pilcrow">¶</a></p>
 <p id="section-6.1-5">If the target CID registration is rejected, for example with a
 CLOSE_TARGET_CID capsule, it MUST NOT forward packets to the requested target CID,
-but only use tunnelled mode. The request might also be rejected
+but only use tunnelled mode. The registration might also be rejected
 if the proxy does not support forwarded mode or has it disabled by policy.<a href="#section-6.1-5" class="pilcrow">¶</a></p>
 <p id="section-6.1-6">QUIC long header packets MUST NOT be forwarded. These packets can only be
 tunnelled within HTTP Datagram frames to avoid exposing unnecessary connection
