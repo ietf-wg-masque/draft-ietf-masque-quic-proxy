@@ -1943,10 +1943,7 @@ fate-sharing may impact performance or may lead to being misclassified as
 malicious.<a href="#section-4-3" class="pilcrow">¶</a></p>
 <p id="section-4-4">A proxy that does not support port sharing, SHOULD send "Proxy-QUIC-Port-Sharing"
 with a value of "?0". Doing so allows clients to stop sending capsules for this
-extension if forwarding mode is also not supported. Clients who send "?1", but do
-not receive any "Proxy-QUIC-Port-Sharing" header in response must assume that port
-sharing may be in effect and MUST continue register connection IDs in order for
-the proxied connection to continue to work.<a href="#section-4-4" class="pilcrow">¶</a></p>
+extension if forwarding mode is also not supported.<a href="#section-4-4" class="pilcrow">¶</a></p>
 <p id="section-4-5">When port sharing is supported and forwarded mode is not, registration of target
 Connection IDs is permitted, but is not required since port sharing only requires
 demultiplexing QUIC packets in the target-to-client direction<a href="#section-4-5" class="pilcrow">¶</a></p>

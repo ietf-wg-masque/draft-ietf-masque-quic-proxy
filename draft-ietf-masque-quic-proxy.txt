@@ -587,10 +587,7 @@ Table of Contents
    A proxy that does not support port sharing, SHOULD send "Proxy-QUIC-
    Port-Sharing" with a value of "?0".  Doing so allows clients to stop
    sending capsules for this extension if forwarding mode is also not
-   supported.  Clients who send "?1", but do not receive any "Proxy-
-   QUIC-Port-Sharing" header in response must assume that port sharing
-   may be in effect and MUST continue register connection IDs in order
-   for the proxied connection to continue to work.
+   supported.
 
    When port sharing is supported and forwarded mode is not,
    registration of target Connection IDs is permitted, but is not
