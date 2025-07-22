@@ -115,7 +115,7 @@ Table of Contents
      10.2.  Active Attacks
      10.3.  Connection ID Registration Attacks
    11. IANA Considerations
-     11.1.  HTTP Header Field
+     11.1.  HTTP Header Fields
      11.2.  Proxy QUIC Forwarding Parameter Names
      11.3.  Packet Transform Names
      11.4.  Capsule Types
@@ -1746,19 +1746,21 @@ Table of Contents
 
 11.  IANA Considerations
 
-11.1.  HTTP Header Field
+11.1.  HTTP Header Fields
 
-   This document registers the "Proxy-QUIC-Forwarding" header field in
-   the "Hypertext Transfer Protocol (HTTP) Field Name Registry"
-   <https://www.iana.org/assignments/http-fields>.
+   This document registers the "Proxy-QUIC-Forwarding" and "Proxy-QUIC-
+   Port-Sharing" header fields in the "Hypertext Transfer Protocol
+   (HTTP) Field Name Registry" <https://www.iana.org/assignments/http-
+   fields>.
 
-    +-----------------------+-----------+-----------------+---------------+----------+
-    |      Field Name       |  Status   | Structured Type |   Reference   | Comments |
-    +-----------------------+-----------+-----------------+---------------+----------+
-    | Proxy-QUIC-Forwarding | permanent |      Item       | This document |   None   |
-    +-----------------------+-----------+-----------------+---------------+----------+
+    +-------------------------+-----------+-----------------+---------------+----------+
+    |      Field Name         |  Status   | Structured Type |   Reference   | Comments |
+    +-------------------------+-----------+-----------------+---------------+----------+
+    | Proxy-QUIC-Forwarding   | permanent |      Item       | This document |   None   |
+    | Proxy-QUIC-Port-Sharing | permanent |      Item       | This document |   None   |
+    +-------------------------+-----------+-----------------+---------------+----------+
 
-               Figure 11: Registered HTTP Header Field
+               Figure 11: Registered HTTP Header Fields
 
 11.2.  Proxy QUIC Forwarding Parameter Names
 
