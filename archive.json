@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-07-20T00:51:05.078018+00:00",
+  "timestamp": "2025-07-22T00:44:40.240161+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -731,15 +731,15 @@
       "id": "MDU6SXNzdWU3NDY2ODYwNTU=",
       "title": "Poor guidance on rejecting short CIDs ",
       "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/35",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "gloinul",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "Detecting Conflict section (2.4) states:\r\n\r\n\"Since very short Connection IDs are more likely to lead to conflicts, particularly zero-length Connection IDs, a proxy MAY choose to reject all requests for very short Connection IDs as conflicts, in anticipation of future conflicts.\"\r\n\r\nSo I think there need to be a framing question for the below. Is the goal here to have multiple different clients with connection-ID to reuse a common server-socket. So that all clients behind a particular MASQUE server wanting to reach popular-service UDP-port=443 will use the same server socket? \r\n\r\nIf that is the case then I can partially understand the MAY to avoid causing clients with long CIDs getting its different CID using different 5-tuples towards the target.\r\n\r\nHow much analysis have you done for what consequences that will result. Having multiple non-coordinated traffic flows share the same 5-tuple will make it very much like a tunnel flow, however this one will most likely be directed to a server. Will that have any strange affect on load-balancing, denial of service mitigation. I see that a bot behind a particular MASQUE service could attempting to share 5-tuple with other clients and use that to DoS those other flows by triggering DoS mitigations for this flow. \r\n\r\nAlso, are you really meaning reject, or simply detect the collision and give the client a new server-socket?\r\n\r\nIf multiple MASQUE client's are not sharing the server-socket then I think this is an unnecessary recommendation that causes issues without any benefit. \r\n\r\nSo the client that attempt to map multiple QUIC CIDs, that might even be the same QUIC connection, to a particular server-socket will likely do this by being aware of this. Thus it will coordinate so that it doesn't conflict. Even if they are uncoordinated there are no point of rejecting a working mapping because it might result in failure later. If the mapping fails, then the proxy simply creates a new server-socket and give it to the client. Rejecting the mapping prior to a conflict occurring and thus using more resource unnecessarily. \r\n\r\nIn the case of totally uncoordinated QUIC connection where one use short CIDs and the other long ones, then I think if there are any considerations to avoid issues for this, that should fall on the client rather than the server to not attempt to map these two connections to the same server-side socket. This collision algorithm is simple and can be run by the client also for those resource it requests.  \r\n",
       "createdAt": "2020-11-19T15:30:45Z",
-      "updatedAt": "2020-11-19T20:39:20Z",
-      "closedAt": null,
+      "updatedAt": "2025-07-21T09:00:29Z",
+      "closedAt": "2025-07-21T09:00:29Z",
       "comments": [
         {
           "author": "gloinul",
@@ -754,6 +754,20 @@
           "body": "Connection ID awareness doesn't force a server to reuse a UDP socket, but it allows it.\r\n\r\nDepending on the proxy configuration, if it knows it needs to always optimize for forwarding mode, the proxy MAY choose to reject clients that are requesting zero-length CIDs, because it shows that they might be misconfigured and will interfere with the forwarding operation.\r\n\r\nI think the key point here is that the clients are always aware they are proxying, and thus are able to choose good CID lengths; this isn't entirely uncoordinated.",
           "createdAt": "2020-11-19T20:39:20Z",
           "updatedAt": "2020-11-19T20:39:20Z"
+        },
+        {
+          "author": "ehaydenr",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@gloinul, now that we have #120 , I think all that's missing is #38 . Are we good to close this issue and track the remaining work there? Or do you feel there's more the address beyond that?",
+          "createdAt": "2025-07-21T08:46:43Z",
+          "updatedAt": "2025-07-21T08:46:43Z"
+        },
+        {
+          "author": "gloinul",
+          "authorAssociation": "NONE",
+          "body": "I think with the additional fix that #144 this topics is sufficiently resolved. So I think we can close this, and have #38 be the gate for #144. ",
+          "createdAt": "2025-07-21T08:59:29Z",
+          "updatedAt": "2025-07-21T08:59:29Z"
         }
       ]
     },
@@ -824,15 +838,17 @@
       "id": "MDU6SXNzdWU3NDY3MjU2NjE=",
       "title": "Security Consideration and shared server-sockets between clients",
       "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/38",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "gloinul",
       "authorAssociation": "NONE",
       "assignees": [],
-      "labels": [],
+      "labels": [
+        "Ready for Text"
+      ],
       "body": "Lets pull out one issue from #35 that likely need separate treatment.\r\n\r\nSo the security consideration says: \r\n\r\n   Since proxies that forward QUIC packets do not perform any\r\n   cryptographic integrity check, it is possible that these packets are\r\n   either malformed, replays, or otherwise malicious.  This may result\r\n   in proxy targets rate limiting or decreasing the reputation of a\r\n   given proxy.\r\n\r\nSo this is indicating that you agree that forwarded traffic may misbehave and cause reactions in the network. Based on this I think any reuse of 5-tuples between the proxy and the target between multiple clients results in that one MASQUE client and its users could affect the flow of another MASQUE client through its traffic beyond traffic volume. I think that should most definitely be discussed, and I think this is to dangerous and should be recommended against. \r\n\r\nI further think client's need to have some control over re-use of target facing proxy-socket. This as a MASQUE client that represent multiple different users, for example some type of gateway from a network may not have trust in that all its users are good behaving citizens and thus one users traffic should not have fatesharing with another. ",
       "createdAt": "2020-11-19T16:18:04Z",
-      "updatedAt": "2025-03-24T09:41:31Z",
-      "closedAt": null,
+      "updatedAt": "2025-07-21T09:00:55Z",
+      "closedAt": "2025-07-21T09:00:55Z",
       "comments": [
         {
           "author": "tfpauly",
@@ -1517,10 +1533,12 @@
       "author": "martinduke",
       "authorAssociation": "NONE",
       "assignees": [],
-      "labels": [],
+      "labels": [
+        "Ready to Close"
+      ],
       "body": "This is editorial, but I would like the \"forwarding mode\" section to unambiguously state that the forwarding-mode packets are not part of the outer connection for any purpose (congestion control, flow control, acks, etc). This is implied by the keepalive section, but ought to be explicit.",
       "createdAt": "2023-03-29T00:56:57Z",
-      "updatedAt": "2023-04-03T18:20:02Z",
+      "updatedAt": "2025-07-20T14:42:37Z",
       "closedAt": null,
       "comments": [
         {
@@ -1586,10 +1604,12 @@
       "author": "martinduke",
       "authorAssociation": "NONE",
       "assignees": [],
-      "labels": [],
+      "labels": [
+        "Ready to Close"
+      ],
       "body": "In general, in tunneled mode there is an inner (client-target) and outer (client-proxy) congestion control loop.\r\n\r\nIn forwarding mode, there is no outer loop.\r\n\r\nIf the bottleneck(s) are between client and proxy, then the outer loop has a shorter RTT and for most congestion controls will capture more of the bottleneck bandwidth. The throughput advantage of tunneled mode could, in principle, overwhelm the overhead advantages of forwarding mode.\r\n\r\nIt would be nice to see some simulations or other data to show that this is not a problem in practice before we adopted this work.\r\n",
       "createdAt": "2023-03-29T01:15:12Z",
-      "updatedAt": "2023-03-29T01:15:12Z",
+      "updatedAt": "2025-07-20T14:42:15Z",
       "closedAt": null,
       "comments": []
     },
@@ -1629,11 +1649,11 @@
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [
-        "Ready for Text"
+        "Ready to Close"
       ],
       "body": "The Register Target Connection ID capsule and the Virtual Connection ID capsule allow connection IDs of up to 255 bytes. This is because RFC 8999 allows up to 255 bytes, while RFC 9000 restricts them to 20 bytes.\r\n\r\nThe capsules also contain stateless reset tokens. However, stateless resets are not a concept defined in RFC 8999, they\u2019re only defined in RFC 9000.\r\n\r\nIt seems like the hope when defining this extension is that once a new QUIC version that allows longer CIDs ships, it will still contain the concept of stateless reset tokens, with unchanged semantics and wire format. This might or might not hold true.",
       "createdAt": "2023-07-03T01:13:19Z",
-      "updatedAt": "2023-07-24T17:07:51Z",
+      "updatedAt": "2025-07-20T14:42:06Z",
       "closedAt": null,
       "comments": [
         {
@@ -2095,10 +2115,12 @@
       "author": "kelmenhorst",
       "authorAssociation": "NONE",
       "assignees": [],
-      "labels": [],
+      "labels": [
+        "Ready to Close"
+      ],
       "body": "From my understanding, there is additional overhead at connection setup when using QUIC-aware in a _multi-hop setting_. \r\nLet's assume a simple multi-hop proxy setup with P1 and P2 where both proxies should do QUIC-forward: \r\n`Client -- P1 -- P2 -- Target`.\r\n\r\nDue to the proxy choosing the virtual target CID, the client needs to\r\n* setup a MASQUE connection to reach the target and learn its chosen CID,\r\n* tell P2 about the target's CID via REGISTER_TARGET_CID, \r\n* learn P2's virtual target CID from ACK_TARGET_CID,\r\n* tell P1 about P2's virtual target CID via REGISTER_TARGET_CID (so that: virtual target CID of P2 == real target CID of P1) ,\r\n* learn P1's virtual target CID from ACK_TARGET_CID,\r\n\r\nin order to finally start forward mode on the uplink. Crucially, the above steps have to be done sequentially.\r\nYou can see that this overhead increases with each added proxy.\r\n\r\nIn the target to client direction, the problem does not exist because the client chooses the virtual client CID. The client still needs to make sure that for each set of adjacent proxies P(n) and P(n+1), where P(n+1) is closer to the target, it must hold that the virtual client CID of P(n+1) is equal to the real client CID of P(n).\r\n\r\nI made a sketch about what I think the setup of virtual CIDs looks like: [cids-multi-hop.pdf](https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/files/14296870/cids-multi-hop.pdf). \r\n\r\nI don't have a solution for this and I don't know if one is needed but I think it should probably at least be mentioned in the draft if the mechanism to select/communicate virtual CIDs stays as it is now.",
       "createdAt": "2024-02-15T12:53:09Z",
-      "updatedAt": "2024-02-29T18:14:51Z",
+      "updatedAt": "2025-07-20T14:41:48Z",
       "closedAt": null,
       "comments": [
         {
@@ -2548,15 +2570,17 @@
       "id": "I_kwDOEHrEP87BMZGQ",
       "title": "Add test vectors for scramble transform",
       "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/136",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "ehaydenr",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
-      "labels": [],
+      "labels": [
+        "Ready for Text"
+      ],
       "body": "",
       "createdAt": "2025-07-17T23:28:02Z",
-      "updatedAt": "2025-07-17T23:28:02Z",
-      "closedAt": null,
+      "updatedAt": "2025-07-21T09:03:10Z",
+      "closedAt": "2025-07-21T09:03:10Z",
       "comments": []
     }
   ],
@@ -8185,24 +8209,26 @@
       "id": "PR_kwDOEHrEP85d5CXJ",
       "title": "Note that the QUIC bit cannot be used with forwarding mode",
       "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/89",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "bemasc",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2023-10-26T16:56:23Z",
-      "updatedAt": "2023-10-26T19:53:24Z",
+      "updatedAt": "2025-07-21T10:23:11Z",
       "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
       "baseRefName": "main",
-      "baseRefOid": "56dd56d2b2e8a8ac341866cd74ce6323ddca04c4",
+      "baseRefOid": "5af02833600e426912469297941093b93923757a",
       "headRepository": "bemasc/draft-ietf-masque-quic-proxy",
       "headRefName": "bemasc-grease-quic-bit",
-      "headRefOid": "53095bd2b761daa9e430152c7c6ffe2e5286a788",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "c25441304cdcd287133f467e5a900864067c9950",
+      "closedAt": "2025-07-21T10:23:11Z",
+      "mergedAt": "2025-07-21T10:23:11Z",
+      "mergedBy": "ehaydenr",
+      "mergeCommit": {
+        "oid": "3287cd46f5f9556f7d5c5daf009b120329b7d486"
+      },
       "comments": [
         {
           "author": "LPardue",
@@ -8231,9 +8257,56 @@
           "body": "It's tricky because the proxy is both an endpoint and a middlebox (for QUIC).  QUIC-MANAGEABILITY doesn't apply to endpoints.  In the proxy's role as a middlebox, there is no protocol identification involved because (formally) only QUIC can flow through the forwarder, so QUIC-MANAGEABILITY doesn't apply there either.\r\n\r\nThe weird thing is that the forwarder shares a 5-tuple with the proxy endpoint, so some of the protocol identification restrictions on middleboxes spill over onto the proxy's QUIC endpoint.",
           "createdAt": "2023-10-26T19:53:24Z",
           "updatedAt": "2023-10-26T19:53:24Z"
+        },
+        {
+          "author": "ehaydenr",
+          "authorAssociation": "COLLABORATOR",
+          "body": "This lgtm, but since this was opened we added an invariance section here: https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/blob/10e49bcc6ffbc57631752e96cf707233c2909d31/draft-ietf-masque-quic-proxy.md?plain=1#L1467. \r\n\r\nWe may want to move the bulk of this to that section and link to it \ud83e\udd14 ",
+          "createdAt": "2025-07-21T10:16:50Z",
+          "updatedAt": "2025-07-21T10:16:50Z"
         }
       ],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP861CnsN",
+          "commit": {
+            "abbreviatedOid": "53095bd"
+          },
+          "author": "DavidSchinazi",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-21T10:06:07Z",
+          "updatedAt": "2025-07-21T10:06:07Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOEHrEP861C4ne",
+          "commit": {
+            "abbreviatedOid": "c254413"
+          },
+          "author": "ehaydenr",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-21T10:21:54Z",
+          "updatedAt": "2025-07-21T10:21:54Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOEHrEP861C5Ly",
+          "commit": {
+            "abbreviatedOid": "c254413"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-21T10:22:53Z",
+          "updatedAt": "2025-07-21T10:22:53Z",
+          "comments": []
+        }
+      ]
     },
     {
       "number": 90,
@@ -11583,24 +11656,26 @@
       "id": "PR_kwDOEHrEP86fQ62Y",
       "title": "highlight how registration does not introduce delays",
       "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/135",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "ehaydenr",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "addresses #103 ",
       "createdAt": "2025-07-16T21:28:52Z",
-      "updatedAt": "2025-07-17T00:13:10Z",
+      "updatedAt": "2025-07-20T14:39:14Z",
       "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
       "baseRefName": "main",
       "baseRefOid": "22c4232d5c6bb132d64f2b0e2bf34952530bfb3d",
       "headRepository": "ehaydenr/quic-proxy",
       "headRefName": "delays",
       "headRefOid": "7f098cdf70b4fa6e45504522f2de97358eebc210",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2025-07-20T14:37:22Z",
+      "mergedAt": "2025-07-20T14:37:22Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "719ceb19df9a1451d4d5a6d15864bd7d7c32169c"
+      },
       "comments": [],
       "reviews": [
         {
@@ -11622,6 +11697,19 @@
               "updatedAt": "2025-07-16T23:45:21Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOEHrEP8609qFs",
+          "commit": {
+            "abbreviatedOid": "7f098cd"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-20T14:37:16Z",
+          "updatedAt": "2025-07-20T14:37:16Z",
+          "comments": []
         }
       ]
     },
@@ -11630,78 +11718,166 @@
       "id": "PR_kwDOEHrEP86fgVmC",
       "title": "mention that forwarded mode isnt always better",
       "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/137",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "ehaydenr",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Addresses #81 ",
       "createdAt": "2025-07-18T05:25:19Z",
-      "updatedAt": "2025-07-18T05:25:20Z",
+      "updatedAt": "2025-07-20T14:41:30Z",
       "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
       "baseRefName": "main",
       "baseRefOid": "22c4232d5c6bb132d64f2b0e2bf34952530bfb3d",
       "headRepository": "ehaydenr/quic-proxy",
       "headRefName": "control-loops",
-      "headRefOid": "be4ae830bfdc737da533918133c05c6abe09922f",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "6d91e0011a6cca34c2066906cdf66f38d3dd18e8",
+      "closedAt": "2025-07-20T14:41:30Z",
+      "mergedAt": "2025-07-20T14:41:30Z",
+      "mergedBy": "ehaydenr",
+      "mergeCommit": {
+        "oid": "5a3d32fb2b11903c1e65e35f35ca37a312f6d461"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP8609qCj",
+          "commit": {
+            "abbreviatedOid": "be4ae83"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-20T14:36:35Z",
+          "updatedAt": "2025-07-20T14:36:35Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "```suggestion\r\ndoesn't necessarily imply overall throughput is improved. Unlike tunnelled packets,\r\n```",
+              "createdAt": "2025-07-20T14:36:35Z",
+              "updatedAt": "2025-07-20T14:36:35Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOEHrEP8609qDS",
+          "commit": {
+            "abbreviatedOid": "be4ae83"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-20T14:36:47Z",
+          "updatedAt": "2025-07-20T14:36:47Z",
+          "comments": []
+        }
+      ]
     },
     {
       "number": 138,
       "id": "PR_kwDOEHrEP86fgbtA",
       "title": "unambiguously state forwarded mode packets are independent",
       "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/138",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "ehaydenr",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "addresses #79 ",
       "createdAt": "2025-07-18T05:36:44Z",
-      "updatedAt": "2025-07-18T05:37:13Z",
+      "updatedAt": "2025-07-20T14:39:58Z",
       "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
       "baseRefName": "main",
       "baseRefOid": "22c4232d5c6bb132d64f2b0e2bf34952530bfb3d",
       "headRepository": "ehaydenr/quic-proxy",
       "headRefName": "external",
       "headRefOid": "d979f4fe2c623af8ae3d22ec3c55c5a397422254",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2025-07-20T14:39:55Z",
+      "mergedAt": "2025-07-20T14:39:55Z",
+      "mergedBy": "ehaydenr",
+      "mergeCommit": {
+        "oid": "1cb88cb8f87d1c3a00bbc511cc8cc16a947888e1"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP8609p__",
+          "commit": {
+            "abbreviatedOid": "d979f4f"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-20T14:35:57Z",
+          "updatedAt": "2025-07-20T14:35:57Z",
+          "comments": []
+        }
+      ]
     },
     {
       "number": 139,
       "id": "PR_kwDOEHrEP86fgpbg",
       "title": "add section about QUIC version invariance",
       "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/139",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "ehaydenr",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "addresses #83 ",
       "createdAt": "2025-07-18T06:02:05Z",
-      "updatedAt": "2025-07-18T06:02:06Z",
+      "updatedAt": "2025-07-20T14:40:59Z",
       "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
       "baseRefName": "main",
       "baseRefOid": "22c4232d5c6bb132d64f2b0e2bf34952530bfb3d",
       "headRepository": "ehaydenr/quic-proxy",
       "headRefName": "version",
-      "headRefOid": "917b32925a659d9e1ff29fb5e3dfd54e71b1db6c",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "5204199f91855b781b6b60d1cdad73c1927eee54",
+      "closedAt": "2025-07-20T14:40:56Z",
+      "mergedAt": "2025-07-20T14:40:56Z",
+      "mergedBy": "ehaydenr",
+      "mergeCommit": {
+        "oid": "774e8250209a08d66e1bcc04e7de46708b2a2cf0"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP8609p-G",
+          "commit": {
+            "abbreviatedOid": "917b329"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-20T14:35:29Z",
+          "updatedAt": "2025-07-20T14:35:29Z",
+          "comments": [
+            {
+              "originalPosition": 20,
+              "body": "```suggestion\r\nare all invariant across future QUIC versions {{!INVARIANTS=RFC8999}}, QUIC proxies can\r\n```",
+              "createdAt": "2025-07-20T14:35:29Z",
+              "updatedAt": "2025-07-20T14:35:29Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOEHrEP8609p-t",
+          "commit": {
+            "abbreviatedOid": "917b329"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-20T14:35:40Z",
+          "updatedAt": "2025-07-20T14:35:40Z",
+          "comments": []
+        }
+      ]
     },
     {
       "number": 140,
@@ -11770,26 +11946,331 @@
       "id": "PR_kwDOEHrEP86frXTc",
       "title": "Fix ACK_CLIENT_VCID description",
       "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/141",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "ehaydenr",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "It's sent in response to ACK_CLIENT_CID, not ACK_TARGET_CID.",
       "createdAt": "2025-07-19T10:14:12Z",
-      "updatedAt": "2025-07-19T10:14:13Z",
+      "updatedAt": "2025-07-20T14:33:30Z",
       "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
       "baseRefName": "main",
       "baseRefOid": "b25d33464cd8f1e7461ed5a49837babf9244416b",
       "headRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
       "headRefName": "ehaydenr-patch-1",
       "headRefOid": "43515ab0d696ba47b867588c2abe17530f8e6ba6",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2025-07-20T14:33:30Z",
+      "mergedAt": "2025-07-20T14:33:30Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "a4c330e1d41c6ed97f0fe8d88ac31e9b63020d0d"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP8609p1O",
+          "commit": {
+            "abbreviatedOid": "43515ab"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-20T14:33:24Z",
+          "updatedAt": "2025-07-20T14:33:24Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 142,
+      "id": "PR_kwDOEHrEP86fvPhC",
+      "title": "Clarifications from scramble interop testing",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/142",
+      "state": "MERGED",
+      "author": "tfpauly",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "tfpauly"
+      ],
+      "labels": [],
+      "body": "Clarify that:\r\n- VCID swapping happens before scrambling\r\n- Scramble keys are generated by entity that sends/scrambles using the key",
+      "createdAt": "2025-07-20T14:42:55Z",
+      "updatedAt": "2025-07-21T10:16:08Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "5a3d32fb2b11903c1e65e35f35ca37a312f6d461",
+      "headRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "headRefName": "tfpauly-patch-14",
+      "headRefOid": "64aab3dfee80c0a20d4628f64816b277a2fd055f",
+      "closedAt": "2025-07-21T10:16:07Z",
+      "mergedAt": "2025-07-21T10:16:07Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "5af02833600e426912469297941093b93923757a"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP8609q8y",
+          "commit": {
+            "abbreviatedOid": "64aab3d"
+          },
+          "author": "ehaydenr",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-20T14:49:39Z",
+          "updatedAt": "2025-07-20T14:49:39Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOEHrEP861CoqS",
+          "commit": {
+            "abbreviatedOid": "64aab3d"
+          },
+          "author": "DavidSchinazi",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-21T10:07:11Z",
+          "updatedAt": "2025-07-21T10:07:11Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 143,
+      "id": "PR_kwDOEHrEP86fzbva",
+      "title": "add forwarded mode test vector",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/143",
+      "state": "MERGED",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "closes #136 ",
+      "createdAt": "2025-07-21T08:26:17Z",
+      "updatedAt": "2025-07-21T09:03:09Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "5a3d32fb2b11903c1e65e35f35ca37a312f6d461",
+      "headRepository": "ehaydenr/quic-proxy",
+      "headRefName": "test-vectors",
+      "headRefOid": "30fa46a35ba5733efd560ad42ef6c63476185f1d",
+      "closedAt": "2025-07-21T09:03:09Z",
+      "mergedAt": "2025-07-21T09:03:09Z",
+      "mergedBy": "ehaydenr",
+      "mergeCommit": {
+        "oid": "10e49bcc6ffbc57631752e96cf707233c2909d31"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP861BdmN",
+          "commit": {
+            "abbreviatedOid": "cd4a743"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-21T08:33:39Z",
+          "updatedAt": "2025-07-21T08:33:39Z",
+          "comments": [
+            {
+              "originalPosition": 9,
+              "body": "```suggestion\r\nOriginal QUIC Destination Connection ID\r\n```",
+              "createdAt": "2025-07-21T08:33:39Z",
+              "updatedAt": "2025-07-21T08:33:39Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOEHrEP861Bdu8",
+          "commit": {
+            "abbreviatedOid": "cd4a743"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-21T08:33:52Z",
+          "updatedAt": "2025-07-21T08:33:53Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "```suggestion\r\nVirtual QUIC Destination Connection ID\r\n```",
+              "createdAt": "2025-07-21T08:33:53Z",
+              "updatedAt": "2025-07-21T08:33:53Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOEHrEP861BqB5",
+          "commit": {
+            "abbreviatedOid": "cd4a743"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Validated the test vector with my implementation. Checks out!",
+          "createdAt": "2025-07-21T08:52:55Z",
+          "updatedAt": "2025-07-21T08:52:55Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 144,
+      "id": "PR_kwDOEHrEP86fzk5z",
+      "title": "add consideration for port sharing",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/144",
+      "state": "MERGED",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "addresses #38 ",
+      "createdAt": "2025-07-21T08:43:38Z",
+      "updatedAt": "2025-07-21T09:00:59Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "5a3d32fb2b11903c1e65e35f35ca37a312f6d461",
+      "headRepository": "ehaydenr/quic-proxy",
+      "headRefName": "port-sharing-considerations",
+      "headRefOid": "9291f6a8dd9338df1c883002e668abd15db870c7",
+      "closedAt": "2025-07-21T09:00:54Z",
+      "mergedAt": "2025-07-21T09:00:54Z",
+      "mergedBy": "ehaydenr",
+      "mergeCommit": {
+        "oid": "0999dd5fab3566bf17330aede73c90662dd50270"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP861Bn00",
+          "commit": {
+            "abbreviatedOid": "1b1a019"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-21T08:49:54Z",
+          "updatedAt": "2025-07-21T08:49:54Z",
+          "comments": [
+            {
+              "originalPosition": 8,
+              "body": "```suggestion\r\nwith clients that might be considered to be untrusted or malicious by the target. Such\r\n```",
+              "createdAt": "2025-07-21T08:49:54Z",
+              "updatedAt": "2025-07-21T08:49:54Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOEHrEP861Bn7_",
+          "commit": {
+            "abbreviatedOid": "1b1a019"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-21T08:50:04Z",
+          "updatedAt": "2025-07-21T08:50:05Z",
+          "comments": [
+            {
+              "originalPosition": 10,
+              "body": "```suggestion\r\nmalicious.\r\n```",
+              "createdAt": "2025-07-21T08:50:04Z",
+              "updatedAt": "2025-07-21T08:50:05Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOEHrEP861Bo4p",
+          "commit": {
+            "abbreviatedOid": "9291f6a"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-21T08:51:27Z",
+          "updatedAt": "2025-07-21T08:51:27Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOEHrEP861Bskm",
+          "commit": {
+            "abbreviatedOid": "9291f6a"
+          },
+          "author": "gloinul",
+          "authorAssociation": "NONE",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-21T08:56:01Z",
+          "updatedAt": "2025-07-21T08:56:01Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 145,
+      "id": "PR_kwDOEHrEP86f2NnY",
+      "title": "elaborate more on loop attacks",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/145",
+      "state": "MERGED",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-07-21T12:37:43Z",
+      "updatedAt": "2025-07-21T15:09:55Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "3287cd46f5f9556f7d5c5daf009b120329b7d486",
+      "headRepository": "ehaydenr/quic-proxy",
+      "headRefName": "loop-attack-elaboration",
+      "headRefOid": "bab12beeec3340724a52efac225b1678fbfa15dd",
+      "closedAt": "2025-07-21T15:09:51Z",
+      "mergedAt": "2025-07-21T15:09:51Z",
+      "mergedBy": "ehaydenr",
+      "mergeCommit": {
+        "oid": "3ac39e573ab23e39cacff438f403cd4597bd3003"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP861EwLu",
+          "commit": {
+            "abbreviatedOid": "bab12be"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-21T12:38:43Z",
+          "updatedAt": "2025-07-21T12:38:43Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOEHrEP861GKJS",
+          "commit": {
+            "abbreviatedOid": "bab12be"
+          },
+          "author": "DavidSchinazi",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-21T14:08:20Z",
+          "updatedAt": "2025-07-21T14:08:20Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
