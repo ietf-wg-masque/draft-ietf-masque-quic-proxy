@@ -1586,16 +1586,17 @@ across proxies, using sufficiently long and random values, or by other means.
 
 ## HTTP Header Field {#iana-header}
 
-This document registers the "Proxy-QUIC-Forwarding" header field in the
+This document registers the "Proxy-QUIC-Forwarding" and "Proxy-QUIC-Port-Sharing" header fields in the
 "Hypertext Transfer Protocol (HTTP) Field Name Registry"
 <[](https://www.iana.org/assignments/http-fields)>.
 
 ~~~
-    +-----------------------+-----------+-----------------+---------------+----------+
-    |      Field Name       |  Status   | Structured Type |   Reference   | Comments |
-    +-----------------------+-----------+-----------------+---------------+----------+
-    | Proxy-QUIC-Forwarding | permanent |      Item       | This document |   None   |
-    +-----------------------+-----------+-----------------+---------------+----------+
+    +-------------------------+-----------+-----------------+---------------+----------+
+    |      Field Name         |  Status   | Structured Type |   Reference   | Comments |
+    +-------------------------+-----------+-----------------+---------------+----------+
+    | Proxy-QUIC-Forwarding   | permanent |      Item       | This document |   None   |
+    | Proxy-QUIC-Port-Sharing | permanent |      Item       | This document |   None   |
+    +-------------------------+-----------+-----------------+---------------+----------+
 ~~~
 {: #iana-header-type-table title="Registered HTTP Header Field"}
 
