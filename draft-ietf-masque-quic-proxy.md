@@ -453,10 +453,10 @@ the value to "?1". If it doesn't want to enable forwarding, but instead only
 provide information about QUIC Connection IDs for the purpose of allowing
 the proxy to share a proxy-to-target 4-tuple, it sets the value to "?0".
 
-The client MUST add an "accept-transform" parameter whose value is a
+If advertising support for forwarding, the client MUST add an "accept-transform" parameter whose value is a
 String containing the supported packet transforms ({{transforms}})
 in order of descending preference, separated by commas. If the proxy receives a
-"Proxy-QUIC-Forwarding" header without the "accept-transform" parameters, it
+"Proxy-QUIC-Forwarding" header with a value of "?1" and without the "accept-transform" parameter, it
 MUST ignore the header and respond as if the client had not sent the
 "Proxy-QUIC-Forwarding" header.
 
