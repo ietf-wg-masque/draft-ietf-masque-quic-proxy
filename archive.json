@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-07-22T00:44:40.240161+00:00",
+  "timestamp": "2025-07-24T00:44:56.888826+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -1750,13 +1750,21 @@
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [
-        "Discuss"
+        "Ready to Close"
       ],
       "body": "As we do work to decouple the potential risks on correlation between the incoming/outgoing connections, the forwarding of ECN has potential risk.  An active attacker could embed signals over a series of packets by clearing+setting ECN bits and observing the same signal on the output side. \r\n\r\nThe end-to-end QUIC congestion control makes it so we really do want to forward ECN, so it's unclear what can be done about this risk in a way that also allows ECN to be applied on any of the hops. \r\n\r\nThis might be something to just capture as a known potential risk and downside for this use-case.",
       "createdAt": "2023-07-24T17:20:07Z",
-      "updatedAt": "2025-07-16T20:35:03Z",
+      "updatedAt": "2025-07-22T09:59:25Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "ehaydenr",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Discussed at IETF 123. Seemed like folks were comfortable with the added security consideration.",
+          "createdAt": "2025-07-22T09:59:18Z",
+          "updatedAt": "2025-07-22T09:59:18Z"
+        }
+      ]
     },
     {
       "number": 86,
@@ -2430,7 +2438,7 @@
       "id": "I_kwDOEHrEP86XWKbh",
       "title": "Don't use the term ECB \ud83d\ude31",
       "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/116",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "emanjon",
       "authorAssociation": "NONE",
       "assignees": [],
@@ -2439,8 +2447,8 @@
       ],
       "body": "https://csrc.nist.gov/News/2022/proposal-to-revise-sp-800-38a\r\n\r\nThat RFC 9001 says it uses ECB is a disaster. It have heard people stating several times that ECB is ok in other settings as it is used by QUIC.\r\n\r\nStating that you use ECB will soon be non-compliant as NIST will soon disallow ECB.\r\n\r\nhttps://csrc.nist.gov/News/2022/proposal-to-revise-sp-800-38a\r\n\r\n_\"the use of ECB to encrypt confidential information constitutes a severe security vulnerability\"\r\n\"In the revision, NIST proposes to limit the approval of ECB to instances that are specifically allowed by other NIST standards or guidance.\"_\r\n\r\nPlease reformulate to state that you use AES encryption or AES-CTR, AES-CBC, AES-OFB, or AES-CFB.\r\n",
       "createdAt": "2024-09-20T16:06:42Z",
-      "updatedAt": "2025-07-16T20:34:47Z",
-      "closedAt": null,
+      "updatedAt": "2025-07-22T09:42:49Z",
+      "closedAt": "2025-07-22T09:42:49Z",
       "comments": [
         {
           "author": "tfpauly",
@@ -2448,6 +2456,13 @@
           "body": "This is mainly quoting the format for pseudocode in RFC 9001. We'll want more discussion on the right way to represent this.",
           "createdAt": "2025-07-07T18:56:51Z",
           "updatedAt": "2025-07-07T18:56:51Z"
+        },
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "As discussed in the IETF 123, we will be keeping the text as-is here. This is using AES-ECB in a way that is appropriate at the level of the protocol that it is in, and the rationale matches that usage in RFC 9001. That does not justify using ECB in inappropriate ways in other protocols, of course!",
+          "createdAt": "2025-07-22T09:42:49Z",
+          "updatedAt": "2025-07-22T09:42:49Z"
         }
       ]
     },
@@ -11953,7 +11968,7 @@
       "labels": [],
       "body": "It's sent in response to ACK_CLIENT_CID, not ACK_TARGET_CID.",
       "createdAt": "2025-07-19T10:14:12Z",
-      "updatedAt": "2025-07-20T14:33:30Z",
+      "updatedAt": "2025-07-22T09:57:11Z",
       "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
       "baseRefName": "main",
       "baseRefOid": "b25d33464cd8f1e7461ed5a49837babf9244416b",
@@ -12268,6 +12283,368 @@
           "body": "",
           "createdAt": "2025-07-21T14:08:20Z",
           "updatedAt": "2025-07-21T14:08:20Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 146,
+      "id": "PR_kwDOEHrEP86gAB7D",
+      "title": "fix formatting of test vector",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/146",
+      "state": "MERGED",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-07-22T06:50:36Z",
+      "updatedAt": "2025-07-22T06:51:55Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "3ac39e573ab23e39cacff438f403cd4597bd3003",
+      "headRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "headRefName": "ehaydenr-patch-2-1",
+      "headRefOid": "4845243332470551a5654be42c3215528ad0fdcc",
+      "closedAt": "2025-07-22T06:51:43Z",
+      "mergedAt": "2025-07-22T06:51:43Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "403b39b0df8a20b26d0ca93a4b5c4c6ad88cf6d3"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP861SCOO",
+          "commit": {
+            "abbreviatedOid": "4845243"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-22T06:51:35Z",
+          "updatedAt": "2025-07-22T06:51:35Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 147,
+      "id": "PR_kwDOEHrEP86gAZP-",
+      "title": "registrations are rejected, not requests",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/147",
+      "state": "MERGED",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "I think the original text is probably easily understood, but I think this is a little clearer. ",
+      "createdAt": "2025-07-22T07:27:46Z",
+      "updatedAt": "2025-07-22T08:53:45Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "403b39b0df8a20b26d0ca93a4b5c4c6ad88cf6d3",
+      "headRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "headRefName": "ehaydenr-patch-3",
+      "headRefOid": "2dcc37f78ece398e04d3bc394f9d26b3baec669d",
+      "closedAt": "2025-07-22T07:33:19Z",
+      "mergedAt": "2025-07-22T07:33:19Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "bf1deb662798a81189d02cad6c4f63fda1cc9f6c"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP861ShyK",
+          "commit": {
+            "abbreviatedOid": "2dcc37f"
+          },
+          "author": "DavidSchinazi",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-22T07:32:22Z",
+          "updatedAt": "2025-07-22T07:32:22Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOEHrEP861SifY",
+          "commit": {
+            "abbreviatedOid": "2dcc37f"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-22T07:33:14Z",
+          "updatedAt": "2025-07-22T07:33:14Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 148,
+      "id": "PR_kwDOEHrEP86gAgOm",
+      "title": "fix minor typo",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/148",
+      "state": "MERGED",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-07-22T07:38:28Z",
+      "updatedAt": "2025-07-22T09:57:07Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "bf1deb662798a81189d02cad6c4f63fda1cc9f6c",
+      "headRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "headRefName": "ehaydenr-patch-4",
+      "headRefOid": "2f0f566837b370b994077066427a4a635a3858dd",
+      "closedAt": "2025-07-22T09:35:31Z",
+      "mergedAt": "2025-07-22T09:35:31Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "66760d2c10fa95cf1d934101510c00152ef34339"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP861Uvho",
+          "commit": {
+            "abbreviatedOid": "2f0f566"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-22T09:35:25Z",
+          "updatedAt": "2025-07-22T09:35:25Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 149,
+      "id": "PR_kwDOEHrEP86gAmS1",
+      "title": "update proxy considerations to include executing transform",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/149",
+      "state": "MERGED",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-07-22T07:46:14Z",
+      "updatedAt": "2025-07-22T09:56:59Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "910fa952eb458bbd7eb14a259f6140c7a5c2e163",
+      "headRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "headRefName": "ehaydenr-patch-5",
+      "headRefOid": "f690d39dec139d7c63f764ed7658d5d899b63e84",
+      "closedAt": "2025-07-22T09:56:56Z",
+      "mergedAt": "2025-07-22T09:56:56Z",
+      "mergedBy": "ehaydenr",
+      "mergeCommit": {
+        "oid": "12be74369f080e11c05be91866b213be53c03a5d"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP861U7kT",
+          "commit": {
+            "abbreviatedOid": "f690d39"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-22T09:48:55Z",
+          "updatedAt": "2025-07-22T09:48:55Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOEHrEP861U892",
+          "commit": {
+            "abbreviatedOid": "f690d39"
+          },
+          "author": "DavidSchinazi",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-22T09:50:32Z",
+          "updatedAt": "2025-07-22T09:50:32Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 150,
+      "id": "PR_kwDOEHrEP86gA4Xj",
+      "title": "add missing \"Proxy-QUIC-Port-Sharing\" header field to IANA considerations",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/150",
+      "state": "MERGED",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-07-22T08:10:15Z",
+      "updatedAt": "2025-07-22T09:45:41Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "bf1deb662798a81189d02cad6c4f63fda1cc9f6c",
+      "headRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "headRefName": "ehaydenr-patch-6",
+      "headRefOid": "91bc4f0f6648f7795f6c4947d9a08cf829ca4b9f",
+      "closedAt": "2025-07-22T09:45:38Z",
+      "mergedAt": "2025-07-22T09:45:38Z",
+      "mergedBy": "ehaydenr",
+      "mergeCommit": {
+        "oid": "c562f0a46f910fb0b3a72862a20ae6299f495c02"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP861UxSA",
+          "commit": {
+            "abbreviatedOid": "91bc4f0"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-22T09:37:11Z",
+          "updatedAt": "2025-07-22T09:37:11Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 151,
+      "id": "PR_kwDOEHrEP86gBj37",
+      "title": "make REGISTER_TARGET_CID optional for port sharing only",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/151",
+      "state": "MERGED",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-07-22T09:02:45Z",
+      "updatedAt": "2025-07-22T09:45:54Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "bf1deb662798a81189d02cad6c4f63fda1cc9f6c",
+      "headRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "headRefName": "ehaydenr-patch-3",
+      "headRefOid": "70ab51e7a373bd0cf375bc3953a19d4fef978d79",
+      "closedAt": "2025-07-22T09:45:51Z",
+      "mergedAt": "2025-07-22T09:45:51Z",
+      "mergedBy": "ehaydenr",
+      "mergeCommit": {
+        "oid": "1711301e065a2b2630535fedccee143316218cd6"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP861Uuzm",
+          "commit": {
+            "abbreviatedOid": "70ab51e"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-22T09:34:37Z",
+          "updatedAt": "2025-07-22T09:34:37Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 152,
+      "id": "PR_kwDOEHrEP86gBrwh",
+      "title": "parameters are only required when forwarding mode enable",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/152",
+      "state": "MERGED",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-07-22T09:13:54Z",
+      "updatedAt": "2025-07-22T09:46:10Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "bf1deb662798a81189d02cad6c4f63fda1cc9f6c",
+      "headRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "headRefName": "ehaydenr-patch-7",
+      "headRefOid": "4ba44edd1ccf5e28a778bed607fd941714bd1f93",
+      "closedAt": "2025-07-22T09:46:05Z",
+      "mergedAt": "2025-07-22T09:46:05Z",
+      "mergedBy": "ehaydenr",
+      "mergeCommit": {
+        "oid": "910fa952eb458bbd7eb14a259f6140c7a5c2e163"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP861UwnV",
+          "commit": {
+            "abbreviatedOid": "4ba44ed"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-22T09:36:44Z",
+          "updatedAt": "2025-07-22T09:36:44Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 153,
+      "id": "PR_kwDOEHrEP86gCKST",
+      "title": "don't require registration if not forwarding and port sharing disabled",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/153",
+      "state": "MERGED",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The existing text is contradictory to other text that states that, when forwarding and port sharing are both disabled, we reduce to regular connect-udp behavior. There's no value in registrations if both are disabled. Any future extension that wants to take advantage of registrations can state that it's required.",
+      "createdAt": "2025-07-22T09:53:37Z",
+      "updatedAt": "2025-07-22T09:56:46Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "910fa952eb458bbd7eb14a259f6140c7a5c2e163",
+      "headRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "headRefName": "ehaydenr-patch-3",
+      "headRefOid": "1aee39f9ec93d49f766c394b1f70f1b81782bec2",
+      "closedAt": "2025-07-22T09:56:43Z",
+      "mergedAt": "2025-07-22T09:56:43Z",
+      "mergedBy": "ehaydenr",
+      "mergeCommit": {
+        "oid": "f809f32fde3298ed27578dd39b5fe88e506d5dff"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP861VBoV",
+          "commit": {
+            "abbreviatedOid": "1aee39f"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-07-22T09:56:29Z",
+          "updatedAt": "2025-07-22T09:56:29Z",
           "comments": []
         }
       ]
