@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-07-24T00:44:56.888826+00:00",
+  "timestamp": "2025-07-27T00:51:17.170773+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -1609,9 +1609,17 @@
       ],
       "body": "In general, in tunneled mode there is an inner (client-target) and outer (client-proxy) congestion control loop.\r\n\r\nIn forwarding mode, there is no outer loop.\r\n\r\nIf the bottleneck(s) are between client and proxy, then the outer loop has a shorter RTT and for most congestion controls will capture more of the bottleneck bandwidth. The throughput advantage of tunneled mode could, in principle, overwhelm the overhead advantages of forwarding mode.\r\n\r\nIt would be nice to see some simulations or other data to show that this is not a problem in practice before we adopted this work.\r\n",
       "createdAt": "2023-03-29T01:15:12Z",
-      "updatedAt": "2025-07-20T14:42:15Z",
+      "updatedAt": "2025-07-26T03:53:31Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "huitema",
+          "authorAssociation": "NONE",
+          "body": "@martinduke how it breaks down probably depends on the configuration. If there is just one proxied connection, yes there may be an advantage to the tunneled mode in this scenario. But if there are multiple connections, each of them running their own congestion control, the advantage most probably disappears. In fact, it will be the other way around, because N parallel forwarded connections will be N times more aggressive than a single tunnel.\n",
+          "createdAt": "2025-07-26T03:53:31Z",
+          "updatedAt": "2025-07-26T03:53:31Z"
+        }
+      ]
     },
     {
       "number": 82,
@@ -1754,7 +1762,7 @@
       ],
       "body": "As we do work to decouple the potential risks on correlation between the incoming/outgoing connections, the forwarding of ECN has potential risk.  An active attacker could embed signals over a series of packets by clearing+setting ECN bits and observing the same signal on the output side. \r\n\r\nThe end-to-end QUIC congestion control makes it so we really do want to forward ECN, so it's unclear what can be done about this risk in a way that also allows ECN to be applied on any of the hops. \r\n\r\nThis might be something to just capture as a known potential risk and downside for this use-case.",
       "createdAt": "2023-07-24T17:20:07Z",
-      "updatedAt": "2025-07-22T09:59:25Z",
+      "updatedAt": "2025-07-26T03:45:15Z",
       "closedAt": null,
       "comments": [
         {
@@ -1763,6 +1771,13 @@
           "body": "Discussed at IETF 123. Seemed like folks were comfortable with the added security consideration.",
           "createdAt": "2025-07-22T09:59:18Z",
           "updatedAt": "2025-07-22T09:59:18Z"
+        },
+        {
+          "author": "huitema",
+          "authorAssociation": "NONE",
+          "body": "Isn't this attack completely mitigated if the transform also obfuscates the ECN bits?",
+          "createdAt": "2025-07-26T03:45:15Z",
+          "updatedAt": "2025-07-26T03:45:15Z"
         }
       ]
     },
