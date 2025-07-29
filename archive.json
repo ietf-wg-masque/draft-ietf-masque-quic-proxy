@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-07-27T00:51:17.170773+00:00",
+  "timestamp": "2025-07-29T00:51:19.545036+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -1762,7 +1762,7 @@
       ],
       "body": "As we do work to decouple the potential risks on correlation between the incoming/outgoing connections, the forwarding of ECN has potential risk.  An active attacker could embed signals over a series of packets by clearing+setting ECN bits and observing the same signal on the output side. \r\n\r\nThe end-to-end QUIC congestion control makes it so we really do want to forward ECN, so it's unclear what can be done about this risk in a way that also allows ECN to be applied on any of the hops. \r\n\r\nThis might be something to just capture as a known potential risk and downside for this use-case.",
       "createdAt": "2023-07-24T17:20:07Z",
-      "updatedAt": "2025-07-26T03:45:15Z",
+      "updatedAt": "2025-07-28T06:44:01Z",
       "closedAt": null,
       "comments": [
         {
@@ -1778,6 +1778,13 @@
           "body": "Isn't this attack completely mitigated if the transform also obfuscates the ECN bits?",
           "createdAt": "2025-07-26T03:45:15Z",
           "updatedAt": "2025-07-26T03:45:15Z"
+        },
+        {
+          "author": "huitema",
+          "authorAssociation": "NONE",
+          "body": "I am still trying to understand a mitigation for this attack. I think the solution is to let the proxy apply CE marks that may not map 1-1 to the incoming packet, but that provide reasonably equivalent data to the congestion controllers. Algorithms like L4S rely on measuring an average rate of marking, and also typically have a threshold above which all marking levels are pretty much equivalent. That give proxies some flexibility, and let them blur the \"ECN/CE\" modulation that attackers could try to use. ",
+          "createdAt": "2025-07-28T06:44:01Z",
+          "updatedAt": "2025-07-28T06:44:01Z"
         }
       ]
     },
