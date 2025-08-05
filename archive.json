@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-07-29T00:51:19.545036+00:00",
+  "timestamp": "2025-08-05T00:47:00.864335+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -2619,6 +2619,37 @@
       "updatedAt": "2025-07-21T09:03:10Z",
       "closedAt": "2025-07-21T09:03:10Z",
       "comments": []
+    },
+    {
+      "number": 154,
+      "id": "I_kwDOEHrEP87D-CpT",
+      "title": "Why does the proxy choose the client VCID?",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/154",
+      "state": "CLOSED",
+      "author": "huitema",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "My understanding of the QUIC aware flows is summarized in the following diagram:\n\n~~~\n   +----------+    target VCID      +------------+  target CID    +--------------+\n   | client --------------------------> proxy -----------------------> target    |\n   |        <--------------------------       <-----------------------           |\n   +----------+    client VCID      +------------+  Client CID    +--------------+\n~~~\n\nIf that understanding is correct, it seems that the proxy will never make a decision based on the value of the client VCID. The client, on the other hand, will need to translate back the client VCID into the client VCID, and process the incoming packet. \n\nThe implementation of the client would be simpler if the client VCID was unique among all connections managed by the client, and unique among the set of \"all VCID\" and \"all client CID\" -- including connections that do not concern the proxy. I understand that this is not strictly necessary, the client could also manage a table keyed by \\<CID + source address of incoming packet\\>. But uniqueness *at the client* allows for a single table instead of two, and is arguably simpler.\n\nThat uniqueness at the client would be easy to achieve if the client, not the proxy, chose the client VCID, and maybe documents it as an optional parameter in the \\<Register Client CID\\> capsule.\n\nDoing that would also make management easier if the client sits behind a load balancer.\n\nCan you explain the reasoning for the non-natural choice of having the proxy, instead of the client, choose the client VCID?\n",
+      "createdAt": "2025-08-04T02:40:43Z",
+      "updatedAt": "2025-08-04T05:05:33Z",
+      "closedAt": "2025-08-04T03:23:20Z",
+      "comments": [
+        {
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@huitema please see: #104 and #88 \n\nOriginally, for the very reasons you mention, the client did pick its own VCID! However, this allows the client to include loops in setups with multiple proxies. Having the proxy pick the VCID was the way the authors and WG as a whole found it cleanest to avoid this attack.\n\nI'll close this as a dup of those for now, but feel free to reopen if necessary.",
+          "createdAt": "2025-08-04T03:23:21Z",
+          "updatedAt": "2025-08-04T03:23:21Z"
+        },
+        {
+          "author": "huitema",
+          "authorAssociation": "NONE",
+          "body": "I was not asking to change the spec, largely because I suspected that you had good reasons to pick the \"non obvious\" design. You do have text explaining that in section 9.2, so I would have found the explanation if I had read further. But a forward reference in section 5 would have saved me quite a bit of head-scratching. Maybe at a bit of text in the paragraph starting by \"The ACK_CLIENT_CID (Section 5.3) and ACK_TARGET_CID (Section 5.4)\". Something like \"The VCID are always chosen by the proxy in order to avoid possible loop attacks, as discussed in Section 9.2.\"",
+          "createdAt": "2025-08-04T05:05:33Z",
+          "updatedAt": "2025-08-04T05:05:33Z"
+        }
+      ]
     }
   ],
   "pulls": [
