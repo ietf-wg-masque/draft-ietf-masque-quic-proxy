@@ -5,9 +5,9 @@
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
 Intended status: Experimental                                 Apple Inc.
-Expires: 20 January 2026                                     D. Schinazi
+Expires: 20 February 2026                                    D. Schinazi
                                                               Google LLC
-                                                            19 July 2025
+                                                          19 August 2025
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 20 January 2026.
+   This Internet-Draft will expire on 20 February 2026.
 
 Copyright Notice
 
@@ -109,18 +109,20 @@ Table of Contents
        6.8.1.  Stateless Resets from the Target
    7.  Example Exchange
    8.  Packet Size Considerations
-   9.  Security Considerations
-     9.1.  Passive Attacks
-     9.2.  Active Attacks
-     9.3.  Connection ID Registration Attacks
-   10. IANA Considerations
-     10.1.  HTTP Header Field
-     10.2.  Proxy QUIC Forwarding Parameter Names
-     10.3.  Packet Transform Names
-     10.4.  Capsule Types
-   11. References
-     11.1.  Normative References
-     11.2.  Informative References
+   9.  QUIC Version Invariance
+   10. Security Considerations
+     10.1.  Passive Attacks
+     10.2.  Active Attacks
+     10.3.  Connection ID Registration Attacks
+   11. IANA Considerations
+     11.1.  HTTP Header Fields
+     11.2.  Proxy QUIC Forwarding Parameter Names
+     11.3.  Packet Transform Names
+     11.4.  Capsule Types
+   12. References
+     12.1.  Normative References
+     12.2.  Informative References
+   Appendix A.  Appendix A.  Example of a Forwarded Mode QUIC Packet
    Acknowledgments
    Authors' Addresses
 
@@ -197,7 +199,7 @@ Table of Contents
    Forwarded mode does not prevent correlation of packets on the link
    between client and proxy and the link between proxy and target by an
    entity that can observe both links.  The precise risks depend on the
-   negotiated transform (Section 6.3).  See Section 9 for further
+   negotiated transform (Section 6.3).  See Section 10 for further
    discussion.
 
    Both clients and proxies can unilaterally choose to disable forwarded
@@ -206,10 +208,15 @@ Table of Contents
    The forwarded mode of proxying is only defined for HTTP/3 [HTTP3] and
    not any earlier versions of HTTP.
 
-   QUIC proxies only need to understand the Header Form bit, and the
-   connection ID fields from packets in client-to-target QUIC
-   connections.  Since these fields are all in the QUIC invariants
-   header [INVARIANTS], QUIC proxies can proxy all versions of QUIC.
+   QUIC proxies can proxy all versions of QUIC.  See Section 9 for more
+   information.
+
+   While Forwarded mode may improve overhead of per-packet processing,
+   this doesn't necessarily imply overall throughput is improved.
+   Unlike tunnelled packets, packets sent in Forwarded mode are not
+   congestion controlled between client and proxy.  Deployments should
+   consider whether or not the overhead advantages outweigh potentially
+   superior throughput afforded by client-to-proxy congestion control.
 
 1.1.  Conventions and Definitions
 
@@ -413,12 +420,14 @@ Table of Contents
    is at least as long as the original client CID.  Similarly, clients
    multiplexing connections on the same UDP 4-tuple SHOULD choose a
    client CID that's sufficiently long to reduce the likelihood of a
-   conflict with the proxy-chosen client VCID.  The client VCID MUST
-   either be constructed such that it is unpredictable to the client or
-   to guarantee no conflicts among all proxies sharing an IP address and
-   port.  For this reason, a non-empty client VCID MUST NOT be equal to
-   the original client CID.  See Section 9 for more discussion on client
-   VCID construction.
+   conflict with the proxy-chosen client VCID.  For proxies that share a
+   client-facing IP and port with other proxies, support target-facing
+   port sharing, and cannot guarantee there are no proxies being proxied
+   to, the client VCID MUST be constructed such that it is unpredictable
+   to the client or to guarantee no conflicts among all proxies sharing
+   an IP address and port.  For such proxies, a non-empty client VCID
+   MUST NOT be equal to the original client CID.  See Section 10 for
+   more discussion on client VCID construction.
 
    Clients and Proxies not implementing forwarded mode do not need to
    consider VCIDs since all client-to-target datagrams will be
@@ -472,22 +481,13 @@ Table of Contents
        send the CLOSE_CLIENT_CID if it detects a conflict with another
        CID.
 
-   3.  The client sends the REGISTER_TARGET_CID capsule as soon as it
-       learns the target CID on the client-to-target connection.
-
-   4.  The proxy sends the ACK_TARGET_CID capsule to acknowledge that
-       CID, with no associated target VCID; alternatively, the proxy can
-       send the CLOSE_TARGET_CID if it detects a conflict with another
-       CID.
-
-   5.  The proxy sends the MAX_CONNECTION_IDS capsule to allow
+   3.  The proxy sends the MAX_CONNECTION_IDS capsule to allow
        additional registration of new connection IDs via future
        REGISTER_CLIENT_CID and REGISTER_TARGET_CID capsules.
 
-   6.  Whenever a client or target stops uses a particular CID, the
-       client sends a CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsule.  The
-       client can also initiate new REGISTER_CLIENT_CID or
-       REGISTER_TARGET_CID exchanges at any time.
+   4.  Whenever a client stops using a particular CID, the client sends
+       a CLOSE_CLIENT_CID.  The client can also initiate new
+       REGISTER_CLIENT_CID exchanges at any time.
 
    For QUIC-aware proxying with forwarded mode, the steps are as
    follows:
@@ -538,12 +538,13 @@ Table of Contents
    Connection IDs for the purpose of allowing the proxy to share a
    proxy-to-target 4-tuple, it sets the value to "?0".
 
-   The client MUST add an "accept-transform" parameter whose value is a
-   String containing the supported packet transforms (Section 6.3) in
-   order of descending preference, separated by commas.  If the proxy
-   receives a "Proxy-QUIC-Forwarding" header without the "accept-
-   transform" parameters, it MUST ignore the header and respond as if
-   the client had not sent the "Proxy-QUIC-Forwarding" header.
+   If advertising support for forwarding, the client MUST add an
+   "accept-transform" parameter whose value is a String containing the
+   supported packet transforms (Section 6.3) in order of descending
+   preference, separated by commas.  If the proxy receives a "Proxy-
+   QUIC-Forwarding" header with a value of "?1" and without the "accept-
+   transform" parameter, it MUST ignore the header and respond as if the
+   client had not sent the "Proxy-QUIC-Forwarding" header.
 
    If the proxy supports QUIC-aware proxying, it will include the
    "Proxy-QUIC-Forwarding" header in successful HTTP responses.  The
@@ -576,15 +577,22 @@ Table of Contents
    Clients SHOULD send this with a value of "?1" unless the client
    wishes to prohibit this behavior.  Permitting the proxy to share
    ports may allow the proxy to conserve resources and support more
-   clients.
+   clients.  Clients should not advertise support for port sharing
+   unless they are willing to share the same 4-tuple when communicating
+   with the target.  Sharing ports with other QUIC connections may
+   result in fate-sharing with clients that might be considered to be
+   untrusted or malicious by the target.  Such fate-sharing may impact
+   performance or may lead to being misclassified as malicious.
 
    A proxy that does not support port sharing, SHOULD send "Proxy-QUIC-
    Port-Sharing" with a value of "?0".  Doing so allows clients to stop
    sending capsules for this extension if forwarding mode is also not
-   supported.  Clients who send "?1", but do not receive any "Proxy-
-   QUIC-Port-Sharing" header in response must assume that port sharing
-   may be in effect and MUST continue register connection IDs in order
-   for the proxied connection to continue to work.
+   supported.
+
+   When port sharing is supported and forwarded mode is not,
+   registration of target Connection IDs is permitted, but is not
+   required since port sharing only requires demultiplexing QUIC packets
+   in the target-to-client direction
 
 5.  Connection ID Capsules
 
@@ -613,7 +621,8 @@ Table of Contents
    mapping was successfully created for a registered connection ID as
    well as optionally provide the Virtual Connection IDs that can be
    used in forwarded mode.  These capsule types MUST only be sent by a
-   proxy.
+   proxy.  Note that Virtual Connection IDs are always sent by the proxy
+   in order to avoid possible loop attacks Section 10.3.
 
    The ACK_CLIENT_VCID (Section 5.5) capsule type MUST only be sent by
    the client and only when forwarded mode is enabled.  It is sent by
@@ -657,6 +666,18 @@ Table of Contents
    ACK_CLIENT_CID.  When port sharing is supported, a proxy SHOULD
    buffer a reasonable number of incoming packets while waiting for the
    first REGISTER_CLIENT_CID capsule.
+
+   Importantly, registering connection IDs does not introduce any delay
+   in communication between client and target unless port sharing is
+   supported and there is an unlikely client CID collision.  The client
+   and target can always communicate over the tunnel without having to
+   wait for registrations to be acknowledged.  Forwarded mode requires
+   CID/VCID mappings be communicated and acknowledged, and, as a
+   consequence, cannot be leveraged without a round trip.  This is
+   particularly pronounced when chaining proxies because registration
+   happens sequentially.  While waiting for forwarded mode to become
+   enabled, clients SHOULD communicate over tunneled mode to avoid end-
+   to-end delays.
 
 5.1.  REGISTER_CLIENT_CID
 
@@ -889,7 +910,7 @@ Table of Contents
    In order to be able to route packets correctly in both tunnelled and
    forwarded mode, proxies check for conflicts before creating a new CID
    mapping.  If a conflict is detected, the proxy will reject the
-   client's request using a CLOSE_CLIENT_CID or CLOSE_TARGET_CID
+   client's registration using a CLOSE_CLIENT_CID or CLOSE_TARGET_CID
    capsule.
 
    Two 4-tuples conflict if and only if all members of the 4-tuple
@@ -911,7 +932,7 @@ Table of Contents
 
    Since very short Connection IDs are more likely to lead to conflicts,
    particularly zero-length Connection IDs, a proxy MAY choose to reject
-   all requests for very short Connection IDs as conflicts, in
+   all registrations for very short Connection IDs as conflicts, in
    anticipation of future conflicts.
 
 5.9.  Client Considerations
@@ -973,8 +994,8 @@ Table of Contents
    proxy, clients are expected to cooperate with proxies in selecting
    client CIDs.  A proxy detects a conflict when it is not able to
    create a unique mapping using the client CID (Section 5.8).  It can
-   reject requests that would cause a conflict and indicate this to the
-   client by replying with a CLOSE_CLIENT_CID capsule.  In order to
+   reject registrations that would cause a conflict and indicate this to
+   the client by replying with a CLOSE_CLIENT_CID capsule.  In order to
    avoid conflicts, clients SHOULD select client CIDs of at least 8
    bytes in length with unpredictable values.  A client also SHOULD NOT
    select a client CID that matches the ID used for the QUIC connection
@@ -1051,12 +1072,13 @@ Table of Contents
    chosen client VCID.  If forwarded mode is enabled, and after
    receiving an ACK_CLIENT_VCID capsule from the client, any packets
    received by the proxy from the proxy-to-target 4-tuple that match the
-   client CID can to be sent to the client after the proxy has replaced
-   the CID with the client VCID.  If forwarded mode is not supported,
-   the proxy MUST NOT send a client VCID by setting the length to zero.
-   The proxy MUST use tunnelled mode (HTTP Datagram frames) for any long
-   header packets.  The proxy SHOULD forward directly to the client for
-   any matching short header packets if forwarding is supported by the
+   client CID can be sent to the client after the proxy has replaced the
+   CID with the client VCID and executed the negotiated transform
+   (Section 6.3).  If forwarded mode is not supported, the proxy MUST
+   NOT send a client VCID by setting the length to zero.  The proxy MUST
+   use tunnelled mode (HTTP Datagram frames) for any long header
+   packets.  The proxy SHOULD forward directly to the client for any
+   matching short header packets if forwarding is supported by the
    client, but the proxy MAY tunnel these packets in HTTP Datagram
    frames instead.  If the mapping would create a conflict, the proxy
    responds with a CLOSE_CLIENT_CID capsule.
@@ -1073,7 +1095,8 @@ Table of Contents
    successful response is sent, the proxy will forward any short header
    packets received on the client-to-proxy 4-tuple that use the target
    VCID using the correct proxy-to-target 4-tuple after first rewriting
-   the target VCID to be the correct target CID.
+   the target VCID to be the correct target CID and executing the
+   negotiated transform.
 
    Proxies MUST choose unpredictable client and target VCIDs to avoid
    forwarding loop attacks.
@@ -1114,6 +1137,9 @@ Table of Contents
    (Section 6.5), server preferred addresses (Section 6.6), ECN markings
    (Section 6.7), and stateless resets (Section 6.8).
 
+   Forwarded mode packets are not part of the QUIC connection the tunnel
+   is managed by, but instead an independent flow of QUIC packets.
+
 6.1.  Sending With Forwarded Mode
 
    Support for forwarded mode is determined by the "Proxy-QUIC-
@@ -1134,9 +1160,9 @@ Table of Contents
 
    If the target CID registration is rejected, for example with a
    CLOSE_TARGET_CID capsule, it MUST NOT forward packets to the
-   requested target CID, but only use tunnelled mode.  The request might
-   also be rejected if the proxy does not support forwarded mode or has
-   it disabled by policy.
+   requested target CID, but only use tunnelled mode.  The registration
+   might also be rejected if the proxy does not support forwarded mode
+   or has it disabled by policy.
 
    QUIC long header packets MUST NOT be forwarded.  These packets can
    only be tunnelled within HTTP Datagram frames to avoid exposing
@@ -1184,12 +1210,16 @@ Table of Contents
 
    A packet transform is the procedure applied to encode packets as they
    are sent on the link between the client and proxy, along with the
-   inverse decode step applied on receipt.  Simple transforms can be
-   modeled as a function as follows:
+   inverse decode step applied on receipt.  When sending packets, the
+   packet transform is applied after replacing a CID with a VCID.  When
+   receiving packets, the packet transform is applied before replacing a
+   VCID with a CID.
+
+   Simple transforms can be modeled as a function as follows:
 
    Inputs:
 
-   1.  A QUIC short header packet (after Connection ID remapping).
+   1.  A QUIC short header packet with a VCID.
 
    2.  The mode (encode or decode).
 
@@ -1219,7 +1249,7 @@ Table of Contents
    target.
 
    The identity transform is identified by the value "identity"
-   Section 10.3.
+   Section 11.3.
 
    Use of this transform is NOT RECOMMENDED if the scramble transform is
    supported by both the client and the proxy.  Implementations MAY
@@ -1243,7 +1273,7 @@ Table of Contents
    Deployments that implement the version of the scramble transform
    defined in this document MUST use the value "scramble-dt".  The
    finalized version is expected to use the reserved value "scramble"
-   Section 10.3.
+   Section 11.3.
 
    The scramble transform is initialized using a 32-byte random
    symmetric key.  When offering or selecting this transform, the client
@@ -1251,7 +1281,11 @@ Table of Contents
    scrambled packets and MUST add it to the "Proxy-QUIC-Forwarding"
    header in an sf-binary parameter named "scramble-key".  If either
    side receives a scramble transform without the "scramble-key"
-   parameter, forwarded mode MUST be disabled.
+   parameter, forwarded mode MUST be disabled.  Note that each side
+   (client and server) generates its own "scramble-key" that it uses
+   when sending scrambled packets; the value received in the "scramble-
+   key" parameter is thus used to unscramble packets received from the
+   peer.
 
    This transform relies on the AES-128 block cipher, which is
    represented by the syntax AES-ECB(key, plaintext_block) as in
@@ -1400,7 +1434,7 @@ Table of Contents
    experienced on the proxy itself.
 
    Forwarding ECN markings introduces certain active attacks.  See
-   Section 9.2 for more detail.
+   Section 10.2 for more detail.
 
 6.8.  Stateless Resets for Forwarded Mode QUIC Packets
 
@@ -1590,7 +1624,36 @@ Table of Contents
    Once a proxied QUIC connections moves into forwarded mode, the client
    SHOULD initiate Path MTU discovery to increase its end-to-end MTU.
 
-9.  Security Considerations
+9.  QUIC Version Invariance
+
+   QUIC proxies only need to understand the Header Form bit, and the
+   connection ID fields from packets in client-to-target QUIC
+   connections.  Since these fields are all invariant across future QUIC
+   versions [INVARIANTS], QUIC proxies can proxy all versions of QUIC.
+
+   While QUIC proxies can proxy all versions of QUIC, some optional
+   capabilities are limited to certain versions.  Specifically, some of
+   the connection ID registration capsules in Section 5 include a
+   Stateless Reset Token field.  This field is defined in [QUIC] and not
+   part of [INVARIANTS].  If a future QUIC version removes or changes
+   the behavior of Stateless Reset Tokens, the Stateless Reset Token
+   field in each capsule MUST have a length of zero.
+
+   When forwarding mode is enabled, the client and target MAY negotiate
+   any QUIC version, and MAY send packets of that version through the
+   forwarding path.  The proxy does not know what version they are
+   using, so it can only require that these packets conform to the QUIC
+   invariants for short-header packets ([RFC8999], Section 5.2).
+
+   QUIC version 1 specifies a Fixed Bit (a.k.a. the "QUIC bit") with a
+   fixed value to support sharing a 5-tuple with other protocols such as
+   DTLS, but the QUIC invariants do not guarantee the value of this bit.
+   Accordingly proxies with forwarding mode enabled MUST NOT rely on
+   this bit for protocol identification, and SHOULD send and accept the
+   grease_quic_bit transport parameter [QUIC-GREASE] to avoid
+   ossification of the forwarding mode path.
+
+10.  Security Considerations
 
    Proxies that support this extension SHOULD provide protections to
    rate-limit or restrict clients from opening an excessive number of
@@ -1605,7 +1668,7 @@ Table of Contents
    proxy.  The following sections highlight deanonymization risks with
    using forwarded mode.
 
-9.1.  Passive Attacks
+10.1.  Passive Attacks
 
    A passive attacker aims to deanonymize a client by correlating
    traffic across both sides of the proxy.  When using forwarded mode
@@ -1630,7 +1693,7 @@ Table of Contents
    proxy traffic.  This additional metadata revealed on each packet
    simplifies size and timing attacks.
 
-9.2.  Active Attacks
+10.2.  Active Attacks
 
    An active attacker is an adversary that can inject, modify, drop, and
    view packets in the network.  Some active attacks have different
@@ -1666,32 +1729,37 @@ Table of Contents
    way, forwarded mode is less vulnerable to flow recognition based on
    corrupting a portion of packets in a burst.
 
-9.3.  Connection ID Registration Attacks
+10.3.  Connection ID Registration Attacks
 
    Chaining of proxies using forwarded mode introduces the risk of
-   forwarding loop attacks.  Preventing client VCID conflicts across
-   proxies sharing an IP address and port mitigates one such forwarding
-   loop attack.  Conflicts can be avoided by partitioning the client
-   VCID space across proxies, using sufficiently long and random values,
-   or by other means.
+   forwarding loop attacks.  Proxies are known to be vulnerable to one
+   such forwarding loop attack when sharing an IP address and port with
+   other proxies, supporting target-facing port sharing, and proxying to
+   other proxies.  Preventing client VCID conflicts across proxies
+   sharing an IP address and port mitigates one such forwarding loop
+   attack.  Conflicts can be avoided by partitioning the client VCID
+   space across proxies, using sufficiently long and random values, or
+   by other means.
 
-10.  IANA Considerations
+11.  IANA Considerations
 
-10.1.  HTTP Header Field
+11.1.  HTTP Header Fields
 
-   This document registers the "Proxy-QUIC-Forwarding" header field in
-   the "Hypertext Transfer Protocol (HTTP) Field Name Registry"
-   <https://www.iana.org/assignments/http-fields>.
+   This document registers the "Proxy-QUIC-Forwarding" and "Proxy-QUIC-
+   Port-Sharing" header fields in the "Hypertext Transfer Protocol
+   (HTTP) Field Name Registry" <https://www.iana.org/assignments/http-
+   fields>.
 
-    +-----------------------+-----------+-----------------+---------------+----------+
-    |      Field Name       |  Status   | Structured Type |   Reference   | Comments |
-    +-----------------------+-----------+-----------------+---------------+----------+
-    | Proxy-QUIC-Forwarding | permanent |      Item       | This document |   None   |
-    +-----------------------+-----------+-----------------+---------------+----------+
+    +-------------------------+-----------+-----------------+---------------+----------+
+    |      Field Name         |  Status   | Structured Type |   Reference   | Comments |
+    +-------------------------+-----------+-----------------+---------------+----------+
+    | Proxy-QUIC-Forwarding   | permanent |      Item       | This document |   None   |
+    | Proxy-QUIC-Port-Sharing | permanent |      Item       | This document |   None   |
+    +-------------------------+-----------+-----------------+---------------+----------+
 
-               Figure 11: Registered HTTP Header Field
+               Figure 11: Registered HTTP Header Fields
 
-10.2.  Proxy QUIC Forwarding Parameter Names
+11.2.  Proxy QUIC Forwarding Parameter Names
 
    This document establishes a new registry, "Proxy QUIC Forwarding
    Parameter Names", for parameter names to use with the "Proxy-QUIC-
@@ -1712,7 +1780,7 @@ Table of Contents
 
        Figure 12: Initial Proxy QUIC Forwarding Parameter Names
 
-10.3.  Packet Transform Names
+11.3.  Packet Transform Names
 
    This document establishes a new registry for packet transform names
    in <https://www.iana.org/assignments/masque/masque.xhtml> and defines
@@ -1738,7 +1806,7 @@ Table of Contents
 
                  Table 1: Initial Packet Transform Names
 
-10.4.  Capsule Types
+11.4.  Capsule Types
 
    This document registers six new values in the "HTTP Capsule Types"
    registry established by [HTTP-CAPSULES].  Note that the codepoints
@@ -1774,9 +1842,9 @@ Table of Contents
    Contact:  masque@ietf.org
    Notes:  None
 
-11.  References
+12.  References
 
-11.1.  Normative References
+12.1.  Normative References
 
    [CONNECT-UDP]
               Schinazi, D., "Proxying UDP in HTTP", RFC 9298,
@@ -1830,12 +1898,17 @@ Table of Contents
               <https://nvlpubs.nist.gov/nistpubs/legacy/sp/
               nistspecialpublication800-38a.pdf>.
 
-11.2.  Informative References
+12.2.  Informative References
 
    [ECN-TUNNEL]
               Briscoe, B., "Tunnelling of Explicit Congestion
               Notification", RFC 6040, DOI 10.17487/RFC6040, November
               2010, <https://www.rfc-editor.org/rfc/rfc6040>.
+
+   [QUIC-GREASE]
+              Schinazi, D. and L. Pardue, "HTTP Datagrams and the
+              Capsule Protocol", RFC 9297, DOI 10.17487/RFC9297, August
+              2022, <https://www.rfc-editor.org/rfc/rfc9297>.
 
    [QUIC-LB]  Duke, M., Banks, N., and C. Huitema, "QUIC-LB: Generating
               Routable QUIC Connection IDs", Work in Progress, Internet-
@@ -1854,6 +1927,38 @@ Table of Contents
    [RFC9209]  Nottingham, M. and P. Sikora, "The Proxy-Status HTTP
               Response Header Field", RFC 9209, DOI 10.17487/RFC9209,
               June 2022, <https://www.rfc-editor.org/rfc/rfc9209>.
+
+Appendix A.  Appendix A.  Example of a Forwarded Mode QUIC Packet
+
+   The following is an example of a QUIC packet that could have been
+   sent by a client or proxy in Forwarded Mode.
+
+   Original QUIC Destination Connection ID
+
+   002e9184cb0022ca7aecf1128c91d809e1b6853f
+
+   Virtual QUIC Destination Connection ID
+
+   0123456789abcdef0123456789abcdef01234567
+
+   Original QUIC Packet Generated for a Peer.
+
+   50002e9184cb0022ca7aecf1128c91d8
+   09e1b6853f1ba3bed7043a2163202304
+   8def32f4f8f260c290490413d24ea6
+
+   Forwarded mode packet with the identity transform
+
+   500123456789abcdef0123456789abcd
+   ef012345671ba3bed7043a2163202304
+   8def32f4f8f260c290490413d24ea6
+
+   Forwarded mode packet with scramble key
+   f13a915f96fb8919d9d8655488ffea5778cac8cffbc27cd38c173bcbad955cff
+
+   320123456789abcdef0123456789abcd
+   ef012345678ebe6906e16ec5fc90a02c
+   0109994c3fed03f9d5d88c5f408bb6
 
 Acknowledgments
 
