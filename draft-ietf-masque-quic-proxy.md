@@ -528,7 +528,9 @@ The ACK_CLIENT_CID ({{capsule-ack-client}}) and ACK_TARGET_CID
 ({{capsule-ack-target}}) capsule types are sent by the proxy to the client
 to indicate that a mapping was successfully created for a registered
 connection ID as well as optionally provide the Virtual Connection IDs that can be
-used in forwarded mode. These capsule types MUST only be sent by a proxy.
+used in forwarded mode. These capsule types MUST only be sent by a proxy. Note that
+Virtual Connection IDs are always sent by the proxy in order to avoid possible loop attacks
+ {{registration-attacks}}.
 
 The ACK_CLIENT_VCID ({{capsule-ack-virtual}}) capsule type MUST only be sent
 by the client and only when forwarded mode is enabled. It is sent by the client
@@ -1562,7 +1564,7 @@ would cause a tunnelling proxy to silently drop packets, while a forwarding prox
 would forward the packets. In this way, forwarded mode is less vulnerable to
 flow recognition based on corrupting a portion of packets in a burst.
 
-## Connection ID Registration Attacks
+## Connection ID Registration Attacks {#registration-attacks}
 
 Chaining of proxies using forwarded mode introduces the risk of forwarding loop
 attacks. Proxies are known to be vulnerable to one such forwarding loop attack
