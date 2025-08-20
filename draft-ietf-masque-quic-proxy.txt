@@ -5,9 +5,9 @@
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
 Intended status: Experimental                                 Apple Inc.
-Expires: 23 January 2026                                     D. Schinazi
+Expires: 21 February 2026                                    D. Schinazi
                                                               Google LLC
-                                                            22 July 2025
+                                                          20 August 2025
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 23 January 2026.
+   This Internet-Draft will expire on 21 February 2026.
 
 Copyright Notice
 
@@ -621,7 +621,8 @@ Table of Contents
    mapping was successfully created for a registered connection ID as
    well as optionally provide the Virtual Connection IDs that can be
    used in forwarded mode.  These capsule types MUST only be sent by a
-   proxy.
+   proxy.  Note that Virtual Connection IDs are always sent by the proxy
+   in order to avoid possible loop attacks Section 10.3.
 
    The ACK_CLIENT_VCID (Section 5.5) capsule type MUST only be sent by
    the client and only when forwarded mode is enabled.  It is sent by
