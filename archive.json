@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-08-05T00:47:00.864335+00:00",
+  "timestamp": "2025-08-21T00:38:44.783184+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -12698,6 +12698,61 @@
           "body": "",
           "createdAt": "2025-07-22T09:56:29Z",
           "updatedAt": "2025-07-22T09:56:29Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 155,
+      "id": "PR_kwDOEHrEP86kUNtY",
+      "title": "add forward reference for proxy chosen virtual connection IDs",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/155",
+      "state": "MERGED",
+      "author": "ehaydenr",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "addresses #154 ",
+      "createdAt": "2025-08-19T14:55:19Z",
+      "updatedAt": "2025-08-20T16:05:29Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "12be74369f080e11c05be91866b213be53c03a5d",
+      "headRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "headRefName": "ehaydenr-patch-1",
+      "headRefOid": "ac802c2e32eb667415269933014a53bf43d5e1c2",
+      "closedAt": "2025-08-20T02:09:30Z",
+      "mergedAt": "2025-08-20T02:09:30Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "0b58c0109fc00192049fbf8336e23dd72a1e91ed"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP866vLFT",
+          "commit": {
+            "abbreviatedOid": "ac802c2"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-08-19T15:51:51Z",
+          "updatedAt": "2025-08-19T15:51:51Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOEHrEP866wCNf",
+          "commit": {
+            "abbreviatedOid": "ac802c2"
+          },
+          "author": "DavidSchinazi",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-08-19T17:05:54Z",
+          "updatedAt": "2025-08-19T17:05:54Z",
           "comments": []
         }
       ]
