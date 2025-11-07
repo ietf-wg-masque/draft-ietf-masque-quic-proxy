@@ -1,7 +1,7 @@
 ---
 title: QUIC-Aware Proxying Using HTTP
 abbrev: QUIC Proxy
-category: exp
+category: std
 docname: draft-ietf-masque-quic-proxy-latest
 submissiontype: IETF
 number:
