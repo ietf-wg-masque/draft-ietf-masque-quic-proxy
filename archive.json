@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-08-21T00:38:44.783184+00:00",
+  "timestamp": "2025-11-09T00:43:42.345156+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -2650,6 +2650,118 @@
           "updatedAt": "2025-08-04T05:05:33Z"
         }
       ]
+    },
+    {
+      "number": 157,
+      "id": "I_kwDOEHrEP87Wy-xE",
+      "title": "MAX_CONNECTION_IDS advertises an inclusive sequence-number maximum",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/157",
+      "state": "OPEN",
+      "author": "kazuho",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "For readers coming from QUIC v1, there\u2019s a small semantic mismatch: QUIC\u2019s MAX_* limits are typically understood as exclusive with respect to an index/offset (e.g., MAX_DATA=4 \u21d2 offsets < 4, i.e., 4 bytes total), whereas MAX_CONNECTION_IDS communicates an inclusive maximum over a registration sequence number (e.g., initial maximum = 1 permits registrations with sequence numbers 0 and 1).\n\nI don\u2019t have a strong preference, but this can surprise implementers.\n\nUnless there is a precedence to use inclusive maximums inside the masque WG, it might make sense to use exclusive maximums to minimize surprise.",
+      "createdAt": "2025-11-08T15:46:33Z",
+      "updatedAt": "2025-11-08T15:46:33Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 158,
+      "id": "I_kwDOEHrEP87WzBLY",
+      "title": "Split CID registration space",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/158",
+      "state": "OPEN",
+      "author": "kazuho",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "IIUC, client CIDs and target CIDs share the same registration space controlled by MAX_CONNECTION_IDS. However, that might not be ideal, especially when the space is tight.\n\nTypically, a proxy wants to retain two client CIDs: one used actively for forwarding packets and another kept as a backup for when the client migrates to a new path. Once the client migrates, the proxy would retire the old client CID and send a MAX_CONNECTION_IDS capsule, asking the client to register a new client CID.\n\nHowever, the intent behind MAX_CONNECTION_IDS is unclear: the client might instead consume that space by registering a new target CID.\n\nOne could argue the client should infer proxy intent from how many CIDs are currently registered for each role, but that\u2019s fragile and adds complexity. Maybe it makes sense to split the space and define two limits, e.g., MAX_CLIENT_CONNECTION_IDS and MAX_TARGET_CONNECTION_IDS.",
+      "createdAt": "2025-11-08T15:57:29Z",
+      "updatedAt": "2025-11-08T15:57:29Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 159,
+      "id": "I_kwDOEHrEP87WzDIq",
+      "title": "Provide advice on how many CIDs a proxy should retain",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/159",
+      "state": "OPEN",
+      "author": "kazuho",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "The draft is currently light on guidance for how many CIDs a proxy ought to accept and retain; the only implicit advice is the initial maximum of 2 (i.e., two registrations across the shared sequence space). Some operational guidance on a desirable minimum would help align implementations.\n\nI might recommend that a proxy retain at least 2 client CIDs (active + standby for migration; see #158) and 1 target CID. Put differently: if the client/target registration space remains shared, advise a minimum MAX_CONNECTION_IDS that allows at least 3 registrations rather than 2, and adjust the default accordingly.",
+      "createdAt": "2025-11-08T16:04:45Z",
+      "updatedAt": "2025-11-08T16:04:45Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 160,
+      "id": "I_kwDOEHrEP87WzGXD",
+      "title": "Short client CIDs can induce loops",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/160",
+      "state": "OPEN",
+      "author": "kazuho",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "[Section 5.8](https://ietf-wg-masque.github.io/draft-ietf-masque-quic-proxy/draft-ietf-masque-quic-proxy.html#section-5.8) states that \u201ca proxy MAY choose to reject all registrations for very short Connection IDs as conflicts, in anticipation of future conflicts.\u201d The draft also says in [section 5.10](https://ietf-wg-masque.github.io/draft-ietf-masque-quic-proxy/draft-ietf-masque-quic-proxy.html#section-5.10-10) that, in order to permit the client to change client-to-target connection IDs, the proxy SHOULD send MAX_CONNECTION_IDS capsules allowing additional registrations.\n\nAn impatient proxy implementation might combine these two clauses and unconditionally reject client CIDs shorter than some threshold (e.g., <9 bytes) while immediately sending MAX_CONNECTION_IDS, effectively inviting the client to retry. Likewise, a client might keep retrying with a merely \u201clong enough\u201d CID (e.g., 8 bytes) before giving up. The net effect is a loop.\n\nIt could make sense to clarify that proxies SHOULD NOT send a MAX_CONNECTION_IDS capsule solely in response to rejecting a CID registration (e.g., via CLOSE_CLIENT_CID) for being too short. This avoids creating retry loops when the proxy\u2019s policy intends a permanent rejection.",
+      "createdAt": "2025-11-08T16:17:30Z",
+      "updatedAt": "2025-11-08T16:17:30Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 162,
+      "id": "I_kwDOEHrEP87WzNyL",
+      "title": "Can a proxy retract CID registration space by advertising a smaller maximum with MAX_CONNECTION_IDS?",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/162",
+      "state": "OPEN",
+      "author": "kazuho",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "The draft does not state whether a proxy may send a MAX_CONNECTION_IDS capsule carrying a maximum smaller than previously advertised, which creates confusion about whether proxies can retract registration space once advertised.\n\nIt might make sense to explicitly prohibit sending smaller values.",
+      "createdAt": "2025-11-08T16:53:50Z",
+      "updatedAt": "2025-11-08T16:53:50Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 163,
+      "id": "I_kwDOEHrEP87WzPDK",
+      "title": "Use of CIDs to identify registration entries",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/163",
+      "state": "OPEN",
+      "author": "kazuho",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "Today, ACK_* and CLOSE_* capsules identify entries by Connection ID. This is a bit surprising because entries themselves are assumed to have \"sequence numbers\" assigned.\n\nThis is a matter of taste, but using the sequence number as the identifier (instead of the CID bytes) might simplify implementations (no need to echo long CIDs, avoids ambiguity if the same CID value is re-registered with a new sequence, and keeps identifiers uniform across capsule types).",
+      "createdAt": "2025-11-08T17:00:33Z",
+      "updatedAt": "2025-11-08T17:00:33Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 164,
+      "id": "I_kwDOEHrEP87WzSso",
+      "title": "Why is ACK_CLIENT_CID.VCID generated by the proxy?",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/issues/164",
+      "state": "OPEN",
+      "author": "kazuho",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "Today, the VCID used in the proxy\u2192client direction is generated by the proxy, which requires three capsules to register a client CID: REGISTER_CLIENT_CID, ACK_CLIENT_CID, and ACK_CLIENT_VCID.\n\nWould it be simpler to let the client generate the VCID used in the proxy\u2192client direction? Then the true CID, the proposed VCID, and the SRT could be conveyed in REGISTER_CLIENT_CID; ACK_CLIENT_CID would be a simple ack and ACK_CLIENT_VCID would be unnecessary.\n\nThis would remove one capsule/round trip. The proxy could still reject proposed VCIDs that violate policy (e.g., too short, prefix conflicts) just as it does for CIDs today.",
+      "createdAt": "2025-11-08T17:17:06Z",
+      "updatedAt": "2025-11-08T17:17:06Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
@@ -12756,6 +12868,74 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 156,
+      "id": "PR_kwDOEHrEP86yJ4Bm",
+      "title": "Change category to proposed standard",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/156",
+      "state": "OPEN",
+      "author": "tfpauly",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "tfpauly"
+      ],
+      "labels": [],
+      "body": "Discussed at IETF 124",
+      "createdAt": "2025-11-07T14:47:25Z",
+      "updatedAt": "2025-11-07T14:47:41Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "0b58c0109fc00192049fbf8336e23dd72a1e91ed",
+      "headRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "headRefName": "tfpauly-patch-15",
+      "headRefOid": "e95c7b71880759d76a15e73cc52db52a770f48f7",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP87MtUXE",
+          "commit": {
+            "abbreviatedOid": "e95c7b7"
+          },
+          "author": "ehaydenr",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-11-07T14:47:41Z",
+          "updatedAt": "2025-11-07T14:47:41Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 161,
+      "id": "PR_kwDOEHrEP86yT9S0",
+      "title": "Fix the name used in the figure",
+      "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/161",
+      "state": "OPEN",
+      "author": "kazuho",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "The capsule is called \"REGISTER_CLIENT_CID\" but the figure calls it \"register CID\" capsule. This pull request fixes the discord.",
+      "createdAt": "2025-11-08T16:21:47Z",
+      "updatedAt": "2025-11-08T16:21:48Z",
+      "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
+      "baseRefName": "main",
+      "baseRefOid": "0b58c0109fc00192049fbf8336e23dd72a1e91ed",
+      "headRepository": "kazuho/draft-ietf-masque-quic-proxy",
+      "headRefName": "patch-1",
+      "headRefOid": "c03df4222319d97bf4c430bd731a2c259ccb05ce",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
