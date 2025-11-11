@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-11-09T00:43:42.345156+00:00",
+  "timestamp": "2025-11-11T00:42:18.171646+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -12923,7 +12923,7 @@
       "labels": [],
       "body": "The capsule is called \"REGISTER_CLIENT_CID\" but the figure calls it \"register CID\" capsule. This pull request fixes the discord.",
       "createdAt": "2025-11-08T16:21:47Z",
-      "updatedAt": "2025-11-08T16:21:48Z",
+      "updatedAt": "2025-11-10T23:33:31Z",
       "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
       "baseRefName": "main",
       "baseRefOid": "0b58c0109fc00192049fbf8336e23dd72a1e91ed",
@@ -12935,7 +12935,21 @@
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOEHrEP87NX9Jf",
+          "commit": {
+            "abbreviatedOid": "c03df42"
+          },
+          "author": "tfpauly",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-11-10T23:33:31Z",
+          "updatedAt": "2025-11-10T23:33:31Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
