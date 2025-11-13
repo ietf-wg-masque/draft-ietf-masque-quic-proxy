@@ -589,13 +589,13 @@ connection ID that is the client-provided connection ID on the client-to-target 
 connection.
 
 ~~~
-Register CID Capsule {
+Register Client CID Capsule {
   Type (i) = see {{iana}} for the value of the capsule type
   Length (i),
   Connection ID (0..2040),
 }
 ~~~
-{: #fig-capsule-register-client-cid title="Register CID Capsule Format"}
+{: #fig-capsule-register-client-cid title="Register Client CID Capsule Format"}
 
 Connection ID:
 : A connection ID being registered, which is between 0 and 255 bytes in
