@@ -5,9 +5,9 @@
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
 Intended status: Experimental                                 Apple Inc.
-Expires: 21 February 2026                                    D. Schinazi
+Expires: 17 May 2026                                         D. Schinazi
                                                               Google LLC
-                                                          20 August 2025
+                                                        13 November 2025
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 21 February 2026.
+   This Internet-Draft will expire on 17 May 2026.
 
 Copyright Notice
 
@@ -685,13 +685,13 @@ Table of Contents
    single connection ID that is the client-provided connection ID on the
    client-to-target QUIC connection.
 
-   Register CID Capsule {
+   Register Client CID Capsule {
      Type (i) = see {{iana}} for the value of the capsule type
      Length (i),
      Connection ID (0..2040),
    }
 
-                   Figure 4: Register CID Capsule Format
+                Figure 4: Register Client CID Capsule Format
 
    Connection ID:  A connection ID being registered, which is between 0
       and 255 bytes in length.  The length of the connection ID is
@@ -1912,9 +1912,9 @@ Table of Contents
 
    [QUIC-LB]  Duke, M., Banks, N., and C. Huitema, "QUIC-LB: Generating
               Routable QUIC Connection IDs", Work in Progress, Internet-
-              Draft, draft-ietf-quic-load-balancers-20, 3 March 2025,
+              Draft, draft-ietf-quic-load-balancers-21, 27 August 2025,
               <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
-              load-balancers-20>.
+              load-balancers-21>.
 
    [RFC8999]  Thomson, M., "Version-Independent Properties of QUIC",
               RFC 8999, DOI 10.17487/RFC8999, May 2021,

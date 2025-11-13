@@ -15,7 +15,7 @@ proxied connections, and adds a mode of proxying in which QUIC short header pack
 can be forwarded and transformed through a HTTP/3 proxy rather than being fully
 re-encapsulated and re-encrypted. 
     " name="description">
-<meta content="xml2rfc 3.30.0" name="generator">
+<meta content="xml2rfc 3.31.0" name="generator">
 <meta content="quic" name="keyword">
 <meta content="http" name="keyword">
 <meta content="datagram" name="keyword">
@@ -28,19 +28,18 @@ re-encapsulated and re-encrypted.
 <meta content="http-ng" name="keyword">
 <meta content="draft-ietf-masque-quic-proxy-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.30.0
-    Python 3.12.11
+  xml2rfc 3.31.0
+    Python 3.12.12
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
     intervaltree 3.1.0
     Jinja2 3.1.6
     lxml 5.3.1
-    platformdirs 4.3.8
+    platformdirs 4.5.0
     pycountry 24.6.1
     PyYAML 6.0.2
-    requests 2.32.4
-    setuptools 80.9.0
-    wcwidth 0.2.13
+    requests 2.32.5
+    wcwidth 0.2.14
 -->
 <link href="draft-ietf-masque-quic-proxy.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1059,11 +1058,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">QUIC Proxy</td>
-<td class="right">August 2025</td>
+<td class="right">November 2025</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Pauly, et al.</td>
-<td class="center">Expires 21 February 2026</td>
+<td class="center">Expires 17 May 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1076,12 +1075,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-masque-quic-proxy-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-08-20" class="published">20 August 2025</time>
+<time datetime="2025-11-13" class="published">13 November 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Experimental</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-02-21">21 February 2026</time></dd>
+<dd class="expires"><time datetime="2026-05-17">17 May 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1143,7 +1142,7 @@ re-encapsulated and re-encrypted.<a href="#section-abstract-1" class="pilcrow">�
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 21 February 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 17 May 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -2031,11 +2030,11 @@ delays.<a href="#section-5-9" class="pilcrow">¶</a></p>
 <p id="section-5.1-1">The REGISTER_CLIENT_CID capsule is sent by the client and contains a single
 connection ID that is the client-provided connection ID on the client-to-target QUIC
 connection.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
-<span id="name-register-cid-capsule-format"></span><div id="fig-capsule-register-client-cid">
+<span id="name-register-client-cid-capsule"></span><div id="fig-capsule-register-client-cid">
 <figure id="figure-4">
           <div class="alignLeft art-text artwork" id="section-5.1-2.1">
 <pre>
-Register CID Capsule {
+Register Client CID Capsule {
   Type (i) = see {{iana}} for the value of the capsule type
   Length (i),
   Connection ID (0..2040),
@@ -2043,7 +2042,7 @@ Register CID Capsule {
 </pre>
 </div>
 <figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
-<a href="#name-register-cid-capsule-format" class="selfRef">Register CID Capsule Format</a>
+<a href="#name-register-client-cid-capsule" class="selfRef">Register Client CID Capsule Format</a>
           </figcaption></figure>
 </div>
 <span class="break"></span><dl class="dlParallel" id="section-5.1-3">
@@ -3491,7 +3490,7 @@ will be replaced with lower values before publication.<a href="#section-11.4-1" 
 <dd class="break"></dd>
 <dt id="QUIC-LB">[QUIC-LB]</dt>
         <dd>
-<span class="refAuthor">Duke, M.</span>, <span class="refAuthor">Banks, N.</span>, and <span class="refAuthor">C. Huitema</span>, <span class="refTitle">"QUIC-LB: Generating Routable QUIC Connection IDs"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-load-balancers-20</span>, <time datetime="2025-03-03" class="refDate">3 March 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-load-balancers-20">https://datatracker.ietf.org/doc/html/draft-ietf-quic-load-balancers-20</a>&gt;</span>. </dd>
+<span class="refAuthor">Duke, M.</span>, <span class="refAuthor">Banks, N.</span>, and <span class="refAuthor">C. Huitema</span>, <span class="refTitle">"QUIC-LB: Generating Routable QUIC Connection IDs"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-load-balancers-21</span>, <time datetime="2025-08-27" class="refDate">27 August 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-load-balancers-21">https://datatracker.ietf.org/doc/html/draft-ietf-quic-load-balancers-21</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8999">[RFC8999]</dt>
         <dd>
