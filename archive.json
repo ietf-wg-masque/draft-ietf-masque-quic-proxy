@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-11-11T00:42:18.171646+00:00",
+  "timestamp": "2025-11-16T00:44:48.958182+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -12916,24 +12916,26 @@
       "id": "PR_kwDOEHrEP86yT9S0",
       "title": "Fix the name used in the figure",
       "url": "https://github.com/ietf-wg-masque/draft-ietf-masque-quic-proxy/pull/161",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "kazuho",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "The capsule is called \"REGISTER_CLIENT_CID\" but the figure calls it \"register CID\" capsule. This pull request fixes the discord.",
       "createdAt": "2025-11-08T16:21:47Z",
-      "updatedAt": "2025-11-10T23:33:31Z",
+      "updatedAt": "2025-11-13T19:47:48Z",
       "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
       "baseRefName": "main",
       "baseRefOid": "0b58c0109fc00192049fbf8336e23dd72a1e91ed",
       "headRepository": "kazuho/draft-ietf-masque-quic-proxy",
       "headRefName": "patch-1",
       "headRefOid": "c03df4222319d97bf4c430bd731a2c259ccb05ce",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2025-11-13T19:47:48Z",
+      "mergedAt": "2025-11-13T19:47:48Z",
+      "mergedBy": "tfpauly",
+      "mergeCommit": {
+        "oid": "118439c91abaa297a8e39a4b4ac8f56b1a053e11"
+      },
       "comments": [],
       "reviews": [
         {
@@ -12947,6 +12949,19 @@
           "body": "",
           "createdAt": "2025-11-10T23:33:31Z",
           "updatedAt": "2025-11-10T23:33:31Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOEHrEP87OTJ3n",
+          "commit": {
+            "abbreviatedOid": "c03df42"
+          },
+          "author": "ehaydenr",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-11-13T18:31:37Z",
+          "updatedAt": "2025-11-13T18:31:37Z",
           "comments": []
         }
       ]
