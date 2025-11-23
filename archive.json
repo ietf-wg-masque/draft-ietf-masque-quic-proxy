@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-11-16T00:44:48.958182+00:00",
+  "timestamp": "2025-11-23T00:48:11.760247+00:00",
   "repo": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
   "labels": [
     {
@@ -12883,7 +12883,7 @@
       "labels": [],
       "body": "Discussed at IETF 124",
       "createdAt": "2025-11-07T14:47:25Z",
-      "updatedAt": "2025-11-07T14:47:41Z",
+      "updatedAt": "2025-11-20T02:09:05Z",
       "baseRepository": "ietf-wg-masque/draft-ietf-masque-quic-proxy",
       "baseRefName": "main",
       "baseRefOid": "0b58c0109fc00192049fbf8336e23dd72a1e91ed",
@@ -12907,6 +12907,19 @@
           "body": "",
           "createdAt": "2025-11-07T14:47:41Z",
           "updatedAt": "2025-11-07T14:47:41Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOEHrEP87PvvtL",
+          "commit": {
+            "abbreviatedOid": "e95c7b7"
+          },
+          "author": "DavidSchinazi",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2025-11-20T02:09:05Z",
+          "updatedAt": "2025-11-20T02:09:05Z",
           "comments": []
         }
       ]
