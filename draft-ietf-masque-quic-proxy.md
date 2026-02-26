@@ -552,12 +552,13 @@ either rejecting the proxy-chosen client VCID or no longer
 needs the connection ID registered.
 
 The MAX_CONNECTION_IDS capsule type {{capsule-max-cids}} MUST only be sent by the
-proxy. It indicates to the client the maximum permitted sequence number for
+proxy. It indicates to the client the maximum number of permitted sequence numbers for
 connection ID registrations. This allows the proxy to limit the number of active
-registrations. The initial maximum is 1, allowing the client to send 2 registrations,
-one with sequence number 0 and another with sequence number 1. A proxy MUST NOT
-send a MAX_CONNECTION_IDS capsule with a value less than 1. Clients receiving a
-MAX_CONNECTION_IDS capsule with a value less than 1 MUST reset the stream with
+registrations. The initial maximum is 2, allowing the client to send 2 registrations,
+one with sequence number 0 and another with sequence number 1. MAX_CONNECTION_IDS are
+only sent to increase the limit, so since the initial limit is 2, a proxy MUST NOT
+send a MAX_CONNECTION_IDS capsule with a value less than 3. Clients receiving a
+MAX_CONNECTION_IDS capsule with a value less than 3 MUST reset the stream with
 H3_DATAGRAM_ERROR error code.
 
 When port sharing {{port-sharing-header}} is supported, the client MUST register
@@ -797,21 +798,30 @@ to 20 bytes, but QUIC invariants allow up to 255 bytes.
 
 ## MAX_CONNECTION_IDS {#capsule-max-cids}
 
-The MAX_CONNECTION_IDS capsule is sent by the proxy
-to permit additional connection ID registrations.
+The MAX_CONNECTION_IDS capsule is sent by the proxy to the client
+to define the cumulative number of connection ID registrations
+the client is allowed to request.
 
 ~~~
 Maximum Connection IDs Capsule {
   Type (i) = see {{iana}} for the value of the capsule type
   Length (i)
-  Maximum Sequence Number (i)
+  Maximum Connection IDs (i)
 }
 ~~~
 {: #fig-capsule-max-connection-ids title="Maximum Connection IDs Capsule Format"}
 
-Maximum Sequence Number
-: The maximum permitted sequence number for connection ID registrations. This MUST
-NOT be less than 1.
+Maximum Connection IDs
+: A count of the cumulative number of connection ID registrations the the client
+is allowed to request. For example, if the value is 4, the maximum allowed sequence
+number for a connection ID registration would be 3.
+
+The value advertised in the capsule MUST NOT be smaller than any value previously
+sent in a MAX_CONNECTION_IDS capsule, and MUST not be smaller than the initial
+allowed limit of 2. Thus, the value sent in the capsule MUST NOT be less than 3.
+
+Clients receiving a MAX_CONNECTION_IDS capsule with an invalid value
+MUST reset the stream with H3_DATAGRAM_ERROR error code.
 
 ## Detecting Conflicts {#conflicts}
 
