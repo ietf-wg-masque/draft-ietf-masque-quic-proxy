@@ -5,9 +5,9 @@
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
 Intended status: Experimental                                 Apple Inc.
-Expires: 30 August 2026                                      D. Schinazi
+Expires: 31 August 2026                                      D. Schinazi
                                                               Google LLC
-                                                        26 February 2026
+                                                        27 February 2026
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 30 August 2026.
+   This Internet-Draft will expire on 31 August 2026.
 
 Copyright Notice
 
@@ -645,8 +645,8 @@ Table of Contents
    chosen client VCID or no longer needs the connection ID registered.
 
    The MAX_CONNECTION_IDS capsule type Section 5.7 MUST only be sent by
-   the proxy.  It indicates to the client the maximum number of
-   permitted sequence numbers for connection ID registrations.  This
+   the proxy.  It indicates to the client the cumulative number of
+   connection ID registrations the client is allowed to request.  This
    allows the proxy to limit the number of active registrations.  The
    initial maximum is 2, allowing the client to send 2 registrations,
    one with sequence number 0 and another with sequence number 1.
@@ -906,9 +906,9 @@ Table of Contents
               Figure 10: Maximum Connection IDs Capsule Format
 
    Maximum Connection IDs  A count of the cumulative number of
-      connection ID registrations the the client is allowed to request.
-      For example, if the value is 4, the maximum allowed sequence
-      number for a connection ID registration would be 3.
+      connection ID registrations the client is allowed to request.  For
+      example, if the value is 4, the maximum allowed sequence number
+      for a connection ID registration would be 3.
 
    The value advertised in the capsule MUST NOT be smaller than any
    value previously sent in a MAX_CONNECTION_IDS capsule, and MUST not
