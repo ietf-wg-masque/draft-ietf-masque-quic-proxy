@@ -552,8 +552,7 @@ either rejecting the proxy-chosen client VCID or no longer
 needs the connection ID registered.
 
 The MAX_CONNECTION_IDS capsule type {{capsule-max-cids}} MUST only be sent by the
-proxy. It indicates to the client the maximum number of permitted sequence numbers for
-connection ID registrations. This allows the proxy to limit the number of active
+proxy. It indicates to the client the cumulative number of connection ID registrations the client is allowed to request. This allows the proxy to limit the number of active
 registrations. The initial maximum is 2, allowing the client to send 2 registrations,
 one with sequence number 0 and another with sequence number 1. MAX_CONNECTION_IDS are
 only sent to increase the limit, so since the initial limit is 2, a proxy MUST NOT
@@ -812,7 +811,7 @@ Maximum Connection IDs Capsule {
 {: #fig-capsule-max-connection-ids title="Maximum Connection IDs Capsule Format"}
 
 Maximum Connection IDs
-: A count of the cumulative number of connection ID registrations the the client
+: A count of the cumulative number of connection ID registrations the client
 is allowed to request. For example, if the value is 4, the maximum allowed sequence
 number for a connection ID registration would be 3.
 
