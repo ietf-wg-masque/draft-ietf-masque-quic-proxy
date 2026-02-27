@@ -555,7 +555,7 @@ The MAX_CONNECTION_IDS capsule type {{capsule-max-cids}} MUST only be sent by th
 proxy. It indicates to the client the cumulative number of connection ID registrations the client is allowed to request. This allows the proxy to limit the number of active
 registrations. The initial maximum is 2, allowing the client to send 2 registrations,
 one with sequence number 0 and another with sequence number 1. MAX_CONNECTION_IDS are
-only sent to increase the limit, so since the initial limit is 2, a proxy MUST NOT
+only sent to increase the limit. Since the initial limit is 2, a proxy MUST NOT
 send a MAX_CONNECTION_IDS capsule with a value less than 3. Clients receiving a
 MAX_CONNECTION_IDS capsule with a value less than 3 MUST reset the stream with
 H3_DATAGRAM_ERROR error code.
