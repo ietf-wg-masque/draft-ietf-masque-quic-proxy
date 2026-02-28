@@ -817,7 +817,7 @@ number for a connection ID registration would be 3.
 
 The value advertised in the capsule MUST be greater than any value previously
 sent in a MAX_CONNECTION_IDS capsule, and MUST be greater than the initial
-allowed limit of 2. Thus, any value sent in the capsule MUST at least 3.
+allowed limit of 2. Thus, any value sent in the capsule MUST be at least 3.
 
 Clients receiving a MAX_CONNECTION_IDS capsule with an invalid value
 MUST reset the stream with H3_DATAGRAM_ERROR error code.
