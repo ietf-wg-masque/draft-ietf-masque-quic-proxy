@@ -32,14 +32,14 @@ re-encapsulated and re-encrypted.
     Python 3.12.12
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
-    intervaltree 3.1.0
+    intervaltree 3.2.1
     Jinja2 3.1.6
-    lxml 5.3.1
-    platformdirs 4.5.0
+    lxml 6.0.2
+    platformdirs 4.5.1
     pycountry 24.6.1
-    PyYAML 6.0.2
+    PyYAML 6.0.3
     requests 2.32.5
-    wcwidth 0.2.14
+    wcwidth 0.3.0
 -->
 <link href="draft-ietf-masque-quic-proxy.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -180,7 +180,7 @@ re-encapsulated and re-encrypted.
   font-weight: 400;
   font-display: swap;
   src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
-  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 @font-face {
   font-family: 'Oxygen Mono';
@@ -188,7 +188,8 @@ re-encapsulated and re-encrypted.
   font-weight: 400;
   font-display: swap;
   src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 }
 
 @font-face {
@@ -580,6 +581,7 @@ aside, blockquote {
 }
 blockquote {
   margin: 1em 0;
+  border-left: 2px var(--pilcrow-strong) solid;
 }
 cite {
   display: block;
@@ -650,7 +652,7 @@ a.pilcrow {
   }
 }
 @media not print {
-  :hover > a.pilcrow {
+  :hover > a.pilcrow, a.pilcrow:focus {
     opacity: 1;
   }
   a.pilcrow[href]:hover {
@@ -1058,11 +1060,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">QUIC Proxy</td>
-<td class="right">November 2025</td>
+<td class="right">February 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Pauly, et al.</td>
-<td class="center">Expires 17 May 2026</td>
+<td class="center">Expires 1 September 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1075,12 +1077,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-masque-quic-proxy-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-11-13" class="published">13 November 2025</time>
+<time datetime="2026-02-28" class="published">28 February 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Experimental</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-05-17">17 May 2026</time></dd>
+<dd class="expires"><time datetime="2026-09-01">1 September 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1142,7 +1144,7 @@ re-encapsulated and re-encrypted.<a href="#section-abstract-1" class="pilcrow">�
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 17 May 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 1 September 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1151,7 +1153,7 @@ re-encapsulated and re-encrypted.<a href="#section-abstract-1" class="pilcrow">�
 <a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
         </h2>
 <p id="section-boilerplate.2-1">
-            Copyright (c) 2025 IETF Trust and the persons identified as the
+            Copyright (c) 2026 IETF Trust and the persons identified as the
             document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.2-2">
             This document is subject to BCP 78 and the IETF Trust's Legal
@@ -1995,12 +1997,12 @@ CLOSE_CLIENT_CID without having sent an ACK_CLIENT_VCID capsule, the client is
 either rejecting the proxy-chosen client VCID or no longer
 needs the connection ID registered.<a href="#section-5-6" class="pilcrow">¶</a></p>
 <p id="section-5-7">The MAX_CONNECTION_IDS capsule type <a href="#capsule-max-cids" class="auto internal xref">Section 5.7</a> MUST only be sent by the
-proxy. It indicates to the client the maximum permitted sequence number for
-connection ID registrations. This allows the proxy to limit the number of active
-registrations. The initial maximum is 1, allowing the client to send 2 registrations,
-one with sequence number 0 and another with sequence number 1. A proxy MUST NOT
-send a MAX_CONNECTION_IDS capsule with a value less than 1. Clients receiving a
-MAX_CONNECTION_IDS capsule with a value less than 1 MUST reset the stream with
+proxy. It indicates to the client the cumulative number of connection ID registrations the client is allowed to request. This allows the proxy to limit the number of active
+registrations. The initial maximum is 2, allowing the client to send 2 registrations,
+one with sequence number 0 and another with sequence number 1. MAX_CONNECTION_IDS are
+only sent to increase the limit. Since the initial limit is 2, a proxy MUST NOT
+send a MAX_CONNECTION_IDS capsule with a value less than 3. Clients receiving a
+MAX_CONNECTION_IDS capsule with a value less than 3 MUST reset the stream with
 H3_DATAGRAM_ERROR error code.<a href="#section-5-7" class="pilcrow">¶</a></p>
 <p id="section-5-8">When port sharing <a href="#port-sharing-header" class="auto internal xref">Section 4</a> is supported, the client MUST register
 and receive acknowledgements for client and target CIDs before using them. Packets with
@@ -2356,8 +2358,9 @@ to 20 bytes, but QUIC invariants allow up to 255 bytes.<a href="#section-5.6-3.2
         <h3 id="name-max_connection_ids">
 <a href="#section-5.7" class="section-number selfRef">5.7. </a><a href="#name-max_connection_ids" class="section-name selfRef">MAX_CONNECTION_IDS</a>
         </h3>
-<p id="section-5.7-1">The MAX_CONNECTION_IDS capsule is sent by the proxy
-to permit additional connection ID registrations.<a href="#section-5.7-1" class="pilcrow">¶</a></p>
+<p id="section-5.7-1">The MAX_CONNECTION_IDS capsule is sent by the proxy to the client
+to define the cumulative number of connection ID registrations
+the client is allowed to request.<a href="#section-5.7-1" class="pilcrow">¶</a></p>
 <span id="name-maximum-connection-ids-caps"></span><div id="fig-capsule-max-connection-ids">
 <figure id="figure-10">
           <div class="alignLeft art-text artwork" id="section-5.7-2.1">
@@ -2365,7 +2368,7 @@ to permit additional connection ID registrations.<a href="#section-5.7-1" class=
 Maximum Connection IDs Capsule {
   Type (i) = see {{iana}} for the value of the capsule type
   Length (i)
-  Maximum Sequence Number (i)
+  Maximum Connection IDs (i)
 }
 </pre>
 </div>
@@ -2374,13 +2377,19 @@ Maximum Connection IDs Capsule {
           </figcaption></figure>
 </div>
 <span class="break"></span><dl class="dlParallel" id="section-5.7-3">
-          <dt id="section-5.7-3.1">Maximum Sequence Number</dt>
+          <dt id="section-5.7-3.1">Maximum Connection IDs</dt>
           <dd style="margin-left: 1.5em" id="section-5.7-3.2">
-            <p id="section-5.7-3.2.1">The maximum permitted sequence number for connection ID registrations. This MUST
-NOT be less than 1.<a href="#section-5.7-3.2.1" class="pilcrow">¶</a></p>
+            <p id="section-5.7-3.2.1">A count of the cumulative number of connection ID registrations the client
+is allowed to request. For example, if the value is 4, the maximum allowed sequence
+number for a connection ID registration would be 3.<a href="#section-5.7-3.2.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
+<p id="section-5.7-4">The value advertised in the capsule MUST be greater than any value previously
+sent in a MAX_CONNECTION_IDS capsule, and MUST be greater than the initial
+allowed limit of 2. Thus, any value sent in the capsule MUST be at least 3.<a href="#section-5.7-4" class="pilcrow">¶</a></p>
+<p id="section-5.7-5">Clients receiving a MAX_CONNECTION_IDS capsule with an invalid value
+MUST reset the stream with H3_DATAGRAM_ERROR error code.<a href="#section-5.7-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="conflicts">
