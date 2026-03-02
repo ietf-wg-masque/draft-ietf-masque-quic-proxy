@@ -3306,7 +3306,7 @@ across proxies, using sufficiently long and random values, or by other means.<a 
 for parameter names to use with the "Proxy-QUIC-Forwarding" header field,
 in &lt;<span><a href="https://www.iana.org/assignments/masque/masque.xhtml">https://www.iana.org/assignments/masque/masque.xhtml</a></span>&gt;.
 Registrations in this registry are assigned using the
-Specification Required policy (Section 4.6 of [IANA-POLICY]).<a href="#section-11.2-1" class="pilcrow">¶</a></p>
+Specification Required policy (Section 4.6 of <span>[<a href="#IANA-POLICY" class="cite xref">IANA-POLICY</a>]</span>).<a href="#section-11.2-1" class="pilcrow">¶</a></p>
 <span id="name-initial-proxy-quic-forwardi"></span><div id="iana-parameter-names-table">
 <figure id="figure-12">
           <div class="alignLeft art-text artwork" id="section-11.2-2.1">
@@ -3341,7 +3341,7 @@ the <code>scramble</code> transform defined in this document should use the valu
 "scramble-dt". Once the design team proposal is adopted and a new draft is submitted,
 the wire identifier will become "scramble-XX" where XX is the draft number.
 Registrations in this registry are assigned using the
-Specification Required policy (Section 4.6 of [IANA-POLICY]).<a href="#section-11.3-1" class="pilcrow">¶</a></p>
+Specification Required policy (Section 4.6 of <span>[<a href="#IANA-POLICY" class="cite xref">IANA-POLICY</a>]</span>).<a href="#section-11.3-1" class="pilcrow">¶</a></p>
 <span id="name-initial-packet-transform-na"></span><div id="iana-packet-transforms-table">
 <table class="center" id="table-1">
           <caption>
@@ -3385,8 +3385,15 @@ Specification Required policy (Section 4.6 of [IANA-POLICY]).<a href="#section-1
 for reason codes used in REGISTER_CLIENT_CID, REGISTER_TARGET_CID,
 CLOSE_CLIENT_CID, and CLOSE_TARGET_CID capsules,
 in &lt;<span><a href="https://www.iana.org/assignments/masque/masque.xhtml">https://www.iana.org/assignments/masque/masque.xhtml</a></span>&gt;.
-Registrations in this registry are assigned using the
-Specification Required policy (Section 4.6 of [IANA-POLICY]).<a href="#section-11.4-1" class="pilcrow">¶</a></p>
+This registry governs a 62-bit space and operates under the QUIC
+registration policy documented in <span><a href="https://rfc-editor.org/rfc/rfc9000#section-22.1" class="relref">Section 22.1</a> of [<a href="#QUIC" class="cite xref">QUIC</a>]</span>. This new registry
+includes the common set of fields listed in <span><a href="https://rfc-editor.org/rfc/rfc9000#section-22.1.1" class="relref">Section 22.1.1</a> of [<a href="#QUIC" class="cite xref">QUIC</a>]</span>. In
+addition to those common fields, all registrations in this registry MUST include
+a "Name" field that contains a short name or label for the Reason.<a href="#section-11.4-1" class="pilcrow">¶</a></p>
+<p id="section-11.4-2">Permanent registrations in this registry are assigned using the Specification
+Required policy (<span><a href="https://rfc-editor.org/rfc/rfc8126#section-4.6" class="relref">Section 4.6</a> of [<a href="#IANA-POLICY" class="cite xref">IANA-POLICY</a>]</span>), except for values
+between 0x00 and 0x3f (in hexadecimal; inclusive), which are assigned using
+Standards Action or IESG Approval as defined in Sections <a href="https://rfc-editor.org/rfc/rfc8126#section-4.9" class="relref">4.9</a> and <a href="https://rfc-editor.org/rfc/rfc8126#section-4.10" class="relref">4.10</a> of <span>[<a href="#IANA-POLICY" class="cite xref">IANA-POLICY</a>]</span>.<a href="#section-11.4-2" class="pilcrow">¶</a></p>
 <span id="name-initial-cid-capsule-reason-"></span><div id="iana-cid-reasons-table">
 <table class="center" id="table-2">
           <caption>
@@ -3548,6 +3555,10 @@ will be replaced with lower values before publication.<a href="#section-11.5-1" 
 <dt id="HTTP3">[HTTP3]</dt>
         <dd>
 <span class="refAuthor">Bishop, M., Ed.</span>, <span class="refTitle">"HTTP/3"</span>, <span class="seriesInfo">RFC 9114</span>, <span class="seriesInfo">DOI 10.17487/RFC9114</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9114">https://www.rfc-editor.org/rfc/rfc9114</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="IANA-POLICY">[IANA-POLICY]</dt>
+        <dd>
+<span class="refAuthor">Cotton, M.</span>, <span class="refAuthor">Leiba, B.</span>, and <span class="refAuthor">T. Narten</span>, <span class="refTitle">"Guidelines for Writing an IANA Considerations Section in RFCs"</span>, <span class="seriesInfo">BCP 26</span>, <span class="seriesInfo">RFC 8126</span>, <span class="seriesInfo">DOI 10.17487/RFC8126</span>, <time datetime="2017-06" class="refDate">June 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8126">https://www.rfc-editor.org/rfc/rfc8126</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="INVARIANTS">[INVARIANTS]</dt>
         <dd>
