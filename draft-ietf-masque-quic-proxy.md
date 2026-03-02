@@ -1693,8 +1693,17 @@ This document establishes a new registry, "CID Capsule Reason Codes",
 for reason codes used in REGISTER_CLIENT_CID, REGISTER_TARGET_CID,
 CLOSE_CLIENT_CID, and CLOSE_TARGET_CID capsules,
 in <[](https://www.iana.org/assignments/masque/masque.xhtml)>.
-Registrations in this registry are assigned using the
-Specification Required policy (Section 4.6 of [IANA-POLICY]).
+This registry governs a 62-bit space and operates under the QUIC
+registration policy documented in {{Section 22.1 of QUIC}}. This new registry
+includes the common set of fields listed in {{Section 22.1.1 of QUIC}}. In
+addition to those common fields, all registrations in this registry MUST include
+a "Name" field that contains a short name or label for the Reason.
+
+Permanent registrations in this registry are assigned using the Specification
+Required policy ({{Section 4.6 of !IANA-POLICY=RFC8126}}), except for values
+between 0x00 and 0x3f (in hexadecimal; inclusive), which are assigned using
+Standards Action or IESG Approval as defined in {{Sections 4.9 and 4.10 of
+IANA-POLICY}}.
 
 | Value | Name       | Description                                      | Specification |
 |:------|:-----------|:-------------------------------------------------|:--------------|
