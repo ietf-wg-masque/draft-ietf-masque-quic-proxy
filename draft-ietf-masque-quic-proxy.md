@@ -520,9 +520,10 @@ The REGISTER_CLIENT_CID ({{capsule-reg-client}}) and REGISTER_TARGET_CID
 the proxy about a new client CID or a new target CID,
 respectively. These capsule types MUST only be sent by a client. These capsule
 types share a sequence number space which allows the proxy to limit the
-number of active registrations. The first registration (of either client CID or target CID)
+number of registrations. The first registration (of either client CID or target CID)
 has sequence number 0, and subsequent registrations increment the sequence number
-by 1.
+by 1. Every registration capsule consumes a sequence number, including registrations
+that are rejected and re-registrations of a previously registered connection ID.
 
 The ACK_CLIENT_CID ({{capsule-ack-client}}) and ACK_TARGET_CID
 ({{capsule-ack-target}}) capsule types are sent by the proxy to the client
@@ -542,14 +543,21 @@ may respond with when receiving forwarded mode packets with the specified
 virtual connection ID.
 
 The CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsule types ({{capsule-close}})
-allow either a client or a proxy to remove a mapping for a connection ID.
-These capsule types MAY be sent by either a client or the proxy. If a proxy sends a
-CLOSE_CLIENT_CID without having sent an ACK_CLIENT_CID, or if a proxy
-sends a CLOSE_TARGET_CID without having sent an ACK_TARGET_CID,
-it is rejecting a Connection ID registration. Similarly, if a client sends
-CLOSE_CLIENT_CID without having sent an ACK_CLIENT_VCID capsule, the client is
-either rejecting the proxy-chosen client VCID or no longer
-needs the connection ID registered.
+are used to close or reject connection ID registrations. Each capsule includes
+a reason code indicating why the connection ID is being closed.
+
+Clients send CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsules to retire connection
+IDs they no longer need, using the RETIRED reason code. A client may also send
+CLOSE_CLIENT_CID without having sent an ACK_CLIENT_VCID capsule to reject the
+proxy-chosen client VCID.
+
+Proxies send CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsules only to reject
+registrations. If a proxy sends CLOSE_CLIENT_CID without having sent an
+ACK_CLIENT_CID, or if a proxy sends CLOSE_TARGET_CID without having sent an
+ACK_TARGET_CID, it is rejecting a Connection ID registration. A proxy MUST NOT
+send a CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsule for a connection ID that it
+has already acknowledged. If a client receives such a capsule, it MUST reset the
+stream with H3_DATAGRAM_ERROR error code.
 
 The MAX_CONNECTION_IDS capsule type {{capsule-max-cids}} MUST only be sent by the
 proxy. It indicates to the client the cumulative number of connection ID registrations the client is allowed to request. This allows the proxy to limit the number of active
@@ -777,17 +785,23 @@ in response to target-to-client forwarded mode packets.
 
 ## CLOSE_CLIENT_CID and CLOSE_TARGET_CID {#capsule-close}
 
-CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsule types include a single connection ID to close. They
-can be sent by either clients or proxies.
+CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsule types include a reason code
+and a connection ID. Clients send these capsules to retire connection IDs they
+no longer need. Proxies send these capsules to reject connection ID registrations.
 
 ~~~
 Close CID Capsule {
   Type (i) = see {{iana}} for the values of the capsule types
   Length (i),
+  Reason (i),
   Connection ID (0..2040),
 }
 ~~~
 {: #fig-capsule-close-cid title="Close CID Capsule Format"}
+
+Reason:
+: The reason for closing or rejecting the connection ID registration.
+See {{iana-close-reasons}} for the list of reason codes.
 
 Connection ID:
 : A connection ID being closed, which is between 0 and 255 bytes in
@@ -827,7 +841,7 @@ MUST reset the stream with H3_DATAGRAM_ERROR error code.
 In order to be able to route packets correctly in both tunnelled and forwarded
 mode, proxies check for conflicts before creating a new CID mapping. If a conflict
 is detected, the proxy will reject the client's registration using a CLOSE_CLIENT_CID
-or CLOSE_TARGET_CID capsule.
+or CLOSE_TARGET_CID capsule with the CONFLICT reason code.
 
 Two 4-tuples conflict if and only if all members of the 4-tuple (local IP
 address, local UDP port, remote IP address, and remote UDP port) are identical.
@@ -844,9 +858,8 @@ The proxy treats two mappings as being in conflict when a conflict is detected
 for all elements on the left side of the mapping diagrams above.
 
 Since very short Connection IDs are more likely to lead to conflicts,
-particularly zero-length Connection IDs, a proxy MAY choose to reject all
-registrations for very short Connection IDs as conflicts, in anticipation of future
-conflicts.
+particularly zero-length Connection IDs, a proxy MAY choose to reject
+registrations for very short Connection IDs using the TOO_SHORT reason code.
 
 ## Client Considerations
 
@@ -854,7 +867,8 @@ The client sends a REGISTER_CLIENT_CID capsule before it advertises a new
 client CID to the target, and a REGISTER_TARGET_CID capsule when
 it has received a new target CID for the target. In order to change
 the connection ID bytes on the wire, a client can solicit new virtual connection
-IDs by re-registering the same connection IDs. The client may solicit a new
+IDs by re-registering the same connection IDs. Note that re-registrations
+consume sequence numbers like any other registration. The client may solicit a new
 target VCID by sending a REGISTER_TARGET_CID capsule with a
 previously registered target CID. Similarly, the client may solicit a
 new client VCID by sending a REGISTER_CLIENT_CID with a
@@ -903,17 +917,19 @@ Since clients are always aware whether or not they are using a QUIC proxy,
 clients are expected to cooperate with proxies in selecting client CIDs.
 A proxy detects a conflict when it is not able to create a unique mapping
 using the client CID ({{conflicts}}). It can reject registrations that
-would cause a conflict and indicate this to the client by replying with a
-CLOSE_CLIENT_CID capsule. In order to avoid conflicts, clients SHOULD select
-client CIDs of at least 8 bytes in length with unpredictable values.
+would cause a conflict by replying with a CLOSE_CLIENT_CID capsule with the
+CONFLICT reason code. Proxies may also reject registrations for short CIDs
+using the TOO_SHORT reason code. In order to avoid rejections, clients SHOULD
+select client CIDs of at least 8 bytes in length with unpredictable values.
 A client also SHOULD NOT select a client CID that matches the ID used
 for the QUIC connection to the proxy, as this inherently creates a conflict.
 
-If the rejection indicated a conflict due to the client CID, the
-client MUST select a new Connection ID before sending a new request, and
-generate a new packet. For example, if a client is sending a QUIC Initial
-packet and chooses a Connection ID that conflicts with an existing mapping
-to the same target server, it will need to generate a new QUIC Initial.
+If the rejection reason was CONFLICT, the client MUST select a new Connection ID
+before sending a new registration request, and generate a new packet. For example,
+if a client is sending a QUIC Initial packet and chooses a Connection ID that
+conflicts with an existing mapping to the same target server, it will need to
+generate a new QUIC Initial. If the rejection reason was TOO_SHORT, the client
+MUST select a longer Connection ID before retrying.
 
 ### Adding New Client Connection IDs
 
@@ -979,7 +995,8 @@ the length to zero. The proxy MUST use tunnelled mode (HTTP Datagram frames) for
 any long header packets. The proxy SHOULD forward directly to the client for any
 matching short header packets if forwarding is supported by the client, but the
 proxy MAY tunnel these packets in HTTP Datagram frames instead. If the mapping
-would create a conflict, the proxy responds with a CLOSE_CLIENT_CID capsule.
+would create a conflict, the proxy responds with a CLOSE_CLIENT_CID capsule
+with the CONFLICT reason code.
 
 When the proxy recieves a REGISTER_TARGET_CID capsule, it is receiving a
 request to allow the client to forward packets to the target. The proxy
@@ -1009,12 +1026,13 @@ registrations.
 
 ### Closing Proxy State
 
-For any registration capsule for which the proxy has sent an acknowledgement, any
-mappings last until either endpoint sends a close capsule or the either side of the
+For any registration capsule for which the proxy has sent an acknowledgement, the
+mapping lasts until the client sends a close capsule or either side of the
 HTTP stream closes.
 
 A client that no longer wants a given Connection ID to be forwarded by the
-proxy sends a CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsule.
+proxy sends a CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsule with the RETIRED
+reason code.
 
 If a client's connection to the proxy is terminated for any reason, all
 mappings associated with all requests are removed.
@@ -1352,7 +1370,6 @@ STREAM(44): HEADERS             -------->
 STREAM(44): DATA                -------->
   Capsule Type = REGISTER_CLIENT_CID
   Connection ID = 0x31323334
-  Stateless Reset Token = Token
 
            <--------  STREAM(44): DATA
                         Capsule Type = MAX_CONNECTION_IDS
@@ -1438,6 +1455,7 @@ following capsule:
 STREAM(44): DATA                -------->
   Capsule Type = REGISTER_TARGET_CID
   Connection ID = 0x61626364
+  Stateless Reset Token = Token
 
            <--------  STREAM(44): DATA
                         Capsule Type = ACK_TARGET_CID
@@ -1644,6 +1662,21 @@ Specification Required policy (Section 4.6 of [IANA-POLICY]).
 | scramble       | Reserved (will be used for final version)  | This Document | Section {{scramble-transform}} |
 {: #iana-packet-transforms-table title="Initial Packet Transform Names"}
 
+## Close CID Reason Codes {#iana-close-reasons}
+
+This document establishes a new registry, "Close CID Reason Codes",
+for reason codes used in CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsules,
+in <[](https://www.iana.org/assignments/masque/masque.xhtml)>.
+Registrations in this registry are assigned using the
+Specification Required policy (Section 4.6 of [IANA-POLICY]).
+
+| Value | Name       | Description                            | Sender      | Specification |
+|:------|:-----------|:---------------------------------------|:------------|:--------------|
+| 0x00  | RETIRED    | CID is being retired                   | Client only | This Document |
+| 0x01  | TOO_SHORT  | CID rejected for being too short       | Proxy only  | This Document |
+| 0x02  | CONFLICT   | CID or VCID conflicts with existing mapping | Proxy only | This Document |
+{: #iana-close-reasons-table title="Initial Close CID Reason Codes"}
+
 ## Capsule Types {#iana-capsule-types}
 
 This document registers six new values in the "HTTP Capsule Types"
@@ -1652,14 +1685,14 @@ will be replaced with lower values before publication.
 
 |     Capule Type     |   Value   | Specification |
 |:--------------------|:----------|:--------------|
-| REGISTER_CLIENT_CID | 0xffe600  | This Document |
-| REGISTER_TARGET_CID | 0xffe601  | This Document |
-| ACK_CLIENT_CID      | 0xffe602  | This Document |
-| ACK_CLIENT_VCID     | 0xffe603  | This Document |
-| ACK_TARGET_CID      | 0xffe604  | This Document |
-| CLOSE_CLIENT_CID    | 0xffe605  | This Document |
-| CLOSE_TARGET_CID    | 0xffe606  | This Document |
-| MAX_CONNECTION_IDS  | 0xffe607  | This Document |
+| REGISTER_CLIENT_CID | 0xffe700  | This Document |
+| REGISTER_TARGET_CID | 0xffe701  | This Document |
+| ACK_CLIENT_CID      | 0xffe702  | This Document |
+| ACK_CLIENT_VCID     | 0xffe703  | This Document |
+| ACK_TARGET_CID      | 0xffe704  | This Document |
+| CLOSE_CLIENT_CID    | 0xffe705  | This Document |
+| CLOSE_TARGET_CID    | 0xffe706  | This Document |
+| MAX_CONNECTION_IDS  | 0xffe707  | This Document |
 {: #iana-capsule-type-table title="Registered Capsule Types"}
 
 All of these new entries use the following values for these fields:
