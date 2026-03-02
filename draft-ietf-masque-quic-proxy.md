@@ -547,9 +547,10 @@ are used to close or reject connection ID registrations. Each capsule includes
 a reason code indicating why the connection ID is being closed.
 
 Clients send CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsules to retire connection
-IDs they no longer need, using the RETIRED reason code. A client may also send
-CLOSE_CLIENT_CID without having sent an ACK_CLIENT_VCID capsule to reject the
-proxy-chosen client VCID.
+IDs they no longer need, using the NONE reason code. If a client cannot use the
+proxy-chosen client VCID (e.g., due to conflict or insufficient length), it can
+re-register the same client CID with an appropriate reason code to request a new
+VCID.
 
 Proxies send CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsules only to reject
 registrations. If a proxy sends CLOSE_CLIENT_CID without having sent an
@@ -600,10 +601,16 @@ connection.
 Register Client CID Capsule {
   Type (i) = see {{iana}} for the value of the capsule type
   Length (i),
+  Reason (i),
   Connection ID (0..2040),
 }
 ~~~
 {: #fig-capsule-register-client-cid title="Register Client CID Capsule Format"}
+
+Reason:
+: The reason for this registration. For initial registrations, this MUST
+be NONE (0x00). For re-registrations due to an unusable VCID, this indicates
+why the previous VCID was rejected. See {{iana-cid-reasons}}.
 
 Connection ID:
 : A connection ID being registered, which is between 0 and 255 bytes in
@@ -621,6 +628,7 @@ the corresponding Stateless Reset Token.
 Register Target CID Capsule {
   Type (i) = see {{iana}} for the value of the capsule type
   Length (i),
+  Reason (i),
   Connection ID Length (i)
   Connection ID (0..2040),
   Stateless Reset Token Length (i),
@@ -628,6 +636,10 @@ Register Target CID Capsule {
 }
 ~~~
 {: #fig-capsule-register-target-cid title="Register Target CID Capsule Format"}
+
+Reason:
+: The reason for this registration. This MUST be NONE (0x00).
+See {{iana-cid-reasons}}.
 
 Connection ID Length
 : The length of the connection ID being registered, which is between 0 and
@@ -801,7 +813,7 @@ Close CID Capsule {
 
 Reason:
 : The reason for closing or rejecting the connection ID registration.
-See {{iana-close-reasons}} for the list of reason codes.
+See {{iana-cid-reasons}} for the list of reason codes.
 
 Connection ID:
 : A connection ID being closed, which is between 0 and 255 bytes in
@@ -879,6 +891,12 @@ has been received. Clients are responsible for changing Virtual Connection IDs
 when the HTTP stream's network path changes to avoid linkability across network
 paths. Note that initial REGISTER_CLIENT_CID capsules MAY be sent prior to
 receiving an HTTP response from the proxy.
+
+If the client receives a VCID it cannot use, it may re-register the same
+client CID with a reason code indicating why the previous VCID was unusable.
+The proxy SHOULD use this information to select a more suitable VCID. If the
+reason is TOO_SHORT, the proxy SHOULD select a longer VCID. If the reason is
+CONFLICT, the proxy MUST select a different VCID.
 
 Connection ID registrations are subject to a proxy-advertised limit. Each registration
 has a corresponding sequence number. The client MUST NOT send a registration
@@ -958,6 +976,11 @@ Similarly, the proxy MUST reply to each REGISTER_TARGET_CID capsule with
 either an ACK_TARGET_CID or CLOSE_TARGET_CID capsule containing the
 Connection ID that was in the registration capsule.
 
+When a proxy receives a REGISTER_CLIENT_CID with a non-zero reason code,
+it indicates the client is requesting a new VCID because the previous one
+was unusable. The proxy SHOULD attempt to address the issue indicated by
+the reason code when selecting the new VCID.
+
 The proxy then determines the proxy-to-target 4-tuple to associate with the
 client's request. This will generally involve performing a DNS lookup for
 the target hostname in the CONNECT request, or finding an existing proxy-to-target
@@ -1031,7 +1054,7 @@ mapping lasts until the client sends a close capsule or either side of the
 HTTP stream closes.
 
 A client that no longer wants a given Connection ID to be forwarded by the
-proxy sends a CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsule with the RETIRED
+proxy sends a CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsule with the NONE
 reason code.
 
 If a client's connection to the proxy is terminated for any reason, all
@@ -1662,20 +1685,21 @@ Specification Required policy (Section 4.6 of [IANA-POLICY]).
 | scramble       | Reserved (will be used for final version)  | This Document | Section {{scramble-transform}} |
 {: #iana-packet-transforms-table title="Initial Packet Transform Names"}
 
-## Close CID Reason Codes {#iana-close-reasons}
+## CID Capsule Reason Codes {#iana-cid-reasons}
 
-This document establishes a new registry, "Close CID Reason Codes",
-for reason codes used in CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsules,
+This document establishes a new registry, "CID Capsule Reason Codes",
+for reason codes used in REGISTER_CLIENT_CID, REGISTER_TARGET_CID,
+CLOSE_CLIENT_CID, and CLOSE_TARGET_CID capsules,
 in <[](https://www.iana.org/assignments/masque/masque.xhtml)>.
 Registrations in this registry are assigned using the
 Specification Required policy (Section 4.6 of [IANA-POLICY]).
 
-| Value | Name       | Description                            | Sender      | Specification |
-|:------|:-----------|:---------------------------------------|:------------|:--------------|
-| 0x00  | RETIRED    | CID is being retired                   | Client only | This Document |
-| 0x01  | TOO_SHORT  | CID rejected for being too short       | Proxy only  | This Document |
-| 0x02  | CONFLICT   | CID or VCID conflicts with existing mapping | Proxy only | This Document |
-{: #iana-close-reasons-table title="Initial Close CID Reason Codes"}
+| Value | Name       | Description                                      | Specification |
+|:------|:-----------|:-------------------------------------------------|:--------------|
+| 0x00  | NONE       | Normal operation                                 | This Document |
+| 0x01  | TOO_SHORT  | CID/VCID rejected for being too short            | This Document |
+| 0x02  | CONFLICT   | CID/VCID conflicts with existing mapping         | This Document |
+{: #iana-cid-reasons-table title="Initial CID Capsule Reason Codes"}
 
 ## Capsule Types {#iana-capsule-types}
 
