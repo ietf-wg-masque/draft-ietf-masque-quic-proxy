@@ -118,7 +118,7 @@ Table of Contents
      11.1.  HTTP Header Fields
      11.2.  Proxy QUIC Forwarding Parameter Names
      11.3.  Packet Transform Names
-     11.4.  Close CID Reason Codes
+     11.4.  CID Capsule Reason Codes
      11.5.  Capsule Types
    12. References
      12.1.  Normative References
@@ -643,9 +643,10 @@ Table of Contents
    being closed.
 
    Clients send CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsules to retire
-   connection IDs they no longer need, using the RETIRED reason code.  A
-   client may also send CLOSE_CLIENT_CID without having sent an
-   ACK_CLIENT_VCID capsule to reject the proxy-chosen client VCID.
+   connection IDs they no longer need, using the NONE reason code.  If a
+   client cannot use the proxy-chosen client VCID (e.g., due to conflict
+   or insufficient length), it can re-register the same client CID with
+   an appropriate reason code to request a new VCID.
 
    Proxies send CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsules only to
    reject registrations.  If a proxy sends CLOSE_CLIENT_CID without
@@ -702,10 +703,16 @@ Table of Contents
    Register Client CID Capsule {
      Type (i) = see {{iana}} for the value of the capsule type
      Length (i),
+     Reason (i),
      Connection ID (0..2040),
    }
 
                 Figure 4: Register Client CID Capsule Format
+
+   Reason:  The reason for this registration.  For initial
+      registrations, this MUST be NONE (0x00).  For re-registrations due
+      to an unusable VCID, this indicates why the previous VCID was
+      rejected.  See Section 11.4.
 
    Connection ID:  A connection ID being registered, which is between 0
       and 255 bytes in length.  The length of the connection ID is
@@ -722,6 +729,7 @@ Table of Contents
    Register Target CID Capsule {
      Type (i) = see {{iana}} for the value of the capsule type
      Length (i),
+     Reason (i),
      Connection ID Length (i)
      Connection ID (0..2040),
      Stateless Reset Token Length (i),
@@ -729,6 +737,9 @@ Table of Contents
    }
 
                 Figure 5: Register Target CID Capsule Format
+
+   Reason:  The reason for this registration.  This MUST be NONE (0x00).
+      See Section 11.4.
 
    Connection ID Length  The length of the connection ID being
       registered, which is between 0 and 255.  Note that in QUICv1, the
@@ -985,6 +996,13 @@ Table of Contents
    paths.  Note that initial REGISTER_CLIENT_CID capsules MAY be sent
    prior to receiving an HTTP response from the proxy.
 
+   If the client receives a VCID it cannot use, it may re-register the
+   same client CID with a reason code indicating why the previous VCID
+   was unusable.  The proxy SHOULD use this information to select a more
+   suitable VCID.  If the reason is TOO_SHORT, the proxy SHOULD select a
+   longer VCID.  If the reason is CONFLICT, the proxy MUST select a
+   different VCID.
+
    Connection ID registrations are subject to a proxy-advertised limit.
    Each registration has a corresponding sequence number.  The client
    MUST NOT send a registration capsule with a sequence number greater
@@ -1071,6 +1089,11 @@ Table of Contents
    with either an ACK_TARGET_CID or CLOSE_TARGET_CID capsule containing
    the Connection ID that was in the registration capsule.
 
+   When a proxy receives a REGISTER_CLIENT_CID with a non-zero reason
+   code, it indicates the client is requesting a new VCID because the
+   previous one was unusable.  The proxy SHOULD attempt to address the
+   issue indicated by the reason code when selecting the new VCID.
+
    The proxy then determines the proxy-to-target 4-tuple to associate
    with the client's request.  This will generally involve performing a
    DNS lookup for the target hostname in the CONNECT request, or finding
@@ -1154,7 +1177,7 @@ Table of Contents
 
    A client that no longer wants a given Connection ID to be forwarded
    by the proxy sends a CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsule
-   with the RETIRED reason code.
+   with the NONE reason code.
 
    If a client's connection to the proxy is terminated for any reason,
    all mappings associated with all requests are removed.
@@ -1842,29 +1865,28 @@ Table of Contents
 
                  Table 1: Initial Packet Transform Names
 
-11.4.  Close CID Reason Codes
+11.4.  CID Capsule Reason Codes
 
-   This document establishes a new registry, "Close CID Reason Codes",
-   for reason codes used in CLOSE_CLIENT_CID and CLOSE_TARGET_CID
-   capsules, in <https://www.iana.org/assignments/masque/masque.xhtml>.
+   This document establishes a new registry, "CID Capsule Reason Codes",
+   for reason codes used in REGISTER_CLIENT_CID, REGISTER_TARGET_CID,
+   CLOSE_CLIENT_CID, and CLOSE_TARGET_CID capsules, in
+   <https://www.iana.org/assignments/masque/masque.xhtml>.
    Registrations in this registry are assigned using the Specification
    Required policy (Section 4.6 of [IANA-POLICY]).
 
-     +=======+===========+==================+========+===============+
-     | Value | Name      | Description      | Sender | Specification |
-     +=======+===========+==================+========+===============+
-     | 0x00  | RETIRED   | CID is being     | Client | This Document |
-     |       |           | retired          | only   |               |
-     +-------+-----------+------------------+--------+---------------+
-     | 0x01  | TOO_SHORT | CID rejected for | Proxy  | This Document |
-     |       |           | being too short  | only   |               |
-     +-------+-----------+------------------+--------+---------------+
-     | 0x02  | CONFLICT  | CID or VCID      | Proxy  | This Document |
-     |       |           | conflicts with   | only   |               |
-     |       |           | existing mapping |        |               |
-     +-------+-----------+------------------+--------+---------------+
+       +=======+===========+=======================+===============+
+       | Value | Name      | Description           | Specification |
+       +=======+===========+=======================+===============+
+       | 0x00  | NONE      | Normal operation      | This Document |
+       +-------+-----------+-----------------------+---------------+
+       | 0x01  | TOO_SHORT | CID/VCID rejected for | This Document |
+       |       |           | being too short       |               |
+       +-------+-----------+-----------------------+---------------+
+       | 0x02  | CONFLICT  | CID/VCID conflicts    | This Document |
+       |       |           | with existing mapping |               |
+       +-------+-----------+-----------------------+---------------+
 
-                  Table 2: Initial Close CID Reason Codes
+                 Table 2: Initial CID Capsule Reason Codes
 
 11.5.  Capsule Types
 

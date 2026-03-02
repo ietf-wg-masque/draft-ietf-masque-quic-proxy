@@ -1330,7 +1330,7 @@ re-encapsulated and re-encrypted.<a href="#section-abstract-1" class="pilcrow">�
                 <p id="section-toc.1-1.11.2.3.1"><a href="#section-11.3" class="auto internal xref">11.3</a>.  <a href="#name-packet-transform-names" class="internal xref">Packet Transform Names</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.4">
-                <p id="section-toc.1-1.11.2.4.1"><a href="#section-11.4" class="auto internal xref">11.4</a>.  <a href="#name-close-cid-reason-codes" class="internal xref">Close CID Reason Codes</a></p>
+                <p id="section-toc.1-1.11.2.4.1"><a href="#section-11.4" class="auto internal xref">11.4</a>.  <a href="#name-cid-capsule-reason-codes" class="internal xref">CID Capsule Reason Codes</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.5">
                 <p id="section-toc.1-1.11.2.5.1"><a href="#section-11.5" class="auto internal xref">11.5</a>.  <a href="#name-capsule-types" class="internal xref">Capsule Types</a></p>
@@ -1995,9 +1995,10 @@ virtual connection ID.<a href="#section-5-5" class="pilcrow">¶</a></p>
 are used to close or reject connection ID registrations. Each capsule includes
 a reason code indicating why the connection ID is being closed.<a href="#section-5-6" class="pilcrow">¶</a></p>
 <p id="section-5-7">Clients send CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsules to retire connection
-IDs they no longer need, using the RETIRED reason code. A client may also send
-CLOSE_CLIENT_CID without having sent an ACK_CLIENT_VCID capsule to reject the
-proxy-chosen client VCID.<a href="#section-5-7" class="pilcrow">¶</a></p>
+IDs they no longer need, using the NONE reason code. If a client cannot use the
+proxy-chosen client VCID (e.g., due to conflict or insufficient length), it can
+re-register the same client CID with an appropriate reason code to request a new
+VCID.<a href="#section-5-7" class="pilcrow">¶</a></p>
 <p id="section-5-8">Proxies send CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsules only to reject
 registrations. If a proxy sends CLOSE_CLIENT_CID without having sent an
 ACK_CLIENT_CID, or if a proxy sends CLOSE_TARGET_CID without having sent an
@@ -2048,6 +2049,7 @@ connection.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
 Register Client CID Capsule {
   Type (i) = see {{iana}} for the value of the capsule type
   Length (i),
+  Reason (i),
   Connection ID (0..2040),
 }
 </pre>
@@ -2057,12 +2059,19 @@ Register Client CID Capsule {
           </figcaption></figure>
 </div>
 <span class="break"></span><dl class="dlParallel" id="section-5.1-3">
-          <dt id="section-5.1-3.1">Connection ID:</dt>
+          <dt id="section-5.1-3.1">Reason:</dt>
           <dd style="margin-left: 1.5em" id="section-5.1-3.2">
-            <p id="section-5.1-3.2.1">A connection ID being registered, which is between 0 and 255 bytes in
+            <p id="section-5.1-3.2.1">The reason for this registration. For initial registrations, this MUST
+be NONE (0x00). For re-registrations due to an unusable VCID, this indicates
+why the previous VCID was rejected. See <a href="#iana-cid-reasons" class="auto internal xref">Section 11.4</a>.<a href="#section-5.1-3.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.1-3.3">Connection ID:</dt>
+          <dd style="margin-left: 1.5em" id="section-5.1-3.4">
+            <p id="section-5.1-3.4.1">A connection ID being registered, which is between 0 and 255 bytes in
 length. The length of the connection ID is implied by the length of the
 capsule. Note that in QUICv1, the length of the Connection ID is limited
-to 20 bytes, but QUIC invariants allow up to 255 bytes.<a href="#section-5.1-3.2.1" class="pilcrow">¶</a></p>
+to 20 bytes, but QUIC invariants allow up to 255 bytes.<a href="#section-5.1-3.4.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
@@ -2083,6 +2092,7 @@ the corresponding Stateless Reset Token.<a href="#section-5.2-1" class="pilcrow"
 Register Target CID Capsule {
   Type (i) = see {{iana}} for the value of the capsule type
   Length (i),
+  Reason (i),
   Connection ID Length (i)
   Connection ID (0..2040),
   Stateless Reset Token Length (i),
@@ -2095,28 +2105,34 @@ Register Target CID Capsule {
           </figcaption></figure>
 </div>
 <span class="break"></span><dl class="dlParallel" id="section-5.2-3">
-          <dt id="section-5.2-3.1">Connection ID Length</dt>
+          <dt id="section-5.2-3.1">Reason:</dt>
           <dd style="margin-left: 1.5em" id="section-5.2-3.2">
-            <p id="section-5.2-3.2.1">The length of the connection ID being registered, which is between 0 and
-255. Note that in QUICv1, the length of the Connection ID is limited to 20
-bytes, but QUIC invariants allow up to 255 bytes.<a href="#section-5.2-3.2.1" class="pilcrow">¶</a></p>
+            <p id="section-5.2-3.2.1">The reason for this registration. This MUST be NONE (0x00).
+See <a href="#iana-cid-reasons" class="auto internal xref">Section 11.4</a>.<a href="#section-5.2-3.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-5.2-3.3">Connection ID</dt>
+<dt id="section-5.2-3.3">Connection ID Length</dt>
           <dd style="margin-left: 1.5em" id="section-5.2-3.4">
-            <p id="section-5.2-3.4.1">A connection ID being registered whose length is equal to Connection ID
-Length. This is the real target CID.<a href="#section-5.2-3.4.1" class="pilcrow">¶</a></p>
+            <p id="section-5.2-3.4.1">The length of the connection ID being registered, which is between 0 and
+255. Note that in QUICv1, the length of the Connection ID is limited to 20
+bytes, but QUIC invariants allow up to 255 bytes.<a href="#section-5.2-3.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-5.2-3.5">Stateless Reset Token Length</dt>
+<dt id="section-5.2-3.5">Connection ID</dt>
           <dd style="margin-left: 1.5em" id="section-5.2-3.6">
-            <p id="section-5.2-3.6.1">The length of the target-provided Stateless Reset Token.<a href="#section-5.2-3.6.1" class="pilcrow">¶</a></p>
+            <p id="section-5.2-3.6.1">A connection ID being registered whose length is equal to Connection ID
+Length. This is the real target CID.<a href="#section-5.2-3.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-5.2-3.7">Stateless Reset Token</dt>
+<dt id="section-5.2-3.7">Stateless Reset Token Length</dt>
           <dd style="margin-left: 1.5em" id="section-5.2-3.8">
-            <p id="section-5.2-3.8.1">The target-provided Stateless Reset token allowing the proxy to correctly
-recognize Stateless Reset packets to be tunnelled to the client.<a href="#section-5.2-3.8.1" class="pilcrow">¶</a></p>
+            <p id="section-5.2-3.8.1">The length of the target-provided Stateless Reset Token.<a href="#section-5.2-3.8.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-5.2-3.9">Stateless Reset Token</dt>
+          <dd style="margin-left: 1.5em" id="section-5.2-3.10">
+            <p id="section-5.2-3.10.1">The target-provided Stateless Reset token allowing the proxy to correctly
+recognize Stateless Reset packets to be tunnelled to the client.<a href="#section-5.2-3.10.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
@@ -2356,7 +2372,7 @@ Close CID Capsule {
           <dt id="section-5.6-3.1">Reason:</dt>
           <dd style="margin-left: 1.5em" id="section-5.6-3.2">
             <p id="section-5.6-3.2.1">The reason for closing or rejecting the connection ID registration.
-See <a href="#iana-close-reasons" class="auto internal xref">Section 11.4</a> for the list of reason codes.<a href="#section-5.6-3.2.1" class="pilcrow">¶</a></p>
+See <a href="#iana-cid-reasons" class="auto internal xref">Section 11.4</a> for the list of reason codes.<a href="#section-5.6-3.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-5.6-3.3">Connection ID:</dt>
@@ -2455,20 +2471,25 @@ has been received. Clients are responsible for changing Virtual Connection IDs
 when the HTTP stream's network path changes to avoid linkability across network
 paths. Note that initial REGISTER_CLIENT_CID capsules MAY be sent prior to
 receiving an HTTP response from the proxy.<a href="#section-5.9-1" class="pilcrow">¶</a></p>
-<p id="section-5.9-2">Connection ID registrations are subject to a proxy-advertised limit. Each registration
+<p id="section-5.9-2">If the client receives a VCID it cannot use, it may re-register the same
+client CID with a reason code indicating why the previous VCID was unusable.
+The proxy SHOULD use this information to select a more suitable VCID. If the
+reason is TOO_SHORT, the proxy SHOULD select a longer VCID. If the reason is
+CONFLICT, the proxy MUST select a different VCID.<a href="#section-5.9-2" class="pilcrow">¶</a></p>
+<p id="section-5.9-3">Connection ID registrations are subject to a proxy-advertised limit. Each registration
 has a corresponding sequence number. The client MUST NOT send a registration
 capsule with a sequence number greater than what the proxy advertises via the
 MAX_CONNECTION_IDS capsule. The initial MAX_CONNECTION_IDS value is 1, allowing both
 sequence numbers 0 and 1 for a total of two registrations without receiving a
-MAX_CONNECTION_IDS capsule from the proxy.<a href="#section-5.9-2" class="pilcrow">¶</a></p>
-<p id="section-5.9-3">Clients that cannot register new connection IDs within a reasonable time due to
+MAX_CONNECTION_IDS capsule from the proxy.<a href="#section-5.9-3" class="pilcrow">¶</a></p>
+<p id="section-5.9-4">Clients that cannot register new connection IDs within a reasonable time due to
 the MAX_CONNECTION_IDS limit SHOULD abort the proxied connection by resetting the HTTP
 stream with error code NO_ERROR. This may happen, for example, if the target server
 sends a NEW_CONNECTION_ID frame with Sequence Number and Retire Prior To equal to the
-same value.<a href="#section-5.9-3" class="pilcrow">¶</a></p>
-<p id="section-5.9-4">Clients can cease receiving with forwarded mode over an existing tunnel while
+same value.<a href="#section-5.9-4" class="pilcrow">¶</a></p>
+<p id="section-5.9-5">Clients can cease receiving with forwarded mode over an existing tunnel while
 retaining the same client-to-target connection by creating a new tunnel with
-"Proxy-QUIC-Forwarding" set to "?0" and migrating the client-to-target connection.<a href="#section-5.9-4" class="pilcrow">¶</a></p>
+"Proxy-QUIC-Forwarding" set to "?0" and migrating the client-to-target connection.<a href="#section-5.9-5" class="pilcrow">¶</a></p>
 <div id="new-proxied-connection-setup">
 <section id="section-5.9.1">
           <h4 id="name-new-proxied-connection-setu">
@@ -2534,7 +2555,11 @@ Connection ID that was in the registration capsule.<a href="#section-5.10-1" cla
 <p id="section-5.10-2">Similarly, the proxy MUST reply to each REGISTER_TARGET_CID capsule with
 either an ACK_TARGET_CID or CLOSE_TARGET_CID capsule containing the
 Connection ID that was in the registration capsule.<a href="#section-5.10-2" class="pilcrow">¶</a></p>
-<p id="section-5.10-3">The proxy then determines the proxy-to-target 4-tuple to associate with the
+<p id="section-5.10-3">When a proxy receives a REGISTER_CLIENT_CID with a non-zero reason code,
+it indicates the client is requesting a new VCID because the previous one
+was unusable. The proxy SHOULD attempt to address the issue indicated by
+the reason code when selecting the new VCID.<a href="#section-5.10-3" class="pilcrow">¶</a></p>
+<p id="section-5.10-4">The proxy then determines the proxy-to-target 4-tuple to associate with the
 client's request. This will generally involve performing a DNS lookup for
 the target hostname in the CONNECT request, or finding an existing proxy-to-target
 4-tuple to the authority. The proxy-to-target 4-tuple might already be open due to a
@@ -2543,17 +2568,17 @@ created, the proxy creates a new one. Proxies can choose to reuse proxy-to-targe
 4-tuples across multiple UDP proxying requests, or have a unique proxy-to-target 4-tuple
 for every UDP proxying request. If the client did not send a value of "?1" for the
 "Proxy-QUIC-Port-Sharing" header, port reuse is not permitted and the proxy MUST allocate
-a new UDP 4-tuple.<a href="#section-5.10-3" class="pilcrow">¶</a></p>
-<p id="section-5.10-4">If a proxy reuses proxy-to-target 4-tuples, it SHOULD store which authorities
+a new UDP 4-tuple.<a href="#section-5.10-4" class="pilcrow">¶</a></p>
+<p id="section-5.10-5">If a proxy reuses proxy-to-target 4-tuples, it SHOULD store which authorities
 (which could be a domain name or IP address literal) are being accessed over a
 particular proxy-to-target 4-tuple so it can avoid performing a new DNS query and
 potentially choosing a different target server IP address which could map to a
-different target server.<a href="#section-5.10-4" class="pilcrow">¶</a></p>
-<p id="section-5.10-5">Proxy-to-target 4-tuples MUST NOT be reused across QUIC and non-QUIC UDP proxy
+different target server.<a href="#section-5.10-5" class="pilcrow">¶</a></p>
+<p id="section-5.10-6">Proxy-to-target 4-tuples MUST NOT be reused across QUIC and non-QUIC UDP proxy
 requests, since it might not be possible to correctly demultiplex or direct
 the traffic. Any packets received on a proxy-to-target 4-tuple used for proxying
-QUIC that does not correspond to a known CID MUST be dropped.<a href="#section-5.10-5" class="pilcrow">¶</a></p>
-<p id="section-5.10-6">When the proxy recieves a REGISTER_CLIENT_CID capsule, it is receiving a
+QUIC that does not correspond to a known CID MUST be dropped.<a href="#section-5.10-6" class="pilcrow">¶</a></p>
+<p id="section-5.10-7">When the proxy recieves a REGISTER_CLIENT_CID capsule, it is receiving a
 request to be able to route traffic matching the client CID back to
 the client using. If the pair of this client CID and the selected
 proxy-to-target 4-tuple does not create a conflict, the proxy creates the mapping
@@ -2569,8 +2594,8 @@ any long header packets. The proxy SHOULD forward directly to the client for any
 matching short header packets if forwarding is supported by the client, but the
 proxy MAY tunnel these packets in HTTP Datagram frames instead. If the mapping
 would create a conflict, the proxy responds with a CLOSE_CLIENT_CID capsule
-with the CONFLICT reason code.<a href="#section-5.10-6" class="pilcrow">¶</a></p>
-<p id="section-5.10-7">When the proxy recieves a REGISTER_TARGET_CID capsule, it is receiving a
+with the CONFLICT reason code.<a href="#section-5.10-7" class="pilcrow">¶</a></p>
+<p id="section-5.10-8">When the proxy recieves a REGISTER_TARGET_CID capsule, it is receiving a
 request to allow the client to forward packets to the target. The proxy
 generates a target VCID for the client to use when sending
 packets in forwarded mode. If forwarded mode is not supported, the proxy MUST
@@ -2582,16 +2607,16 @@ ACK_TARGET_CID capsule. Once the successful response is sent, the proxy will
 forward any short header packets received on the client-to-proxy 4-tuple that use
 the target VCID using the correct proxy-to-target 4-tuple after
 first rewriting the target VCID to be the correct target CID and executing the
-negotiated transform.<a href="#section-5.10-7" class="pilcrow">¶</a></p>
-<p id="section-5.10-8">Proxies MUST choose unpredictable client and target VCIDs to
-avoid forwarding loop attacks.<a href="#section-5.10-8" class="pilcrow">¶</a></p>
-<p id="section-5.10-9">The proxy MUST only forward non-tunnelled packets from the client that are QUIC
+negotiated transform.<a href="#section-5.10-8" class="pilcrow">¶</a></p>
+<p id="section-5.10-9">Proxies MUST choose unpredictable client and target VCIDs to
+avoid forwarding loop attacks.<a href="#section-5.10-9" class="pilcrow">¶</a></p>
+<p id="section-5.10-10">The proxy MUST only forward non-tunnelled packets from the client that are QUIC
 short header packets (based on the Header Form bit) and have mapped target VCIDs.
 Packets sent by the client that are forwarded SHOULD be
-considered as activity for restarting QUIC's Idle Timeout <span>[<a href="#QUIC" class="cite xref">QUIC</a>]</span>.<a href="#section-5.10-9" class="pilcrow">¶</a></p>
-<p id="section-5.10-10">In order to permit the client to change client-to-target connection IDs, the proxy
+considered as activity for restarting QUIC's Idle Timeout <span>[<a href="#QUIC" class="cite xref">QUIC</a>]</span>.<a href="#section-5.10-10" class="pilcrow">¶</a></p>
+<p id="section-5.10-11">In order to permit the client to change client-to-target connection IDs, the proxy
 SHOULD send MAX_CONNECTION_IDS capsules allowing the client additional connection ID
-registrations.<a href="#section-5.10-10" class="pilcrow">¶</a></p>
+registrations.<a href="#section-5.10-11" class="pilcrow">¶</a></p>
 <div id="closing-proxy-state">
 <section id="section-5.10.1">
           <h4 id="name-closing-proxy-state">
@@ -2601,7 +2626,7 @@ registrations.<a href="#section-5.10-10" class="pilcrow">¶</a></p>
 mapping lasts until the client sends a close capsule or either side of the
 HTTP stream closes.<a href="#section-5.10.1-1" class="pilcrow">¶</a></p>
 <p id="section-5.10.1-2">A client that no longer wants a given Connection ID to be forwarded by the
-proxy sends a CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsule with the RETIRED
+proxy sends a CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsule with the NONE
 reason code.<a href="#section-5.10.1-2" class="pilcrow">¶</a></p>
 <p id="section-5.10.1-3">If a client's connection to the proxy is terminated for any reason, all
 mappings associated with all requests are removed.<a href="#section-5.10.1-3" class="pilcrow">¶</a></p>
@@ -3349,51 +3374,48 @@ Specification Required policy (Section 4.6 of [IANA-POLICY]).<a href="#section-1
 </div>
 </section>
 </div>
-<div id="iana-close-reasons">
+<div id="iana-cid-reasons">
 <section id="section-11.4">
-        <h3 id="name-close-cid-reason-codes">
-<a href="#section-11.4" class="section-number selfRef">11.4. </a><a href="#name-close-cid-reason-codes" class="section-name selfRef">Close CID Reason Codes</a>
+        <h3 id="name-cid-capsule-reason-codes">
+<a href="#section-11.4" class="section-number selfRef">11.4. </a><a href="#name-cid-capsule-reason-codes" class="section-name selfRef">CID Capsule Reason Codes</a>
         </h3>
-<p id="section-11.4-1">This document establishes a new registry, "Close CID Reason Codes",
-for reason codes used in CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsules,
+<p id="section-11.4-1">This document establishes a new registry, "CID Capsule Reason Codes",
+for reason codes used in REGISTER_CLIENT_CID, REGISTER_TARGET_CID,
+CLOSE_CLIENT_CID, and CLOSE_TARGET_CID capsules,
 in &lt;<span><a href="https://www.iana.org/assignments/masque/masque.xhtml">https://www.iana.org/assignments/masque/masque.xhtml</a></span>&gt;.
 Registrations in this registry are assigned using the
 Specification Required policy (Section 4.6 of [IANA-POLICY]).<a href="#section-11.4-1" class="pilcrow">¶</a></p>
-<span id="name-initial-close-cid-reason-co"></span><div id="iana-close-reasons-table">
+<span id="name-initial-cid-capsule-reason-"></span><div id="iana-cid-reasons-table">
 <table class="center" id="table-2">
           <caption>
 <a href="#table-2" class="selfRef">Table 2</a>:
-<a href="#name-initial-close-cid-reason-co" class="selfRef">Initial Close CID Reason Codes</a>
+<a href="#name-initial-cid-capsule-reason-" class="selfRef">Initial CID Capsule Reason Codes</a>
           </caption>
 <thead>
             <tr>
               <th class="text-left" rowspan="1" colspan="1">Value</th>
               <th class="text-left" rowspan="1" colspan="1">Name</th>
               <th class="text-left" rowspan="1" colspan="1">Description</th>
-              <th class="text-left" rowspan="1" colspan="1">Sender</th>
               <th class="text-left" rowspan="1" colspan="1">Specification</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">0x00</td>
-              <td class="text-left" rowspan="1" colspan="1">RETIRED</td>
-              <td class="text-left" rowspan="1" colspan="1">CID is being retired</td>
-              <td class="text-left" rowspan="1" colspan="1">Client only</td>
+              <td class="text-left" rowspan="1" colspan="1">NONE</td>
+              <td class="text-left" rowspan="1" colspan="1">Normal operation</td>
               <td class="text-left" rowspan="1" colspan="1">This Document</td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">0x01</td>
               <td class="text-left" rowspan="1" colspan="1">TOO_SHORT</td>
-              <td class="text-left" rowspan="1" colspan="1">CID rejected for being too short</td>
-              <td class="text-left" rowspan="1" colspan="1">Proxy only</td>
+              <td class="text-left" rowspan="1" colspan="1">CID/VCID rejected for being too short</td>
               <td class="text-left" rowspan="1" colspan="1">This Document</td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">0x02</td>
               <td class="text-left" rowspan="1" colspan="1">CONFLICT</td>
-              <td class="text-left" rowspan="1" colspan="1">CID or VCID conflicts with existing mapping</td>
-              <td class="text-left" rowspan="1" colspan="1">Proxy only</td>
+              <td class="text-left" rowspan="1" colspan="1">CID/VCID conflicts with existing mapping</td>
               <td class="text-left" rowspan="1" colspan="1">This Document</td>
             </tr>
           </tbody>
