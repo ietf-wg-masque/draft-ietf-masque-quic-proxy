@@ -897,7 +897,7 @@ receiving an HTTP response from the proxy.
 If the client receives a VCID it cannot use, it may re-register the same
 client CID with a reason code indicating why the previous VCID was unusable.
 The proxy SHOULD use this information to select a more suitable VCID. If the
-reason is TOO_SHORT, the proxy SHOULD select a longer VCID. If the reason is
+reason is TOO_SHORT, the proxy MUST either select a longer VCID or close the registration. If the reason is
 CONFLICT, the proxy MUST select a different VCID.
 
 Connection ID registrations are subject to a proxy-advertised limit. Each registration
