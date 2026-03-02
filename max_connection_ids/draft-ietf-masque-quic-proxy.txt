@@ -643,10 +643,10 @@ Table of Contents
    being closed.
 
    Clients send CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsules to retire
-   connection IDs they no longer need, using the NONE reason code.  If a
-   client cannot use the proxy-chosen client VCID (e.g., due to conflict
-   or insufficient length), it can re-register the same client CID with
-   an appropriate reason code to request a new VCID.
+   connection IDs they no longer need, using the DEFAULT reason code.
+   If a client cannot use the proxy-chosen client VCID (e.g., due to
+   conflict or insufficient length), it can re-register the same client
+   CID with an appropriate reason code to request a new VCID.
 
    Proxies send CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsules only to
    reject registrations.  If a proxy sends CLOSE_CLIENT_CID without
@@ -710,8 +710,8 @@ Table of Contents
                 Figure 4: Register Client CID Capsule Format
 
    Reason:  The reason for this registration.  For initial
-      registrations, this MUST be NONE (0x00).  For re-registrations due
-      to an unusable VCID, this indicates why the previous VCID was
+      registrations, this MUST be DEFAULT (0x00).  For re-registrations
+      due to an unusable VCID, this indicates why the previous VCID was
       rejected.  See Section 11.4.
 
    Connection ID:  A connection ID being registered, which is between 0
@@ -738,8 +738,8 @@ Table of Contents
 
                 Figure 5: Register Target CID Capsule Format
 
-   Reason:  The reason for this registration.  This MUST be NONE (0x00).
-      See Section 11.4.
+   Reason:  The reason for this registration.  This MUST be DEFAULT
+      (0x00).  See Section 11.4.
 
    Connection ID Length  The length of the connection ID being
       registered, which is between 0 and 255.  Note that in QUICv1, the
@@ -1177,7 +1177,7 @@ Table of Contents
 
    A client that no longer wants a given Connection ID to be forwarded
    by the proxy sends a CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsule
-   with the NONE reason code.
+   with the DEFAULT reason code.
 
    If a client's connection to the proxy is terminated for any reason,
    all mappings associated with all requests are removed.
@@ -1877,7 +1877,7 @@ Table of Contents
        +=======+===========+=======================+===============+
        | Value | Name      | Description           | Specification |
        +=======+===========+=======================+===============+
-       | 0x00  | NONE      | Normal operation      | This Document |
+       | 0x00  | DEFAULT   | Normal operation      | This Document |
        +-------+-----------+-----------------------+---------------+
        | 0x01  | TOO_SHORT | CID/VCID rejected for | This Document |
        |       |           | being too short       |               |

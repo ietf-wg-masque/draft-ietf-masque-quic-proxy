@@ -1995,7 +1995,7 @@ virtual connection ID.<a href="#section-5-5" class="pilcrow">¶</a></p>
 are used to close or reject connection ID registrations. Each capsule includes
 a reason code indicating why the connection ID is being closed.<a href="#section-5-6" class="pilcrow">¶</a></p>
 <p id="section-5-7">Clients send CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsules to retire connection
-IDs they no longer need, using the NONE reason code. If a client cannot use the
+IDs they no longer need, using the DEFAULT reason code. If a client cannot use the
 proxy-chosen client VCID (e.g., due to conflict or insufficient length), it can
 re-register the same client CID with an appropriate reason code to request a new
 VCID.<a href="#section-5-7" class="pilcrow">¶</a></p>
@@ -2062,7 +2062,7 @@ Register Client CID Capsule {
           <dt id="section-5.1-3.1">Reason:</dt>
           <dd style="margin-left: 1.5em" id="section-5.1-3.2">
             <p id="section-5.1-3.2.1">The reason for this registration. For initial registrations, this MUST
-be NONE (0x00). For re-registrations due to an unusable VCID, this indicates
+be DEFAULT (0x00). For re-registrations due to an unusable VCID, this indicates
 why the previous VCID was rejected. See <a href="#iana-cid-reasons" class="auto internal xref">Section 11.4</a>.<a href="#section-5.1-3.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
@@ -2107,7 +2107,7 @@ Register Target CID Capsule {
 <span class="break"></span><dl class="dlParallel" id="section-5.2-3">
           <dt id="section-5.2-3.1">Reason:</dt>
           <dd style="margin-left: 1.5em" id="section-5.2-3.2">
-            <p id="section-5.2-3.2.1">The reason for this registration. This MUST be NONE (0x00).
+            <p id="section-5.2-3.2.1">The reason for this registration. This MUST be DEFAULT (0x00).
 See <a href="#iana-cid-reasons" class="auto internal xref">Section 11.4</a>.<a href="#section-5.2-3.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
@@ -2626,7 +2626,7 @@ registrations.<a href="#section-5.10-11" class="pilcrow">¶</a></p>
 mapping lasts until the client sends a close capsule or either side of the
 HTTP stream closes.<a href="#section-5.10.1-1" class="pilcrow">¶</a></p>
 <p id="section-5.10.1-2">A client that no longer wants a given Connection ID to be forwarded by the
-proxy sends a CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsule with the NONE
+proxy sends a CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsule with the DEFAULT
 reason code.<a href="#section-5.10.1-2" class="pilcrow">¶</a></p>
 <p id="section-5.10.1-3">If a client's connection to the proxy is terminated for any reason, all
 mappings associated with all requests are removed.<a href="#section-5.10.1-3" class="pilcrow">¶</a></p>
@@ -3402,7 +3402,7 @@ Specification Required policy (Section 4.6 of [IANA-POLICY]).<a href="#section-1
           <tbody>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">0x00</td>
-              <td class="text-left" rowspan="1" colspan="1">NONE</td>
+              <td class="text-left" rowspan="1" colspan="1">DEFAULT</td>
               <td class="text-left" rowspan="1" colspan="1">Normal operation</td>
               <td class="text-left" rowspan="1" colspan="1">This Document</td>
             </tr>
