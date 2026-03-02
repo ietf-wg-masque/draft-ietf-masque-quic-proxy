@@ -609,7 +609,8 @@ Register Client CID Capsule {
 
 Reason:
 : The reason for this registration. For initial registrations, this MUST
-be DEFAULT (0x00). For re-registrations due to an unusable VCID, this indicates
+be DEFAULT (0x00), although a different value can be used for future
+extensions. For re-registrations due to an unusable VCID, this indicates
 why the previous VCID was rejected. See {{iana-cid-reasons}}.
 
 Connection ID:
@@ -638,7 +639,8 @@ Register Target CID Capsule {
 {: #fig-capsule-register-target-cid title="Register Target CID Capsule Format"}
 
 Reason:
-: The reason for this registration. This MUST be DEFAULT (0x00).
+: The reason for this registration. This MUST be DEFAULT (0x00), although a
+different value can be used for future extensions.
 See {{iana-cid-reasons}}.
 
 Connection ID Length
