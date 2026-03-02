@@ -547,7 +547,7 @@ are used to close or reject connection ID registrations. Each capsule includes
 a reason code indicating why the connection ID is being closed.
 
 Clients send CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsules to retire connection
-IDs they no longer need, using the NONE reason code. If a client cannot use the
+IDs they no longer need, using the DEFAULT reason code. If a client cannot use the
 proxy-chosen client VCID (e.g., due to conflict or insufficient length), it can
 re-register the same client CID with an appropriate reason code to request a new
 VCID.
@@ -609,7 +609,7 @@ Register Client CID Capsule {
 
 Reason:
 : The reason for this registration. For initial registrations, this MUST
-be NONE (0x00). For re-registrations due to an unusable VCID, this indicates
+be DEFAULT (0x00). For re-registrations due to an unusable VCID, this indicates
 why the previous VCID was rejected. See {{iana-cid-reasons}}.
 
 Connection ID:
@@ -638,7 +638,7 @@ Register Target CID Capsule {
 {: #fig-capsule-register-target-cid title="Register Target CID Capsule Format"}
 
 Reason:
-: The reason for this registration. This MUST be NONE (0x00).
+: The reason for this registration. This MUST be DEFAULT (0x00).
 See {{iana-cid-reasons}}.
 
 Connection ID Length
@@ -1054,7 +1054,7 @@ mapping lasts until the client sends a close capsule or either side of the
 HTTP stream closes.
 
 A client that no longer wants a given Connection ID to be forwarded by the
-proxy sends a CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsule with the NONE
+proxy sends a CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsule with the DEFAULT
 reason code.
 
 If a client's connection to the proxy is terminated for any reason, all
@@ -1696,7 +1696,7 @@ Specification Required policy (Section 4.6 of [IANA-POLICY]).
 
 | Value | Name       | Description                                      | Specification |
 |:------|:-----------|:-------------------------------------------------|:--------------|
-| 0x00  | NONE       | Normal operation                                 | This Document |
+| 0x00  | DEFAULT       | Normal operation                                 | This Document |
 | 0x01  | TOO_SHORT  | CID/VCID rejected for being too short            | This Document |
 | 0x02  | CONFLICT   | CID/VCID conflicts with existing mapping         | This Document |
 {: #iana-cid-reasons-table title="Initial CID Capsule Reason Codes"}
