@@ -4,10 +4,10 @@
 
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
-Intended status: Experimental                                 Apple Inc.
-Expires: 3 September 2026                                    D. Schinazi
+Intended status: Standards Track                              Apple Inc.
+Expires: 17 September 2026                                   D. Schinazi
                                                               Google LLC
-                                                            2 March 2026
+                                                           16 March 2026
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 3 September 2026.
+   This Internet-Draft will expire on 17 September 2026.
 
 Copyright Notice
 
