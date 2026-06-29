@@ -1306,11 +1306,11 @@ No capsules are exchanged in response to passive migration.
 
 ### Active Migration Steps {#active-migration-steps}
 
-1. Client registers client-target connection IDs "A" while on client-proxy network path "Wifi"
+1. Client registers client-target connection IDs while on client-proxy network path "Wi-Fi"
 1. Client probes client-proxy network path "Cellular" and migrates
-1. Proxy removes forwarding rules on path "Wifi". The forwarding rules are removed, but
+1. Proxy removes forwarding rules on path "Wi-Fi". The forwarding rules are removed, but
 the registration remains active in order to continue to support port sharing.
-1. Client re-registers client-target connection IDs "A" while on client-proxy network path
+1. Client re-registers the original client-target connection IDs while on client-proxy network path
 "Cellular". This solicits new virtual CIDs from the proxy and does not count as an additional
 sequence number towards MAX_CONNECTION_IDs.
 1. Upon client-proxy network path validation, forwarding rules are configured with the new
