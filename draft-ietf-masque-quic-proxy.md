@@ -1278,17 +1278,47 @@ path to avoid creating unintentional congestion on the new path.
 
 When operating in forwarded mode, the proxy reconfigures or removes forwarding
 rules as the network path between the client and proxy changes. In the event of
-passive migration, the proxy automatically reconfigures forwarding rules to use
+passive migration, the proxy MUST automatically reconfigure forwarding rules to use
 the latest active and validated network path for the HTTP stream. In the event of
-active migration, the proxy removes forwarding rules in order to not send
+active migration, the proxy MUST remove forwarding rules in order to not send
 packets with the same connection ID bytes over multiple network paths. After
 initiating active migration, clients are no longer able to send forwarded mode
 packets since the proxy will have removed forwarding rules. Clients can proceed with
 tunnelled mode or can request new forwarding rules via REGISTER_CLIENT_CID and
-REGISTER_TARGET_CID capsules. Each of the acknowledging capsules will contain new
-virtual connection IDs to prevent packets with the same connection ID bytes being
-used over multiple network paths. Note that the client CID and target CID
-can stay the same while the target VCID and client VCID change.
+REGISTER_TARGET_CID capsules. Requesting new forwarding rules like this for the same
+client-to-target CIDs, is a re-registration and does not increment the sequence
+number or have any impact on MAX_CONNECTION_IDs. Each of the acknowledging capsules
+will contain new virtual connection IDs to prevent packets with the same connection
+ID bytes being used over multiple network paths. Note that the client CID and target
+CID can stay the same while the target VCID and client VCID change. Importantly,
+the client and proxy do not send a CLOSE_CLIENT_CID capsule because that would also
+remove the registration of the CID for the purpose of port sharing - breaking the
+tunnelled path.
+
+### Passive Migration Steps {#passive-migration-steps}
+
+1. Client registers connection IDs via REGISTER_CLIENT_CID/REGISTER_TARGET_CID
+1. Client experiences NAT rebinding
+1. Proxy recognfigures forwarding rules to reuse the same virtual CID on the new network path.
+Forwarding rules activated upon validation of the client-proxy network path.
+
+No capsules were exchanged due to passive migration.
+
+### Active Migration Steps {#active-migration-steps}
+
+1. Client registers client-target connection IDs "A" while on client-proxy network path "Wifi"
+1. Client probes client-proxy network path "Cellular" and migrates
+1. Proxy removes forwarding rules on path "Wifi". The forwarding rules are removed, but
+the registration remains active in order to continue to support port sharing.
+1. Client re-registers client-target connection IDs "A" while on client-proxy network path
+"Cellular". This solicits new virtual CIDs from the proxy and does not count as an additional
+sequence number towards MAX_CONNECTION_IDs.
+1. Upon client-proxy network path validation, forwarding rules are configured with the new
+virtual CIDs provided by the proxy.
+
+Migrating "back" requires the same steps - there are no special affordances for previously
+configured paths. Forwarding rules are removed and re-registration is required to enable
+forwarding on the network path.
 
 ## Handling Server Preferred Addresses {#preferred-address}
 
