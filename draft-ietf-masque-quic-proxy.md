@@ -1285,24 +1285,24 @@ packets with the same connection ID bytes over multiple network paths. After
 initiating active migration, clients are no longer able to send forwarded mode
 packets since the proxy will have removed forwarding rules. Clients can proceed with
 tunnelled mode or can request new forwarding rules via REGISTER_CLIENT_CID and
-REGISTER_TARGET_CID capsules. Requesting new forwarding rules like this for the same
-client-to-target CIDs, is a re-registration and does not increment the sequence
+REGISTER_TARGET_CID capsules. Requesting new forwarding rules in this way (registering the same
+client-to-target CIDs again) is a re-registration and does not increment the sequence
 number or have any impact on MAX_CONNECTION_IDs. Each of the acknowledging capsules
 will contain new virtual connection IDs to prevent packets with the same connection
 ID bytes being used over multiple network paths. Note that the client CID and target
 CID can stay the same while the target VCID and client VCID change. Importantly,
 the client and proxy do not send a CLOSE_CLIENT_CID capsule because that would also
-remove the registration of the CID for the purpose of port sharing - breaking the
+remove the registration of the CID for the purpose of port sharing, potentially breaking the
 tunnelled path.
 
 ### Passive Migration Steps {#passive-migration-steps}
 
 1. Client registers connection IDs via REGISTER_CLIENT_CID/REGISTER_TARGET_CID
 1. Client experiences NAT rebinding
-1. Proxy recognfigures forwarding rules to reuse the same virtual CID on the new network path.
+1. Proxy reconfigures forwarding rules to reuse the same virtual CID on the new network path.
 Forwarding rules activated upon validation of the client-proxy network path.
 
-No capsules were exchanged due to passive migration.
+No capsules are exchanged in response to passive migration.
 
 ### Active Migration Steps {#active-migration-steps}
 
