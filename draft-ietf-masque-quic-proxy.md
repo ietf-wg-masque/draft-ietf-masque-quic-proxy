@@ -1272,12 +1272,15 @@ event does not end up sending too many tunnelled or forwarded packets on a new
 path prior to path validation.
 
 Specifically, the proxy MUST limit the number of packets that it will proxy
-to an unvalidated client address to the size of an initial congestion window.
+Specifically, the proxy MUST NOT forward packets
+to an unvalidated client address.
 Proxies additionally SHOULD pace the rate at which packets are sent over a new
 path to avoid creating unintentional congestion on the new path.
 
 When operating in forwarded mode, the proxy reconfigures or removes forwarding
-rules as the network path between the client and proxy changes. In the event of
+rules (i.e., the mappings for VCIDs) as the network path between the client and proxy changes.
+
+In the event of
 passive migration, the proxy MUST automatically reconfigure forwarding rules to use
 the latest active and validated network path for the HTTP stream. In the event of
 active migration, the proxy MUST remove forwarding rules in order to not send
@@ -1297,8 +1300,8 @@ tunnelled path.
 
 ### Passive Migration Steps {#passive-migration-steps}
 
-1. Client registers connection IDs via REGISTER_CLIENT_CID/REGISTER_TARGET_CID
-1. Client experiences NAT rebinding
+1. Client and proxy exchange connection IDs via REGISTER_CLIENT_CID/REGISTER_TARGET_CID/ACK_CLIENT_CID/ACK_TARGET_CID and start using the forwarded mode.
+1. The network path experiences NAT rebinding.
 1. Proxy reconfigures forwarding rules to reuse the same virtual CID on the new network path.
 Forwarding rules activated upon validation of the client-proxy network path.
 
