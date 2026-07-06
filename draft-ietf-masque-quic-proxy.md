@@ -1339,13 +1339,10 @@ No capsules are exchanged in response to passive migration.
 
 ### Active Migration Steps {#active-migration-steps}
 
-1. Client registers client-target connection IDs while on client-proxy network path "Wi-Fi"
-1. Client probes client-proxy network path "Cellular" and migrates
-1. Proxy removes forwarding rules on path "Wi-Fi". The forwarding rules are removed, but
-the registration remains active in order to continue to support port sharing.
-1. Client re-registers the original client-target connection IDs while on client-proxy network path
-"Cellular". This solicits new virtual CIDs from the proxy and does not count as an additional
-sequence number towards MAX_CONNECTION_IDs.
+1. Client and proxy exchange connection IDs via REGISTER_CLIENT_CID/REGISTER_TARGET_CID/ACK_CLIENT_CID/ACK_TARGET_CID and start using the forwarded mode.
+1. Client probes a new network path and migrates.
+1. Proxy, by receiving a non-probing packet on a non-active path that uses a Connection ID different from the active path, detects that the client intentionally migrated, and removes the forwarding rules.
+1. Client re-registers the original client-to-target Connection IDs. This solicits new virtual CIDs from the proxy.
 1. When the proxy receives a REGISTER_TARGET_CID capsule, the proxy responds with an ACK_TARGET_CID capsule carrying a fresh VCID, and enables the forwarding rule in the client-to-target direction.
 1. When the proxy receives a REGISTER_CLIENT_CID capsule, the proxy responds with an ACK_CLIENT_CID capsule carrying a fresh VCID; once the client acknowledges it with an ACK_CLIENT_VCID capsule and the network path is validated, the proxy enables the forwarding rule in the target-to-client direction.
 
