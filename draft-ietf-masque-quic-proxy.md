@@ -1324,7 +1324,7 @@ number and is dependent on sufficient MAX_CONNECTION_IDs. Each of the acknowledg
 will contain new virtual connection IDs to prevent packets with the same connection
 ID bytes being used over multiple network paths. Note that the client CID and target
 CID can stay the same while the target VCID and client VCID change. Importantly,
-the client deso not send a CLOSE_CLIENT_CID capsule because that would also
+the client does not send a CLOSE_CLIENT_CID capsule because that would also
 remove the registration of the CID for the purpose of port sharing, potentially breaking the
 tunnelled path.
 
