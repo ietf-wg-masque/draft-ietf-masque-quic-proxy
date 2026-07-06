@@ -1299,9 +1299,7 @@ If a proxy supports QUIC connection migration, it needs to ensure that a migrati
 event does not end up sending too many tunnelled or forwarded packets on a new
 path prior to path validation.
 
-Specifically, the proxy MUST limit the number of packets that it will proxy
-Specifically, the proxy MUST NOT forward packets
-to an unvalidated client address.
+Specifically, the proxy MUST NOT forward packets to an unvalidated client address.
 Proxies additionally SHOULD pace the rate at which packets are sent over a new
 path to avoid creating unintentional congestion on the new path.
 
@@ -1312,7 +1310,7 @@ In the event of
 passive migration, the proxy automatically reconfigures forwarding rules to use
 the latest active and validated network path for the HTTP stream. Specifically,
 the proxy MUST NOT forward packets to the client until the new network path
-is validated. The proxy MAY continue forwarding packets to the target.
+is validated. The proxy SHOULD continue forwarding packets to the target.
 
 In the event of
 active migration, the proxy MUST remove forwarding rules in order to not send
@@ -1348,8 +1346,8 @@ the registration remains active in order to continue to support port sharing.
 1. Client re-registers the original client-target connection IDs while on client-proxy network path
 "Cellular". This solicits new virtual CIDs from the proxy and does not count as an additional
 sequence number towards MAX_CONNECTION_IDs.
-1. Upon client-proxy network path validation, forwarding rules are configured with the new
-virtual CIDs provided by the proxy.
+1. When the proxy receives a REGISTER_TARGET_CID capsule, the proxy responds with an ACK_TARGET_CID capsule carrying a fresh VCID, and enables the forwarding rule in the client-to-target direction.
+1. When the proxy receives a REGISTER_CLIENT_CID capsule, the proxy responds with an ACK_CLIENT_CID capsule carrying a fresh VCID; once the client acknowledges it with an ACK_CLIENT_VCID capsule and the network path is validated, the proxy enables the forwarding rule in the target-to-client direction.
 
 Migrating "back" requires the same steps - there are no special affordances for previously
 configured paths. Forwarding rules are removed and re-registration is required to enable
