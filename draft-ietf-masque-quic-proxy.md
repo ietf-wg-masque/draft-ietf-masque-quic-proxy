@@ -1332,8 +1332,8 @@ tunnelled path.
 
 1. Client and proxy exchange connection IDs via REGISTER_CLIENT_CID/REGISTER_TARGET_CID/ACK_CLIENT_CID/ACK_TARGET_CID and start using the forwarded mode.
 1. The network path experiences NAT rebinding.
-1. Proxy reconfigures forwarding rules to reuse the same virtual CID on the new network path.
-Forwarding rules activated upon validation of the client-proxy network path.
+1. Proxy immediately and automatically reconfigures client-to-target forwarding rules to prevent dropping of forwarded mode packets.
+1. Proxy waits for the client-to-proxy network path to become validated and then automatically reconfigures target-to-client forwarding rules.
 
 No capsules are exchanged in response to passive migration.
 
