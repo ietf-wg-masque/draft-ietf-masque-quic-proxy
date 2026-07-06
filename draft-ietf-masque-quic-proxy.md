@@ -495,23 +495,22 @@ acknowledgement. This capsule also contains a Stateless Reset Token the client
 may respond with when receiving forwarded mode packets with the specified
 virtual connection ID.
 
+The REJECT_CLIENT_CID and REJECT_TARGET_CID capsule types ({{capsule-reject}})
+are used to reject connection ID registrations. Each capsule includes
+a reason code indicating the reason for the rejection. These capsules MUST only be sent
+by the proxy. A proxy MUST NOT send a rejection capsule for a registration that it
+has already acknowledged. If a client receives such a capsule, it MUST reset the
+stream with H3_DATAGRAM_ERROR error code.
+
 The CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsule types ({{capsule-close}})
-are used to close or reject connection ID registrations. Each capsule includes
-a reason code indicating why the connection ID is being closed.
+are used to close connection ID registrations. These capsules are only sent by the
+client and MUST NOT be sent by proxies.
 
 Clients send CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsules to retire connection
 IDs they no longer need, using the DEFAULT reason code. If a client cannot use the
 proxy-chosen client VCID (e.g., due to conflict or insufficient length), it can
 re-register the same client CID with an appropriate reason code to request a new
 VCID.
-
-Proxies send CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsules only to reject
-registrations. If a proxy sends CLOSE_CLIENT_CID without having sent an
-ACK_CLIENT_CID, or if a proxy sends CLOSE_TARGET_CID without having sent an
-ACK_TARGET_CID, it is rejecting a Connection ID registration. A proxy MUST NOT
-send a CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsule for a connection ID that it
-has already acknowledged. If a client receives such a capsule, it MUST reset the
-stream with H3_DATAGRAM_ERROR error code.
 
 The MAX_CONNECTION_IDS capsule type {{capsule-max-cids}} MUST only be sent by the
 proxy. It indicates to the client the cumulative number of connection ID registrations the client is allowed to request. This allows the proxy to limit the number of active
@@ -551,7 +550,7 @@ CID that it will use for receiving packets from a target.
 
 1. The proxy sends the `ACK_CLIENT_CID` capsule to acknowledge that CID,
 with no associated client VCID; alternatively, the proxy can send the
-`CLOSE_CLIENT_CID` if it detects a conflict with another CID.
+`REJECT_CLIENT_CID` if it detects a conflict with another CID.
 
 1. The proxy sends the `MAX_CONNECTION_IDS` capsule to allow additional
 registration of new connection IDs via future `REGISTER_CLIENT_CID` and
@@ -568,7 +567,7 @@ CID that it will use for receiving packets from a target.
 
 1. The proxy sends the `ACK_CLIENT_CID` capsule to acknowledge that CID,
 with a client VCID; alternatively, the proxy can send the
-`CLOSE_CLIENT_CID` if it detects a conflict with another CID.
+`REJECT_CLIENT_CID` if it detects a conflict with another CID.
 
 1. The client sends the `ACK_CLIENT_VCID` capsule to acknowledge the
 client VCID, which allows forwarded packets for that VCID to be used.
@@ -578,7 +577,7 @@ the target CID on the client-to-target connection.
 
 1. The proxy sends the `ACK_TARGET_CID` capsule to acknowledge that CID,
 with a target VCID; alternatively, the proxy can send the
-`CLOSE_TARGET_CID` if it detects a conflict with another CID. Once
+`REJECT_TARGET_CID` if it detects a conflict with another CID. Once
 the client receives the target VCID, it can start sending forwarded
 packets using the target VCID.
 
@@ -799,11 +798,36 @@ Stateless Reset Token
 : A Stateless Reset Token allowing reset of the target-to-client forwarding rule
 in response to target-to-client forwarded mode packets.
 
+### REJECT_CLIENT_CID and REJECT_TARGET_CID {#capsule-reject}
+
+REJECT_CLIENT_CID and REJECT_TARGET_CID capsule types include a reason code
+and a connection ID. Proxies send these capsules to reject connection ID registrations.
+
+~~~
+Reject CID Capsule {
+  Type (i) = see {{iana}} for the values of the capsule types
+  Length (i),
+  Reason (i),
+  Connection ID (0..2040),
+}
+~~~
+{: #fig-capsule-reject-cid title="Reject CID Capsule Format"}
+
+Reason:
+: The reason for rejecting the connection ID registration.
+See {{iana-cid-reasons}} for the list of reason codes.
+
+Connection ID:
+: A connection ID being closed, which is between 0 and 255 bytes in
+length. The length of the connection ID is implied by the length of the
+capsule. Note that in QUICv1, the length of the Connection ID is limited
+to 20 bytes, but QUIC invariants allow up to 255 bytes.
+
 ### CLOSE_CLIENT_CID and CLOSE_TARGET_CID {#capsule-close}
 
-CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsule types include a reason code
-and a connection ID. Clients send these capsules to retire connection IDs they
-no longer need. Proxies send these capsules to reject connection ID registrations.
+CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsule types include a connection ID.
+Clients send these capsules to retire connection IDs they
+no longer need.
 
 ~~~
 Close CID Capsule {
@@ -948,11 +972,12 @@ an optional Stateless Reset Token.
 ## Proxy Considerations
 
 The proxy MUST reply to each REGISTER_CLIENT_CID capsule with either
-an ACK_CLIENT_CID or CLOSE_CLIENT_CID capsule containing the
-Connection ID that was in the registration capsule.
+an ACK_CLIENT_CID or REJECT_CLIENT_CID capsule containing the
+Connection ID that was in the registration capsule. Capsules MUST be responded
+to in the order in which they are received.
 
 Similarly, the proxy MUST reply to each REGISTER_TARGET_CID capsule with
-either an ACK_TARGET_CID or CLOSE_TARGET_CID capsule containing the
+either an ACK_TARGET_CID or REJECT_TARGET_CID capsule containing the
 Connection ID that was in the registration capsule.
 
 When a proxy receives a REGISTER_CLIENT_CID with a non-zero reason code,
@@ -1728,9 +1753,11 @@ will be replaced with lower values before publication.
 | ACK_CLIENT_CID      | 0xffe702  | This Document |
 | ACK_CLIENT_VCID     | 0xffe703  | This Document |
 | ACK_TARGET_CID      | 0xffe704  | This Document |
-| CLOSE_CLIENT_CID    | 0xffe705  | This Document |
-| CLOSE_TARGET_CID    | 0xffe706  | This Document |
-| MAX_CONNECTION_IDS  | 0xffe707  | This Document |
+| REJECT_CLIENT_CID   | 0xffe705  | This Document |
+| REJECT_TARGET_CID   | 0xffe706  | This Document |
+| CLOSE_CLIENT_CID    | 0xffe707  | This Document |
+| CLOSE_TARGET_CID    | 0xffe708  | This Document |
+| MAX_CONNECTION_IDS  | 0xffe709  | This Document |
 {: #iana-capsule-type-table title="Registered Capsule Types"}
 
 All of these new entries use the following values for these fields:
