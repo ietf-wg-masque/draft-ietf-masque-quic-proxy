@@ -1748,16 +1748,16 @@ will be replaced with lower values before publication.
 
 |     Capule Type     |   Value   | Specification |
 |:--------------------|:----------|:--------------|
-| REGISTER_CLIENT_CID | 0xffe700  | This Document |
-| REGISTER_TARGET_CID | 0xffe701  | This Document |
-| ACK_CLIENT_CID      | 0xffe702  | This Document |
-| ACK_CLIENT_VCID     | 0xffe703  | This Document |
-| ACK_TARGET_CID      | 0xffe704  | This Document |
-| REJECT_CLIENT_CID   | 0xffe705  | This Document |
-| REJECT_TARGET_CID   | 0xffe706  | This Document |
-| CLOSE_CLIENT_CID    | 0xffe707  | This Document |
-| CLOSE_TARGET_CID    | 0xffe708  | This Document |
-| MAX_CONNECTION_IDS  | 0xffe709  | This Document |
+| REGISTER_CLIENT_CID | 0xffe800  | This Document |
+| REGISTER_TARGET_CID | 0xffe801  | This Document |
+| ACK_CLIENT_CID      | 0xffe802  | This Document |
+| ACK_CLIENT_VCID     | 0xffe803  | This Document |
+| ACK_TARGET_CID      | 0xffe804  | This Document |
+| REJECT_CLIENT_CID   | 0xffe805  | This Document |
+| REJECT_TARGET_CID   | 0xffe806  | This Document |
+| CLOSE_CLIENT_CID    | 0xffe807  | This Document |
+| CLOSE_TARGET_CID    | 0xffe808  | This Document |
+| MAX_CONNECTION_IDS  | 0xffe809  | This Document |
 {: #iana-capsule-type-table title="Registered Capsule Types"}
 
 All of these new entries use the following values for these fields:
