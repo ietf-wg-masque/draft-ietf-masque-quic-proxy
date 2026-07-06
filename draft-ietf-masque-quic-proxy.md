@@ -1299,24 +1299,55 @@ If a proxy supports QUIC connection migration, it needs to ensure that a migrati
 event does not end up sending too many tunnelled or forwarded packets on a new
 path prior to path validation.
 
-Specifically, the proxy MUST limit the number of packets that it will proxy
-to an unvalidated client address to the size of an initial congestion window.
+Specifically, the proxy MUST NOT forward packets to an unvalidated client address.
 Proxies additionally SHOULD pace the rate at which packets are sent over a new
 path to avoid creating unintentional congestion on the new path.
 
 When operating in forwarded mode, the proxy reconfigures or removes forwarding
-rules as the network path between the client and proxy changes. In the event of
-passive migration, the proxy automatically reconfigures forwarding rules to use
-the latest active and validated network path for the HTTP stream. In the event of
-active migration, the proxy removes forwarding rules in order to not send
-packets with the same connection ID bytes over multiple network paths. After
+rules (i.e., the mappings for VCIDs) as the network path between the client and proxy changes.
+
+In the event of passive migration, the proxy automatically reconfigures forwarding rules
+according to the HTTP stream's active network path and its validation status. Specifically,
+the proxy MUST NOT forward packets to the client until the new network path
+is validated. The proxy SHOULD continue forwarding packets to the target to avoid disruption
+of the client-to-target forwarding packet flow.
+
+In the event of active migration, the proxy MUST remove forwarding rules in order to not send
+packets with the same connection ID bytes over multiple network paths, and MUST NOT apply the new forwarding rule in the target-to-client direction until the new network path is validated. After
 initiating active migration, clients are no longer able to send forwarded mode
 packets since the proxy will have removed forwarding rules. Clients can proceed with
 tunnelled mode or can request new forwarding rules via REGISTER_CLIENT_CID and
-REGISTER_TARGET_CID capsules. Each of the acknowledging capsules will contain new
-virtual connection IDs to prevent packets with the same connection ID bytes being
-used over multiple network paths. Note that the client CID and target CID
-can stay the same while the target VCID and client VCID change.
+REGISTER_TARGET_CID capsules. Requesting new forwarding rules in this way (registering the same
+client-to-target CIDs again) is a re-registration and does increment the sequence
+number and is dependent on sufficient MAX_CONNECTION_IDs. Each of the acknowledging capsules
+will contain new virtual connection IDs to prevent packets with the same connection
+ID bytes being used over multiple network paths. Note that the client CID and target
+CID can stay the same while the target VCID and client VCID change. Importantly,
+the client does not send a CLOSE_CLIENT_CID capsule because that would also
+remove the registration of the CID for the purpose of port sharing, potentially breaking the
+tunnelled path.
+
+### Passive Migration Steps {#passive-migration-steps}
+
+1. Client and proxy exchange connection IDs via REGISTER_CLIENT_CID/REGISTER_TARGET_CID/ACK_CLIENT_CID/ACK_TARGET_CID and start using the forwarded mode.
+1. The network path experiences NAT rebinding.
+1. Proxy immediately and automatically reconfigures client-to-target forwarding rules to prevent dropping of forwarded mode packets.
+1. Proxy waits for the client-to-proxy network path to become validated and then automatically reconfigures target-to-client forwarding rules.
+
+No capsules are exchanged in response to passive migration.
+
+### Active Migration Steps {#active-migration-steps}
+
+1. Client and proxy exchange connection IDs via REGISTER_CLIENT_CID/REGISTER_TARGET_CID/ACK_CLIENT_CID/ACK_TARGET_CID and start using the forwarded mode.
+1. Client probes a new network path and migrates.
+1. Proxy, by receiving a non-probing packet on a non-active path that uses a Connection ID different from the active path, detects that the client intentionally migrated, and removes the forwarding rules.
+1. Client re-registers the original client-to-target Connection IDs. This solicits new virtual CIDs from the proxy.
+1. When the proxy receives a REGISTER_TARGET_CID capsule, the proxy responds with an ACK_TARGET_CID capsule carrying a fresh VCID, and enables the forwarding rule in the client-to-target direction.
+1. When the proxy receives a REGISTER_CLIENT_CID capsule, the proxy responds with an ACK_CLIENT_CID capsule carrying a fresh VCID; once the client acknowledges it with an ACK_CLIENT_VCID capsule and the network path is validated, the proxy enables the forwarding rule in the target-to-client direction.
+
+Migrating "back" requires the same steps - there are no special affordances for previously
+configured paths. Forwarding rules are removed and re-registration is required to enable
+forwarding on the network path.
 
 ## Handling Server Preferred Addresses {#preferred-address}
 
