@@ -273,7 +273,7 @@ Virtual Connection IDs (VCIDs) are QUIC Connection IDs used on the link between 
 client and proxy that do not belong to the QUIC connection between the client
 and proxy, but instead are aliases for particular client-to-target connections.
 VCIDs are only used in forwarded mode. They are established using HTTP capsules
-{{!HTTP-CAPSULES=RFC9297}} as described in {{cid-capsules}}.
+{{!HTTP-CAPSULES=RFC9297}} as described in {{cid-registration}}.
 
 For example, consider a proxy using HTTP/3 that has a single client connected
 to it. The client-to-proxy QUIC connection has `CCCC0000` as the client CID
@@ -350,7 +350,7 @@ Clients and Proxies not implementing forwarded mode do not need to consider
 VCIDs since all client-to-target datagrams will be encapsulated
 within the client-to-proxy connection.
 
-## Negotiating Modes and Connection IDs {#negotiation}
+## Negotiating Modes {#negotiation}
 
 In order to support QUIC-aware proxying, both clients and proxies need
 to support capsules {{HTTP-CAPSULES}}, which is indicated by including
@@ -387,57 +387,10 @@ If neither header is supplied with a value of "?1", none of the functionality
 in this document can be used and handling reduces to normal connect-udp.
 
 After negotiating support with header fields, clients and proxies use
-the capsules defined in {{cid-capsules}} to communicate information
+the capsules defined in {{cid-registration}} to communicate information
 about CIDs and VCIDs.
 
-For QUIC-aware proxying without forwarded mode, the steps are as follows:
-
-1. The client sends the `REGISTER_CLIENT_CID` capsule once it selects a
-CID that it will use for receiving packets from a target.
-
-1. The proxy sends the `ACK_CLIENT_CID` capsule to acknowledge that CID,
-with no associated client VCID; alternatively, the proxy can send the
-`CLOSE_CLIENT_CID` if it detects a conflict with another CID.
-
-1. The proxy sends the `MAX_CONNECTION_IDS` capsule to allow additional
-registration of new connection IDs via future `REGISTER_CLIENT_CID` and
-`REGISTER_TARGET_CID` capsules.
-
-1. Whenever a client stops using a particular CID, the client
-sends a `CLOSE_CLIENT_CID`. The client can also initiate new
-`REGISTER_CLIENT_CID` exchanges at any time.
-
-For QUIC-aware proxying with forwarded mode, the steps are as follows:
-
-1. The client sends the `REGISTER_CLIENT_CID` capsule once it selects a
-CID that it will use for receiving packets from a target.
-
-1. The proxy sends the `ACK_CLIENT_CID` capsule to acknowledge that CID,
-with a client VCID; alternatively, the proxy can send the
-`CLOSE_CLIENT_CID` if it detects a conflict with another CID.
-
-1. The client sends the `ACK_CLIENT_VCID` capsule to acknowledge the
-client VCID, which allows forwarded packets for that VCID to be used.
-
-1. The client sends the `REGISTER_TARGET_CID` capsule as soon as it learns
-the target CID on the client-to-target connection.
-
-1. The proxy sends the `ACK_TARGET_CID` capsule to acknowledge that CID,
-with a target VCID; alternatively, the proxy can send the
-`CLOSE_TARGET_CID` if it detects a conflict with another CID. Once
-the client receives the target VCID, it can start sending forwarded
-packets using the target VCID.
-
-1. The proxy sends the `MAX_CONNECTION_IDS` capsule to allow additional
-registration of new connection IDs via future `REGISTER_CLIENT_CID` and
-`REGISTER_TARGET_CID` capsules.
-
-1. Whenever a client or target stops uses a particular CID, the client
-sends a `CLOSE_CLIENT_CID` or `CLOSE_TARGET_CID` capsule. The client
-can also initiate new `REGISTER_CLIENT_CID` or `REGISTER_TARGET_CID`
-exchanges at any time.
-
-# Proxy-QUIC-Forwarding Header {#forwarding-header}
+### Proxy-QUIC-Forwarding Header {#forwarding-header}
 
 A client initiates UDP proxying via a CONNECT request as defined
 in {{CONNECT-UDP}}. Within its request, it includes the "Proxy-QUIC-Forwarding"
@@ -476,7 +429,7 @@ Clients MUST NOT send the "transform" parameter and servers MUST NOT send the
 "accept-transform" parameter. Clients MUST ignore receipt of an "accept-transform"
 parameter and servers MUST ignore receipt of a "transform" parameter.
 
-# Proxy-QUIC-Port-Sharing Header {#port-sharing-header}
+### Proxy-QUIC-Port-Sharing Header {#port-sharing-header}
 
 A client may include the "Proxy-QUIC-Port-Sharing" header to indicate whether
 or not the proxy is permitted to share ports between this QUIC connection and other
@@ -502,7 +455,7 @@ When port sharing is supported and forwarded mode is not, registration of target
 Connection IDs is permitted, but is not required since port sharing only requires
 demultiplexing QUIC packets in the target-to-client direction
 
-# Connection ID Capsules {#cid-capsules}
+# Connection ID Registration {#cid-registration}
 
 Connection ID awareness relies on using capsules {{HTTP-CAPSULES}} to
 signal addition and removal of Connection IDs. Clients send capsules
@@ -591,7 +544,56 @@ registration happens sequentially. While waiting for forwarded mode to become
 enabled, clients SHOULD communicate over tunneled mode to avoid end-to-end
 delays.
 
-## REGISTER_CLIENT_CID {#capsule-reg-client}
+For QUIC-aware proxying without forwarded mode, the steps are as follows:
+
+1. The client sends the `REGISTER_CLIENT_CID` capsule once it selects a
+CID that it will use for receiving packets from a target.
+
+1. The proxy sends the `ACK_CLIENT_CID` capsule to acknowledge that CID,
+with no associated client VCID; alternatively, the proxy can send the
+`CLOSE_CLIENT_CID` if it detects a conflict with another CID.
+
+1. The proxy sends the `MAX_CONNECTION_IDS` capsule to allow additional
+registration of new connection IDs via future `REGISTER_CLIENT_CID` and
+`REGISTER_TARGET_CID` capsules.
+
+1. Whenever a client stops using a particular CID, the client
+sends a `CLOSE_CLIENT_CID`. The client can also initiate new
+`REGISTER_CLIENT_CID` exchanges at any time.
+
+For QUIC-aware proxying with forwarded mode, the steps are as follows:
+
+1. The client sends the `REGISTER_CLIENT_CID` capsule once it selects a
+CID that it will use for receiving packets from a target.
+
+1. The proxy sends the `ACK_CLIENT_CID` capsule to acknowledge that CID,
+with a client VCID; alternatively, the proxy can send the
+`CLOSE_CLIENT_CID` if it detects a conflict with another CID.
+
+1. The client sends the `ACK_CLIENT_VCID` capsule to acknowledge the
+client VCID, which allows forwarded packets for that VCID to be used.
+
+1. The client sends the `REGISTER_TARGET_CID` capsule as soon as it learns
+the target CID on the client-to-target connection.
+
+1. The proxy sends the `ACK_TARGET_CID` capsule to acknowledge that CID,
+with a target VCID; alternatively, the proxy can send the
+`CLOSE_TARGET_CID` if it detects a conflict with another CID. Once
+the client receives the target VCID, it can start sending forwarded
+packets using the target VCID.
+
+1. The proxy sends the `MAX_CONNECTION_IDS` capsule to allow additional
+registration of new connection IDs via future `REGISTER_CLIENT_CID` and
+`REGISTER_TARGET_CID` capsules.
+
+1. Whenever a client or target stops uses a particular CID, the client
+sends a `CLOSE_CLIENT_CID` or `CLOSE_TARGET_CID` capsule. The client
+can also initiate new `REGISTER_CLIENT_CID` or `REGISTER_TARGET_CID`
+exchanges at any time.
+
+## Capsule Types and Formats {#capsule-types-formats}
+
+### REGISTER_CLIENT_CID {#capsule-reg-client}
 
 The REGISTER_CLIENT_CID capsule is sent by the client and contains a single
 connection ID that is the client-provided connection ID on the client-to-target QUIC
@@ -619,7 +621,7 @@ length. The length of the connection ID is implied by the length of the
 capsule. Note that in QUICv1, the length of the Connection ID is limited
 to 20 bytes, but QUIC invariants allow up to 255 bytes.
 
-## REGISTER_TARGET_CID {#capsule-reg-target}
+### REGISTER_TARGET_CID {#capsule-reg-target}
 
 The REGISTER_TARGET_CID capsule is sent by the client and includes the
 target-provided connection ID on the client-to-target QUIC connection, and
@@ -659,7 +661,7 @@ Stateless Reset Token
 : The target-provided Stateless Reset token allowing the proxy to correctly
 recognize Stateless Reset packets to be tunnelled to the client.
 
-## ACK_CLIENT_CID {#capsule-ack-client}
+### ACK_CLIENT_CID {#capsule-ack-client}
 
 The ACK_CLIENT_CID capsule is sent by the proxy in
 response to a REGISTER_CLIENT_CID capsule. It optionally assigns a Virtual
@@ -700,7 +702,7 @@ Virtual Connection ID
 forwarded mode. The proxy rewrites forwarded mode packets to contain the
 correct client VCID prior to sending them to the client.
 
-## ACK_TARGET_CID {#capsule-ack-target}
+### ACK_TARGET_CID {#capsule-ack-target}
 
 The ACK_TARGET_CID capsule is sent by the proxy in
 response to a REGISTER_TARGET_CID capsule. It optionally assigns a Virtual
@@ -752,7 +754,7 @@ Stateless Reset Token
 : A Stateless Reset Token allowing reset of the client-to-target connection in
 response to client-to-target forwarded mode packets.
 
-## ACK_CLIENT_VCID {#capsule-ack-virtual}
+### ACK_CLIENT_VCID {#capsule-ack-virtual}
 
 The ACK_CLIENT_VCID capsule type is sent by the client in
 response to an ACK_CLIENT_CID capsule that contains a virtual connection ID.
@@ -797,7 +799,7 @@ Stateless Reset Token
 : A Stateless Reset Token allowing reset of the target-to-client forwarding rule
 in response to target-to-client forwarded mode packets.
 
-## CLOSE_CLIENT_CID and CLOSE_TARGET_CID {#capsule-close}
+### CLOSE_CLIENT_CID and CLOSE_TARGET_CID {#capsule-close}
 
 CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsule types include a reason code
 and a connection ID. Clients send these capsules to retire connection IDs they
@@ -823,7 +825,7 @@ length. The length of the connection ID is implied by the length of the
 capsule. Note that in QUICv1, the length of the Connection ID is limited
 to 20 bytes, but QUIC invariants allow up to 255 bytes.
 
-## MAX_CONNECTION_IDS {#capsule-max-cids}
+### MAX_CONNECTION_IDS {#capsule-max-cids}
 
 The MAX_CONNECTION_IDS capsule is sent by the proxy to the client
 to define the cumulative number of connection ID registrations
@@ -849,31 +851,6 @@ allowed limit of 2. Thus, any value sent in the capsule MUST be at least 3.
 
 Clients receiving a MAX_CONNECTION_IDS capsule with an invalid value
 MUST reset the stream with H3_DATAGRAM_ERROR error code.
-
-## Detecting Conflicts {#conflicts}
-
-In order to be able to route packets correctly in both tunnelled and forwarded
-mode, proxies check for conflicts before creating a new CID mapping. If a conflict
-is detected, the proxy will reject the client's registration using a CLOSE_CLIENT_CID
-or CLOSE_TARGET_CID capsule with the CONFLICT reason code.
-
-Two 4-tuples conflict if and only if all members of the 4-tuple (local IP
-address, local UDP port, remote IP address, and remote UDP port) are identical.
-
-Two Connection IDs conflict if and only if one Connection ID is equal to or a
-prefix of another. For example, a zero-length Connection ID conflicts with all
-connection IDs. This definition of a conflict originates from the fact that
-QUIC short headers do not carry the length of the Destination Connection ID
-field, and therefore if two short headers with different Destination Connection
-IDs are received on a shared 4-tuple, one being a prefix of the other prevents
-the receiver from identifying which mapping this corresponds to.
-
-The proxy treats two mappings as being in conflict when a conflict is detected
-for all elements on the left side of the mapping diagrams above.
-
-Since very short Connection IDs are more likely to lead to conflicts,
-particularly zero-length Connection IDs, a proxy MAY choose to reject
-registrations for very short Connection IDs using the TOO_SHORT reason code.
 
 ## Client Considerations
 
@@ -1048,6 +1025,32 @@ considered as activity for restarting QUIC's Idle Timeout {{QUIC}}.
 In order to permit the client to change client-to-target connection IDs, the proxy
 SHOULD send MAX_CONNECTION_IDS capsules allowing the client additional connection ID
 registrations.
+
+### Detecting Conflicts {#conflicts}
+
+In order to be able to route packets correctly in both tunnelled and forwarded
+mode, proxies check for conflicts before creating a new CID mapping. If a conflict
+is detected, the proxy will reject the client's registration using a CLOSE_CLIENT_CID
+or CLOSE_TARGET_CID capsule with the CONFLICT reason code.
+
+Two 4-tuples conflict if and only if all members of the 4-tuple (local IP
+address, local UDP port, remote IP address, and remote UDP port) are identical.
+
+Two Connection IDs conflict if and only if one Connection ID is equal to or a
+prefix of another. For example, a zero-length Connection ID conflicts with all
+connection IDs. This definition of a conflict originates from the fact that
+QUIC short headers do not carry the length of the Destination Connection ID
+field, and therefore if two short headers with different Destination Connection
+IDs are received on a shared 4-tuple, one being a prefix of the other prevents
+the receiver from identifying which mapping this corresponds to.
+
+The proxy treats two mappings as being in conflict when a conflict is detected
+for all elements on the left side of the mapping diagrams above.
+
+Since very short Connection IDs are more likely to lead to conflicts,
+particularly zero-length Connection IDs, a proxy MAY choose to reject
+registrations for very short Connection IDs using the TOO_SHORT reason code.
+
 
 ### Closing Proxy State
 
@@ -1563,7 +1566,7 @@ proxy all versions of QUIC.
 
 While QUIC proxies can proxy all versions of QUIC, some optional capabilities
 are limited to certain versions. Specifically, some of the connection ID
-registration capsules in {{cid-capsules}} include a Stateless Reset Token field.
+registration capsules in {{capsule-types-formats}} include a Stateless Reset Token field.
 This field is defined in {{!QUIC=RFC9000}} and not part of
 {{!INVARIANTS=RFC8999}}. If a future QUIC version removes or changes the
 behavior of Stateless Reset Tokens, the Stateless Reset Token field in each
