@@ -1309,10 +1309,14 @@ When operating in forwarded mode, the proxy reconfigures or removes forwarding
 rules (i.e., the mappings for VCIDs) as the network path between the client and proxy changes.
 
 In the event of
-passive migration, the proxy MUST automatically reconfigure forwarding rules to use
-the latest active and validated network path for the HTTP stream. In the event of
+passive migration, the proxy automatically reconfigures forwarding rules to use
+the latest active and validated network path for the HTTP stream. Specifically,
+the proxy MUST NOT forward packets to the client until the new network path
+is validated. The proxy MAY continue forwarding packets to the target.
+
+In the event of
 active migration, the proxy MUST remove forwarding rules in order to not send
-packets with the same connection ID bytes over multiple network paths. After
+packets with the same connection ID bytes over multiple network paths, and MUST NOT apply the new forwarding rule in the target-to-client direction until the new network path is validated. After
 initiating active migration, clients are no longer able to send forwarded mode
 packets since the proxy will have removed forwarding rules. Clients can proceed with
 tunnelled mode or can request new forwarding rules via REGISTER_CLIENT_CID and
