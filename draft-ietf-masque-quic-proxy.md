@@ -72,7 +72,7 @@ normative:
 This document extends UDP Proxying over HTTP to add optimizations for proxied
 QUIC connections. Specifically, it allows a proxy to reuse UDP 4-tuples for multiple
 proxied connections, and adds a mode of proxying in which QUIC short header packets
-can be forwarded and transformed through a HTTP/3 proxy rather than being fully
+can be forwarded and transformed through an HTTP/3 proxy rather than being fully
 re-encapsulated and re-encrypted.
 
 --- middle
@@ -115,7 +115,7 @@ These packets use multiple layers of encryption and congestion control.
 2. Forwarded is the mode of proxying added by this document. In this mode,
 packets in the QUIC connection between the client and target are sent with dedicated
 QUIC Connection IDs between the client and proxy, and use special-purpose
-tranforms instead of full re-encapsulation and re-encryption.
+transforms instead of full re-encapsulation and re-encryption.
 
 QUIC long header packets between clients and targets MUST be proxied in tunnelled
 mode. QUIC short header packets between clients and targets MAY be proxied in
@@ -221,7 +221,7 @@ QUIC connection IDs on the client-to-target QUIC connection ({{cid-awareness}}).
 Forwarded mode adds the concept of Virtual Connection IDs that are assigned
 by the proxy to use to identify packets on the client-to-proxy 4-tuple ({{vcids}}).
 
-Negotation of modes and assignment of connection IDs is described in {{negotiation}}.
+Negotiation of modes and assignment of connection IDs is described in {{negotiation}}.
 
 ## Connection ID Awareness {#cid-awareness}
 
@@ -265,7 +265,7 @@ correct client based on CID `AAAA0000` or `BBBB0000`.
 
 In order to share a proxy-to-target 4-tuple between multiple proxied connections,
 the proxy MUST guarantee that the client CIDs do not conflict. See {{conflicts}}
-for more discussion of handlng CID conflicts.
+for more discussion of handling CID conflicts.
 
 ## Virtual Connection IDs {#vcids}
 
@@ -540,7 +540,7 @@ acknowledged. Forwarded mode requires CID/VCID mappings be communicated and
 acknowledged, and, as a consequence, cannot be leveraged without a round
 trip. This is particularly pronounced when chaining proxies because
 registration happens sequentially. While waiting for forwarded mode to become
-enabled, clients SHOULD communicate over tunneled mode to avoid end-to-end
+enabled, clients SHOULD communicate over tunnelled mode to avoid end-to-end
 delays.
 
 For QUIC-aware proxying without forwarded mode, the steps are as follows:
@@ -585,7 +585,7 @@ packets using the target VCID.
 registration of new connection IDs via future `REGISTER_CLIENT_CID` and
 `REGISTER_TARGET_CID` capsules.
 
-1. Whenever a client or target stops uses a particular CID, the client
+1. Whenever a client or target stops using a particular CID, the client
 sends a `CLOSE_CLIENT_CID` or `CLOSE_TARGET_CID` capsule. The client
 can also initiate new `REGISTER_CLIENT_CID` or `REGISTER_TARGET_CID`
 exchanges at any time.
@@ -685,7 +685,7 @@ is limited to 20 bytes, but QUIC invariants allow up to 255 bytes.
 
 Connection ID
 : A connection ID being acknowledged whose length is equal to
-Connection ID Length. This is the real Cilent Connection ID.
+Connection ID Length. This is the real Client Connection ID.
 
 Virtual Connection ID Length
 : The length of the client VCID being provided. This MUST be a
@@ -779,7 +779,7 @@ is limited to 20 bytes, but QUIC invariants allow up to 255 bytes.
 
 Connection ID
 : A connection ID being acknowledged whose length is equal to
-Connection ID Length. This is the real Cilent Connection ID.
+Connection ID Length. This is the real Client Connection ID.
 
 Virtual Connection ID Length
 : The length of the client VCID being acknowledged.
@@ -924,7 +924,7 @@ To initiate QUIC-aware proxying, the client sends a REGISTER_CLIENT_CID
 capsule containing the initial client CID that the client has
 advertised to the target.
 
-If the mapping is created successfully, the client will receive a
+If the mapping is created successfully, the client will receive an
 ACK_CLIENT_CID capsule that contains the same client CID that was
 requested as well as a client VCID that the client MUST use
 when sending forwarded mode packets, assuming forwarded mode is supported.
@@ -1007,9 +1007,9 @@ requests, since it might not be possible to correctly demultiplex or direct
 the traffic. Any packets received on a proxy-to-target 4-tuple used for proxying
 QUIC that does not correspond to a known CID MUST be dropped.
 
-When the proxy recieves a REGISTER_CLIENT_CID capsule, it is receiving a
+When the proxy receives a REGISTER_CLIENT_CID capsule, it is receiving a
 request to be able to route traffic matching the client CID back to
-the client using. If the pair of this client CID and the selected
+the client. If the pair of this client CID and the selected
 proxy-to-target 4-tuple does not create a conflict, the proxy creates the mapping
 and responds with an ACK_CLIENT_CID capsule. If forwarded mode is enabled, the
 capsule contains a proxy-chosen client VCID. If forwarded mode
@@ -1025,7 +1025,7 @@ proxy MAY tunnel these packets in HTTP Datagram frames instead. If the mapping
 would create a conflict, the proxy responds with a REJECT_CLIENT_CID capsule
 with the CONFLICT reason code.
 
-When the proxy recieves a REGISTER_TARGET_CID capsule, it is receiving a
+When the proxy receives a REGISTER_TARGET_CID capsule, it is receiving a
 request to allow the client to forward packets to the target. The proxy
 generates a target VCID for the client to use when sending
 packets in forwarded mode. If forwarded mode is not supported, the proxy MUST
@@ -1655,7 +1655,7 @@ vulnerable to packet injection in the target-to-client direction. An attacker
 can inject a burst of packets with a known QUIC Connection ID and see which
 Connection ID is used for the corresponding burst on the proxy-to-client network path.
 
-Forwarded mode is vulnerable to some active attacks that tunneled mode is not.
+Forwarded mode is vulnerable to some active attacks that tunnelled mode is not.
 For example, packet injection with a known QUIC Connection ID can also happen in the
 client-to-proxy direction, which only affects forwarded mode since
 tunnelled mode sends packets within an authenticated and integrity protected
@@ -1773,11 +1773,11 @@ IANA-POLICY}}.
 
 ## Capsule Types {#iana-capsule-types}
 
-This document registers six new values in the "HTTP Capsule Types"
+This document registers ten new values in the "HTTP Capsule Types"
 registry established by {{HTTP-CAPSULES}}. Note that the codepoints below
 will be replaced with lower values before publication.
 
-|     Capule Type     |   Value   | Specification |
+|     Capsule Type    |   Value   | Specification |
 |:--------------------|:----------|:--------------|
 | REGISTER_CLIENT_CID | 0xffe800  | This Document |
 | REGISTER_TARGET_CID | 0xffe801  | This Document |
