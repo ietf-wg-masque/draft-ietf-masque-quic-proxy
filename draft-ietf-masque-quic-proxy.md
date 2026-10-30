@@ -903,8 +903,8 @@ CONFLICT, the proxy MUST select a different VCID.
 
 Connection ID registrations are subject to a proxy-advertised limit. Each registration
 has a corresponding sequence number. The client MUST NOT send a registration
-capsule with a sequence number greater than what the proxy advertises via the
-MAX_CONNECTION_IDS capsule. The initial MAX_CONNECTION_IDS value is 1, allowing both
+capsule with a sequence number greater than or equal to the value the proxy
+advertises via the MAX_CONNECTION_IDS capsule. The initial limit is 2, allowing
 sequence numbers 0 and 1 for a total of two registrations without receiving a
 MAX_CONNECTION_IDS capsule from the proxy.
 
@@ -1457,7 +1457,7 @@ STREAM(44): DATA                -------->
 
            <--------  STREAM(44): DATA
                         Capsule Type = MAX_CONNECTION_IDS
-                        Maximum Sequence Number = 3
+                        Maximum Connection IDs = 4
 
 DATAGRAM                        -------->
   Quarter Stream ID = 11
@@ -1483,8 +1483,8 @@ cannot send forwarded mode packets because the client hasn't acknowledged the
 client VCID.
 
 The proxy indicates to the client that it will allow connection ID registrations
-with sequence numbers 0-3, allowing for registrations beyond the initial maximum
-of 1.
+with sequence numbers 0-3, allowing for registrations beyond the initial limit
+of 2.
 
 ~~~
 STREAM(44): DATA                -------->
