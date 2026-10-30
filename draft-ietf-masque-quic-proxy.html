@@ -12,10 +12,10 @@
        This document extends UDP Proxying over HTTP to add optimizations for proxied
 QUIC connections. Specifically, it allows a proxy to reuse UDP 4-tuples for multiple
 proxied connections, and adds a mode of proxying in which QUIC short header packets
-can be forwarded and transformed through a HTTP/3 proxy rather than being fully
+can be forwarded and transformed through an HTTP/3 proxy rather than being fully
 re-encapsulated and re-encrypted. 
     " name="description">
-<meta content="xml2rfc 3.34.0" name="generator">
+<meta content="xml2rfc 3.34.1" name="generator">
 <meta content="quic" name="keyword">
 <meta content="http" name="keyword">
 <meta content="datagram" name="keyword">
@@ -28,19 +28,19 @@ re-encapsulated and re-encrypted.
 <meta content="http-ng" name="keyword">
 <meta content="draft-ietf-masque-quic-proxy-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.34.0
-    Python 3.14.5
-    ConfigArgParse 1.7.5
+  xml2rfc 3.34.1
+    Python 3.14.8
+    ConfigArgParse 1.8.0
     google-i18n-address 3.1.1
     intervaltree 3.2.1
     Jinja2 3.1.6
     lxml 6.1.1
     natsort 8.4.0
-    platformdirs 4.10.0
+    platformdirs 4.13.4
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
-    wcwidth 0.8.2
+    wcwidth 0.9.2
 -->
 <link href="draft-ietf-masque-quic-proxy.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -76,7 +76,6 @@ re-encapsulated and re-encrypted.
   src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
   unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
-
 @font-face {
   font-family: 'Lora';
   font-style: italic;
@@ -125,7 +124,6 @@ re-encapsulated and re-encrypted.
   src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
-
 @font-face {
   font-family: 'Lora';
   font-style: normal;
@@ -190,7 +188,6 @@ re-encapsulated and re-encrypted.
   font-display: swap;
   src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
 }
 
 @font-face {
@@ -1059,11 +1056,11 @@ svg {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">QUIC Proxy</td>
-<td class="right">July 2026</td>
+<td class="right">October 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Pauly, et al.</td>
-<td class="center">Expires 7 January 2027</td>
+<td class="center">Expires 3 May 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1076,12 +1073,12 @@ svg {
 <dd class="internet-draft">draft-ietf-masque-quic-proxy-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-07-06" class="published">6 July 2026</time>
+<time datetime="2026-10-30" class="published">30 October 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-01-07">7 January 2027</time></dd>
+<dd class="expires"><time datetime="2027-05-03">3 May 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1105,7 +1102,7 @@ svg {
 <p id="section-abstract-1">This document extends UDP Proxying over HTTP to add optimizations for proxied
 QUIC connections. Specifically, it allows a proxy to reuse UDP 4-tuples for multiple
 proxied connections, and adds a mode of proxying in which QUIC short header packets
-can be forwarded and transformed through a HTTP/3 proxy rather than being fully
+can be forwarded and transformed through an HTTP/3 proxy rather than being fully
 re-encapsulated and re-encrypted.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
@@ -1143,7 +1140,7 @@ re-encapsulated and re-encrypted.<a href="#section-abstract-1" class="pilcrow">�
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 7 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 3 May 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1416,7 +1413,7 @@ These packets use multiple layers of encryption and congestion control.<a href="
           <p id="section-1-7.2.1">Forwarded is the mode of proxying added by this document. In this mode,
 packets in the QUIC connection between the client and target are sent with dedicated
 QUIC Connection IDs between the client and proxy, and use special-purpose
-tranforms instead of full re-encapsulation and re-encryption.<a href="#section-1-7.2.1" class="pilcrow">¶</a></p>
+transforms instead of full re-encapsulation and re-encryption.<a href="#section-1-7.2.1" class="pilcrow">¶</a></p>
 </li>
       </ol>
 <p id="section-1-8">QUIC long header packets between clients and targets MUST be proxied in tunnelled
@@ -1589,7 +1586,7 @@ is just treated as a target by the preceding proxy.<a href="#section-2-1" class=
 QUIC connection IDs on the client-to-target QUIC connection (<a href="#cid-awareness" class="auto internal xref">Section 2.1</a>).<a href="#section-2-3" class="pilcrow">¶</a></p>
 <p id="section-2-4">Forwarded mode adds the concept of Virtual Connection IDs that are assigned
 by the proxy to use to identify packets on the client-to-proxy 4-tuple (<a href="#vcids" class="auto internal xref">Section 2.2</a>).<a href="#section-2-4" class="pilcrow">¶</a></p>
-<p id="section-2-5">Negotation of modes and assignment of connection IDs is described in <a href="#negotiation" class="auto internal xref">Section 2.3</a>.<a href="#section-2-5" class="pilcrow">¶</a></p>
+<p id="section-2-5">Negotiation of modes and assignment of connection IDs is described in <a href="#negotiation" class="auto internal xref">Section 2.3</a>.<a href="#section-2-5" class="pilcrow">¶</a></p>
 <div id="cid-awareness">
 <section id="section-2.1">
         <h3 id="name-connection-id-awareness">
@@ -1680,7 +1677,7 @@ correct client based on CID <code>AAAA0000</code> or <code>BBBB0000</code>.<a hr
 </div>
 <p id="section-2.1-5">In order to share a proxy-to-target 4-tuple between multiple proxied connections,
 the proxy MUST guarantee that the client CIDs do not conflict. See <a href="#conflicts" class="auto internal xref">Section 3.3.1</a>
-for more discussion of handlng CID conflicts.<a href="#section-2.1-5" class="pilcrow">¶</a></p>
+for more discussion of handling CID conflicts.<a href="#section-2.1-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="vcids">
@@ -1988,7 +1985,7 @@ acknowledged. Forwarded mode requires CID/VCID mappings be communicated and
 acknowledged, and, as a consequence, cannot be leveraged without a round
 trip. This is particularly pronounced when chaining proxies because
 registration happens sequentially. While waiting for forwarded mode to become
-enabled, clients SHOULD communicate over tunneled mode to avoid end-to-end
+enabled, clients SHOULD communicate over tunnelled mode to avoid end-to-end
 delays.<a href="#section-3-11" class="pilcrow">¶</a></p>
 <p id="section-3-12">For QUIC-aware proxying without forwarded mode, the steps are as follows:<a href="#section-3-12" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-3-13">
@@ -2044,7 +2041,7 @@ registration of new connection IDs via future <code>REGISTER_CLIENT_CID</code> a
 <code>REGISTER_TARGET_CID</code> capsules.<a href="#section-3-15.6.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-3-15.7">
-          <p id="section-3-15.7.1">Whenever a client or target stops uses a particular CID, the client
+          <p id="section-3-15.7.1">Whenever a client or target stops using a particular CID, the client
 sends a <code>CLOSE_CLIENT_CID</code> or <code>CLOSE_TARGET_CID</code> capsule. The client
 can also initiate new <code>REGISTER_CLIENT_CID</code> or <code>REGISTER_TARGET_CID</code>
 exchanges at any time.<a href="#section-3-15.7.1" class="pilcrow">¶</a></p>
@@ -2198,7 +2195,7 @@ is limited to 20 bytes, but QUIC invariants allow up to 255 bytes.<a href="#sect
 <dt id="section-3.1.3-3.3">Connection ID</dt>
             <dd style="margin-left: 1.5em" id="section-3.1.3-3.4">
               <p id="section-3.1.3-3.4.1">A connection ID being acknowledged whose length is equal to
-Connection ID Length. This is the real Cilent Connection ID.<a href="#section-3.1.3-3.4.1" class="pilcrow">¶</a></p>
+Connection ID Length. This is the real Client Connection ID.<a href="#section-3.1.3-3.4.1" class="pilcrow">¶</a></p>
 </dd>
             <dd class="break"></dd>
 <dt id="section-3.1.3-3.5">Virtual Connection ID Length</dt>
@@ -2336,7 +2333,7 @@ is limited to 20 bytes, but QUIC invariants allow up to 255 bytes.<a href="#sect
 <dt id="section-3.1.5-3.3">Connection ID</dt>
             <dd style="margin-left: 1.5em" id="section-3.1.5-3.4">
               <p id="section-3.1.5-3.4.1">A connection ID being acknowledged whose length is equal to
-Connection ID Length. This is the real Cilent Connection ID.<a href="#section-3.1.5-3.4.1" class="pilcrow">¶</a></p>
+Connection ID Length. This is the real Client Connection ID.<a href="#section-3.1.5-3.4.1" class="pilcrow">¶</a></p>
 </dd>
             <dd class="break"></dd>
 <dt id="section-3.1.5-3.5">Virtual Connection ID Length</dt>
@@ -2539,7 +2536,7 @@ retaining the same client-to-target connection by creating a new tunnel with
 <p id="section-3.2.1-1">To initiate QUIC-aware proxying, the client sends a REGISTER_CLIENT_CID
 capsule containing the initial client CID that the client has
 advertised to the target.<a href="#section-3.2.1-1" class="pilcrow">¶</a></p>
-<p id="section-3.2.1-2">If the mapping is created successfully, the client will receive a
+<p id="section-3.2.1-2">If the mapping is created successfully, the client will receive an
 ACK_CLIENT_CID capsule that contains the same client CID that was
 requested as well as a client VCID that the client MUST use
 when sending forwarded mode packets, assuming forwarded mode is supported.<a href="#section-3.2.1-2" class="pilcrow">¶</a></p>
@@ -2620,9 +2617,9 @@ different target server.<a href="#section-3.3-5" class="pilcrow">¶</a></p>
 requests, since it might not be possible to correctly demultiplex or direct
 the traffic. Any packets received on a proxy-to-target 4-tuple used for proxying
 QUIC that does not correspond to a known CID MUST be dropped.<a href="#section-3.3-6" class="pilcrow">¶</a></p>
-<p id="section-3.3-7">When the proxy recieves a REGISTER_CLIENT_CID capsule, it is receiving a
+<p id="section-3.3-7">When the proxy receives a REGISTER_CLIENT_CID capsule, it is receiving a
 request to be able to route traffic matching the client CID back to
-the client using. If the pair of this client CID and the selected
+the client. If the pair of this client CID and the selected
 proxy-to-target 4-tuple does not create a conflict, the proxy creates the mapping
 and responds with an ACK_CLIENT_CID capsule. If forwarded mode is enabled, the
 capsule contains a proxy-chosen client VCID. If forwarded mode
@@ -2637,7 +2634,7 @@ matching short header packets if forwarding is supported by the client, but the
 proxy MAY tunnel these packets in HTTP Datagram frames instead. If the mapping
 would create a conflict, the proxy responds with a REJECT_CLIENT_CID capsule
 with the CONFLICT reason code.<a href="#section-3.3-7" class="pilcrow">¶</a></p>
-<p id="section-3.3-8">When the proxy recieves a REGISTER_TARGET_CID capsule, it is receiving a
+<p id="section-3.3-8">When the proxy receives a REGISTER_TARGET_CID capsule, it is receiving a
 request to allow the client to forward packets to the target. The proxy
 generates a target VCID for the client to use when sending
 packets in forwarded mode. If forwarded mode is not supported, the proxy MUST
@@ -3354,7 +3351,7 @@ flows in either mode.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
 vulnerable to packet injection in the target-to-client direction. An attacker
 can inject a burst of packets with a known QUIC Connection ID and see which
 Connection ID is used for the corresponding burst on the proxy-to-client network path.<a href="#section-8.2-2" class="pilcrow">¶</a></p>
-<p id="section-8.2-3">Forwarded mode is vulnerable to some active attacks that tunneled mode is not.
+<p id="section-8.2-3">Forwarded mode is vulnerable to some active attacks that tunnelled mode is not.
 For example, packet injection with a known QUIC Connection ID can also happen in the
 client-to-proxy direction, which only affects forwarded mode since
 tunnelled mode sends packets within an authenticated and integrity protected
@@ -3561,7 +3558,7 @@ Standards Action or IESG Approval as defined in Sections <a href="https://rfc-ed
         <h3 id="name-capsule-types">
 <a href="#section-9.5" class="section-number selfRef">9.5. </a><a href="#name-capsule-types" class="section-name selfRef">Capsule Types</a>
         </h3>
-<p id="section-9.5-1">This document registers six new values in the "HTTP Capsule Types"
+<p id="section-9.5-1">This document registers ten new values in the "HTTP Capsule Types"
 registry established by <span>[<a href="#HTTP-CAPSULES" class="cite xref">HTTP-CAPSULES</a>]</span>. Note that the codepoints below
 will be replaced with lower values before publication.<a href="#section-9.5-1" class="pilcrow">¶</a></p>
 <span id="name-registered-capsule-types"></span><div id="iana-capsule-type-table">
@@ -3572,7 +3569,7 @@ will be replaced with lower values before publication.<a href="#section-9.5-1" c
           </caption>
 <thead>
             <tr>
-              <th class="text-left" rowspan="1" colspan="1">Capule Type</th>
+              <th class="text-left" rowspan="1" colspan="1">Capsule Type</th>
               <th class="text-left" rowspan="1" colspan="1">Value</th>
               <th class="text-left" rowspan="1" colspan="1">Specification</th>
             </tr>
@@ -3741,7 +3738,7 @@ will be replaced with lower values before publication.<a href="#section-9.5-1" c
 <dd class="break"></dd>
 <dt id="QUIC-LB">[QUIC-LB]</dt>
         <dd>
-<span class="refAuthor">Duke, M.</span>, <span class="refAuthor">Banks, N.</span>, and <span class="refAuthor">C. Huitema</span>, <span class="refTitle">"QUIC-LB: Generating Routable QUIC Connection IDs"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-load-balancers-21</span>, <time datetime="2025-08-27" class="refDate">27 August 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-load-balancers-21">https://datatracker.ietf.org/doc/html/draft-ietf-quic-load-balancers-21</a>&gt;</span>. </dd>
+<span class="refAuthor">Duke, M.</span>, <span class="refAuthor">Banks, N.</span>, and <span class="refAuthor">C. Huitema</span>, <span class="refTitle">"QUIC-LB: Generating Routable QUIC Connection IDs"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-load-balancers-22</span>, <time datetime="2026-10-23" class="refDate">23 October 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-load-balancers-22">https://datatracker.ietf.org/doc/html/draft-ietf-quic-load-balancers-22</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8999">[RFC8999]</dt>
         <dd>
