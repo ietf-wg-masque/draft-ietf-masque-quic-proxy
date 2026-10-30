@@ -5,9 +5,9 @@
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
 Intended status: Standards Track                              Apple Inc.
-Expires: 7 January 2027                                      D. Schinazi
+Expires: 3 May 2027                                          D. Schinazi
                                                               Google LLC
-                                                             6 July 2026
+                                                         30 October 2026
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 7 January 2027.
+   This Internet-Draft will expire on 3 May 2027.
 
 Copyright Notice
 
@@ -1007,10 +1007,10 @@ Table of Contents
    Connection ID registrations are subject to a proxy-advertised limit.
    Each registration has a corresponding sequence number.  The client
    MUST NOT send a registration capsule with a sequence number greater
-   than what the proxy advertises via the MAX_CONNECTION_IDS capsule.
-   The initial MAX_CONNECTION_IDS value is 1, allowing both sequence
-   numbers 0 and 1 for a total of two registrations without receiving a
-   MAX_CONNECTION_IDS capsule from the proxy.
+   than or equal to the value the proxy advertises via the
+   MAX_CONNECTION_IDS capsule.  The initial limit is 2, allowing
+   sequence numbers 0 and 1 for a total of two registrations without
+   receiving a MAX_CONNECTION_IDS capsule from the proxy.
 
    Clients that cannot register new connection IDs within a reasonable
    time due to the MAX_CONNECTION_IDS limit SHOULD abort the proxied
@@ -1662,7 +1662,7 @@ Table of Contents
 
               <--------  STREAM(44): DATA
                            Capsule Type = MAX_CONNECTION_IDS
-                           Maximum Sequence Number = 3
+                           Maximum Connection IDs = 4
 
    DATAGRAM                        -------->
      Quarter Stream ID = 11
@@ -1688,7 +1688,7 @@ Table of Contents
 
    The proxy indicates to the client that it will allow connection ID
    registrations with sequence numbers 0-3, allowing for registrations
-   beyond the initial maximum of 1.
+   beyond the initial limit of 2.
 
    STREAM(44): DATA                -------->
      Capsule Type = ACK_CLIENT_VCID
@@ -2110,9 +2110,9 @@ Table of Contents
 
    [QUIC-LB]  Duke, M., Banks, N., and C. Huitema, "QUIC-LB: Generating
               Routable QUIC Connection IDs", Work in Progress, Internet-
-              Draft, draft-ietf-quic-load-balancers-21, 27 August 2025,
+              Draft, draft-ietf-quic-load-balancers-22, 23 October 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
-              load-balancers-21>.
+              load-balancers-22>.
 
    [RFC8999]  Thomson, M., "Version-Independent Properties of QUIC",
               RFC 8999, DOI 10.17487/RFC8999, May 2021,
