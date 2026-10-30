@@ -2516,8 +2516,8 @@ reason is TOO_SHORT, the proxy MUST either select a longer VCID or close the reg
 CONFLICT, the proxy MUST select a different VCID.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
 <p id="section-3.2-3">Connection ID registrations are subject to a proxy-advertised limit. Each registration
 has a corresponding sequence number. The client MUST NOT send a registration
-capsule with a sequence number greater than what the proxy advertises via the
-MAX_CONNECTION_IDS capsule. The initial MAX_CONNECTION_IDS value is 1, allowing both
+capsule with a sequence number greater than or equal to the value the proxy
+advertises via the MAX_CONNECTION_IDS capsule. The initial limit is 2, allowing
 sequence numbers 0 and 1 for a total of two registrations without receiving a
 MAX_CONNECTION_IDS capsule from the proxy.<a href="#section-3.2-3" class="pilcrow">¶</a></p>
 <p id="section-3.2-4">Clients that cannot register new connection IDs within a reasonable time due to
@@ -3147,7 +3147,7 @@ STREAM(44): DATA                --------&gt;
 
            &lt;--------  STREAM(44): DATA
                         Capsule Type = MAX_CONNECTION_IDS
-                        Maximum Sequence Number = 3
+                        Maximum Connection IDs = 4
 
 DATAGRAM                        --------&gt;
   Quarter Stream ID = 11
@@ -3172,8 +3172,8 @@ Even if there were Short Header packets to send, the proxy
 cannot send forwarded mode packets because the client hasn't acknowledged the
 client VCID.<a href="#section-5-4" class="pilcrow">¶</a></p>
 <p id="section-5-5">The proxy indicates to the client that it will allow connection ID registrations
-with sequence numbers 0-3, allowing for registrations beyond the initial maximum
-of 1.<a href="#section-5-5" class="pilcrow">¶</a></p>
+with sequence numbers 0-3, allowing for registrations beyond the initial limit
+of 2.<a href="#section-5-5" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-5-6">
 <pre>
 STREAM(44): DATA                --------&gt;
