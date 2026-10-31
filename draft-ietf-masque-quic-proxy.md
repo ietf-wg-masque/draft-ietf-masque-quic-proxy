@@ -221,7 +221,8 @@ QUIC connection IDs on the client-to-target QUIC connection ({{cid-awareness}}).
 Forwarded mode adds the concept of Virtual Connection IDs that are assigned
 by the proxy to use to identify packets on the client-to-proxy 4-tuple ({{vcids}}).
 
-Negotiation of modes and assignment of connection IDs is described in {{negotiation}}.
+Negotiation of modes is described in {{negotiation}}, registration of connection
+IDs in {{cid-registration}}, and forwarded mode in {{forwarded-mode}}.
 
 ## Connection ID Awareness {#cid-awareness}
 
@@ -273,7 +274,7 @@ Virtual Connection IDs (VCIDs) are QUIC Connection IDs used on the link between 
 client and proxy that do not belong to the QUIC connection between the client
 and proxy, but instead are aliases for particular client-to-target connections.
 VCIDs are only used in forwarded mode. They are established using HTTP capsules
-{{!HTTP-CAPSULES=RFC9297}} as described in {{cid-registration}}.
+{{!HTTP-CAPSULES=RFC9297}} as described in {{vcid-lifecycle}}.
 
 For example, consider a proxy using HTTP/3 that has a single client connected
 to it. The client-to-proxy QUIC connection has `CCCC0000` as the client CID
@@ -282,8 +283,7 @@ through the proxy, and the client-to-target QUIC connection has `CCCC1111`
 as the client CID and `1111CCCC` as the target CID. In order to use
 forwarded mode, the proxy assigns VCIDs to use on the client-to-proxy link
 to represent the client-to-target connection. In this case, the VCIDs could
-be `CCCC2222` for the client's VCID and `2222CCCC` for the proxy's VCID that
-it uses to forward to the target.
+be `CCCC2222` for the client VCID and `2222CCCC` for the target VCID.
 
 ~~~ aasvg
    +--------+              +-----------+              +--------+
@@ -331,9 +331,9 @@ paths to avoid linkability. The client VCID is a connection ID
 chosen by the proxy that the proxy uses when sending forwarded mode packets.
 The proxy replaces the client CID with the client VCID prior to
 forwarding the packet to the client. Clients take advantage of this
-to avoid linkability when migrating a client to proxy network path. The Virtual
-client CID allows the connection ID bytes to change on the wire
-without requiring the connection IDs on the client to target connection change.
+to avoid linkability when migrating a client to proxy network path. The client
+VCID allows the connection ID bytes to change on the wire without requiring the
+connection IDs on the client-to-target connection to change.
 To reduce the likelihood of connection ID conflicts, the proxy MUST choose a
 client VCID that is at least as long as the original client CID. Similarly,
 clients multiplexing connections on the same UDP 4-tuple SHOULD
@@ -343,7 +343,7 @@ client-facing IP and port with other proxies, support target-facing port sharing
 and cannot guarantee there are no proxies being proxied to, the client VCID MUST be
 constructed such that it is unpredictable to the client or to guarantee no
 conflicts among all proxies sharing an IP address and port. For such proxies, a
-non-empty client VCID MUST NOT be equal to the original client CID. See
+client VCID MUST NOT be equal to the original client CID. See
 {{security}} for more discussion on client VCID construction.
 
 Clients and Proxies not implementing forwarded mode do not need to consider
@@ -376,7 +376,7 @@ the "Proxy-QUIC-Forwarding" header field, as defined in {{forwarding-header}}.
 This indicates support for forwarded mode, and allows negotiation of
 packet transforms to apply when forwarding ({{transforms}}), along
 with any parameters for specific transforms. Clients or proxies that
-don't support forwarded mode will not include this header field.
+don't support forwarded mode omit this header field or set it to "?0".
 
 ~~~
   proxy-quic-forwarding = ?1; accept-transform="scramble,identity"; \
@@ -387,24 +387,20 @@ If neither header is supplied with a value of "?1", none of the functionality
 in this document can be used and handling reduces to normal connect-udp.
 
 After negotiating support with header fields, clients and proxies use
-the capsules defined in {{cid-registration}} to communicate information
-about CIDs and VCIDs.
+the capsules defined in {{cid-registration}} and {{forwarded-mode}} to
+communicate information about CIDs and VCIDs.
 
 ### Proxy-QUIC-Forwarding Header {#forwarding-header}
 
 A client initiates UDP proxying via a CONNECT request as defined
 in {{CONNECT-UDP}}. Within its request, it includes the "Proxy-QUIC-Forwarding"
 header to indicate whether or not the request should support forwarding.
-If this header is not included, the client MUST NOT send any connection ID
-capsules.
 
 "Proxy-QUIC-Forwarding" is an Item Structured Header {{!RFC8941}}. Its
 value MUST be a Boolean.
 
 If the client wants to enable QUIC packet forwarding for this request, it sets
-the value to "?1". If it doesn't want to enable forwarding, but instead only
-provide information about QUIC Connection IDs for the purpose of allowing
-the proxy to share a proxy-to-target 4-tuple, it sets the value to "?0".
+the value to "?1". Otherwise, it sets the value to "?0" or omits the header.
 
 If advertising support for forwarding, the client MUST add an "accept-transform" parameter whose value is a
 String containing the supported packet transforms ({{transforms}})
@@ -413,21 +409,30 @@ in order of descending preference, separated by commas. If the proxy receives a
 MUST ignore the header and respond as if the client had not sent the
 "Proxy-QUIC-Forwarding" header.
 
-If the proxy supports QUIC-aware proxying, it will include the
-"Proxy-QUIC-Forwarding" header in successful HTTP responses. The value
-indicates whether or not the proxy supports forwarding. If the client does
-not receive this header in responses, the client SHALL assume that the proxy
-does not support this extension. If the client receives a transform that it did
-not advertise support for, it MUST abort the request.
+If advertising support for forwarding, the client MAY add an "active-vcid-limit"
+parameter whose value is an Integer indicating the maximum number of active
+Virtual Connection IDs that the proxy can issue for each registered connection
+ID ({{vcid-limit}}). The value MUST be at least 2. If the parameter is absent, a
+limit of 2 is assumed. If the proxy receives an "active-vcid-limit" parameter
+whose value is not an Integer or is less than 2, it MUST ignore the header and
+respond as if the client had not sent the "Proxy-QUIC-Forwarding" header.
+
+If the proxy supports forwarded mode for the request, it will include the
+"Proxy-QUIC-Forwarding" header with a value of "?1" in successful HTTP
+responses. If the client does not receive this header with a value of "?1", the
+client SHALL assume that the proxy does not support forwarded mode. If the
+client receives a transform that it did not advertise support for, it MUST
+abort the request.
 
 The proxy MUST include a "transform" parameter whose value is a String
 indicating the selected transform. If the proxy does not recognize or accept
 any of the transforms offered by the client, it MUST omit this parameter and
 set the header field value to "?0", or omit the header entirely.
 
-Clients MUST NOT send the "transform" parameter and servers MUST NOT send the
-"accept-transform" parameter. Clients MUST ignore receipt of an "accept-transform"
-parameter and servers MUST ignore receipt of a "transform" parameter.
+Clients MUST NOT send the "transform" parameter and proxies MUST NOT send the
+"accept-transform" or "active-vcid-limit" parameters. Clients MUST ignore
+receipt of an "accept-transform" or "active-vcid-limit" parameter and proxies
+MUST ignore receipt of a "transform" parameter.
 
 ### Proxy-QUIC-Port-Sharing Header {#port-sharing-header}
 
@@ -447,13 +452,15 @@ with clients that might be considered to be untrusted or malicious by the target
 fate-sharing may impact performance or may lead to being misclassified as
 malicious.
 
+A proxy that supports port sharing for the request includes
+"Proxy-QUIC-Port-Sharing" with a value of "?1" in its response.
 A proxy that does not support port sharing, SHOULD send "Proxy-QUIC-Port-Sharing"
 with a value of "?0". Doing so allows clients to stop sending capsules for this
 extension if forwarding mode is also not supported.
 
 When port sharing is supported and forwarded mode is not, registration of target
 Connection IDs is permitted, but is not required since port sharing only requires
-demultiplexing QUIC packets in the target-to-client direction
+demultiplexing QUIC packets in the target-to-client direction.
 
 # Connection ID Registration {#cid-registration}
 
@@ -461,8 +468,7 @@ Connection ID awareness relies on using capsules {{HTTP-CAPSULES}} to
 signal addition and removal of Connection IDs. Clients send capsules
 to let proxies know when Connection IDs on the client-to-target
 QUIC connection are changing. Proxies send capsules to acknowledge or
-reject these Connection IDs, and in forwarded mode to let clients know
-about Virtual Connection IDs to use on the client-to-proxy link.
+reject these Connection IDs.
 
 Note that these capsules do not register contexts. QUIC packets are encoded
 using HTTP Datagrams with the context ID set to zero as defined in
@@ -471,58 +477,49 @@ using HTTP Datagrams with the context ID set to zero as defined in
 The REGISTER_CLIENT_CID ({{capsule-reg-client}}) and REGISTER_TARGET_CID
 ({{capsule-reg-target}}) capsule types allow a client to inform
 the proxy about a new client CID or a new target CID,
-respectively. These capsule types MUST only be sent by a client. These capsule
-types share a sequence number space which allows the proxy to limit the
-number of registrations. The first registration (of either client CID or target CID)
-has sequence number 0, and subsequent registrations increment the sequence number
-by 1. Every registration capsule consumes a sequence number, including registrations
-that are rejected and re-registrations of a previously registered connection ID.
+respectively. These capsule types MUST only be sent by a client. Each
+registration capsule carries the sequence number of the registration, which
+other capsules use to refer to it. Client CID registrations and target CID
+registrations have separate sequence number spaces, which allows the proxy to
+limit the number of registrations of each type independently. The first
+registration of each type has sequence number 0, and each subsequent
+registration of the same type has a sequence number one greater than the
+previous one. Every registration capsule consumes a sequence number, including
+registrations that are rejected. A proxy that receives a registration capsule
+whose sequence number is not the next one for that type of registration, or is
+not less than the limit that it has advertised for that type, MUST reset the
+stream with H3_DATAGRAM_ERROR error code.
 
-The ACK_CLIENT_CID ({{capsule-ack-client}}) and ACK_TARGET_CID
-({{capsule-ack-target}}) capsule types are sent by the proxy to the client
-to indicate that a mapping was successfully created for a registered
-connection ID as well as optionally provide the Virtual Connection IDs that can be
-used in forwarded mode. These capsule types MUST only be sent by a proxy. Note that
-Virtual Connection IDs are always sent by the proxy in order to avoid possible loop attacks
- {{registration-attacks}}.
-
-The ACK_CLIENT_VCID ({{capsule-ack-virtual}}) capsule type MUST only be sent
-by the client and only when forwarded mode is enabled. It is sent by the client
-to the proxy in response to an ACK_CLIENT_CID capsule to indicate that the client
-is ready to receive forwarded mode packets with the specified virtual connection ID.
-The proxy MUST NOT send forwarded mode packets to the client prior to receiving this
-acknowledgement. This capsule also contains a Stateless Reset Token the client
-may respond with when receiving forwarded mode packets with the specified
-virtual connection ID.
+The ACK_CLIENT_CID and ACK_TARGET_CID capsule types ({{capsule-ack-cid}}) are
+sent by the proxy to the client to indicate that a mapping was successfully
+created for a registered connection ID. These capsule types MUST only be sent by
+a proxy.
 
 The REJECT_CLIENT_CID and REJECT_TARGET_CID capsule types ({{capsule-reject}})
 are used to reject connection ID registrations. Each capsule includes
 a reason code indicating the reason for the rejection. These capsules MUST only be sent
-by the proxy. A proxy MUST NOT send a rejection capsule for a registration that it
-has already acknowledged. If a client receives such a capsule, it MUST reset the
-stream with H3_DATAGRAM_ERROR error code.
+by the proxy.
 
-The CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsule types ({{capsule-close}})
-are used to close connection ID registrations. These capsules are only sent by the
-client and MUST NOT be sent by proxies.
-
-Clients send CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsules to retire connection
-IDs they no longer need, using the DEFAULT reason code. If a client cannot use the
-proxy-chosen client VCID (e.g., due to conflict or insufficient length), it can
-re-register the same client CID with an appropriate reason code to request a new
-VCID.
-
-The MAX_CONNECTION_IDS capsule type {{capsule-max-cids}} MUST only be sent by the
-proxy. It indicates to the client the cumulative number of connection ID registrations the client is allowed to request. This allows the proxy to limit the number of active
-registrations. The initial maximum is 2, allowing the client to send 2 registrations,
-one with sequence number 0 and another with sequence number 1. MAX_CONNECTION_IDS are
-only sent to increase the limit. Since the initial limit is 2, a proxy MUST NOT
-send a MAX_CONNECTION_IDS capsule with a value less than 3. Clients receiving a
-MAX_CONNECTION_IDS capsule with a value less than 3 MUST reset the stream with
+A proxy MUST NOT send an acknowledgement or rejection capsule for a registration
+that the client has not sent, or that the proxy has already acknowledged or
+rejected. If a client receives such a capsule, it MUST reset the stream with
 H3_DATAGRAM_ERROR error code.
 
+The RETIRE_CLIENT_CID and RETIRE_TARGET_CID capsule types ({{capsule-retire-cid}})
+are used by the client to remove connection ID registrations, typically because
+the connection ID was retired on the client-to-target connection. These capsule
+types MUST only be sent by a client.
+
+The MAX_CLIENT_CIDS and MAX_TARGET_CIDS capsule types ({{capsule-max-cids}})
+MUST only be sent by the proxy. They indicate to the client the cumulative
+number of client CID and target CID registrations, respectively, that the client
+is allowed to request. The initial maximum for each type is 2, allowing the
+client to send 2 registrations of each type, one with sequence number 0 and
+another with sequence number 1. These capsules are only sent to increase the
+limit.
+
 When port sharing {{port-sharing-header}} is supported, the client MUST register
-and receive acknowledgements for client and target CIDs before using them. Packets with
+and receive acknowledgements for client CIDs before using them. Packets with
 unknown connection IDs received by the proxy on a target-facing sockets that support
 port sharing MUST be dropped. In order to avoid introducing an additional round trip
 on setup, a REGISTER_CLIENT_CID capsule SHOULD be sent at the same time as the client's
@@ -536,83 +533,46 @@ Importantly, registering connection IDs does not introduce any delay in
 communication between client and target unless port sharing is supported and
 there is an unlikely client CID collision. The client and target can always
 communicate over the tunnel without having to wait for registrations to be
-acknowledged. Forwarded mode requires CID/VCID mappings be communicated and
-acknowledged, and, as a consequence, cannot be leveraged without a round
-trip. This is particularly pronounced when chaining proxies because
-registration happens sequentially. While waiting for forwarded mode to become
-enabled, clients SHOULD communicate over tunnelled mode to avoid end-to-end
-delays.
+acknowledged.
 
 For QUIC-aware proxying without forwarded mode, the steps are as follows:
 
 1. The client sends the `REGISTER_CLIENT_CID` capsule once it selects a
 CID that it will use for receiving packets from a target.
 
-1. The proxy sends the `ACK_CLIENT_CID` capsule to acknowledge that CID,
-with no associated client VCID; alternatively, the proxy can send the
+1. The proxy sends the `ACK_CLIENT_CID` capsule to acknowledge that CID;
+alternatively, the proxy can send the
 `REJECT_CLIENT_CID` if it detects a conflict with another CID.
 
-1. The proxy sends the `MAX_CONNECTION_IDS` capsule to allow additional
-registration of new connection IDs via future `REGISTER_CLIENT_CID` and
+1. The proxy sends `MAX_CLIENT_CIDS` and `MAX_TARGET_CIDS` capsules to allow
+additional registrations via future `REGISTER_CLIENT_CID` and
 `REGISTER_TARGET_CID` capsules.
 
 1. Whenever a client stops using a particular CID, the client
-sends a `CLOSE_CLIENT_CID`. The client can also initiate new
+sends a `RETIRE_CLIENT_CID`. The client can also initiate new
 `REGISTER_CLIENT_CID` exchanges at any time.
-
-For QUIC-aware proxying with forwarded mode, the steps are as follows:
-
-1. The client sends the `REGISTER_CLIENT_CID` capsule once it selects a
-CID that it will use for receiving packets from a target.
-
-1. The proxy sends the `ACK_CLIENT_CID` capsule to acknowledge that CID,
-with a client VCID; alternatively, the proxy can send the
-`REJECT_CLIENT_CID` if it detects a conflict with another CID.
-
-1. The client sends the `ACK_CLIENT_VCID` capsule to acknowledge the
-client VCID, which allows forwarded packets for that VCID to be used.
-
-1. The client sends the `REGISTER_TARGET_CID` capsule as soon as it learns
-the target CID on the client-to-target connection.
-
-1. The proxy sends the `ACK_TARGET_CID` capsule to acknowledge that CID,
-with a target VCID; alternatively, the proxy can send the
-`REJECT_TARGET_CID` if it detects a conflict with another CID. Once
-the client receives the target VCID, it can start sending forwarded
-packets using the target VCID.
-
-1. The proxy sends the `MAX_CONNECTION_IDS` capsule to allow additional
-registration of new connection IDs via future `REGISTER_CLIENT_CID` and
-`REGISTER_TARGET_CID` capsules.
-
-1. Whenever a client or target stops using a particular CID, the client
-sends a `CLOSE_CLIENT_CID` or `CLOSE_TARGET_CID` capsule. The client
-can also initiate new `REGISTER_CLIENT_CID` or `REGISTER_TARGET_CID`
-exchanges at any time.
 
 ## Capsule Types and Formats {#capsule-types-formats}
 
 ### REGISTER_CLIENT_CID {#capsule-reg-client}
 
-The REGISTER_CLIENT_CID capsule is sent by the client and contains a single
-connection ID that is the client-provided connection ID on the client-to-target QUIC
-connection.
+The REGISTER_CLIENT_CID capsule is sent by the client and contains a sequence
+number and a single connection ID that is the client-provided connection ID on
+the client-to-target QUIC connection.
 
 ~~~
 Register Client CID Capsule {
   Type (i) = see {{iana}} for the value of the capsule type
   Length (i),
-  Reason (i),
+  Registration Sequence Number (i),
   Connection ID (0..2040),
 }
 ~~~
 {: #fig-capsule-register-client-cid title="Register Client CID Capsule Format"}
 
-Reason:
-: The reason for this registration. For initial registrations, this MUST
-be DEFAULT (0x00), although a different value can be used for future
-extensions. For re-registrations due to an unusable VCID, this indicates
-why the previous VCID was rejected. See {{iana-cid-reasons}}.
+Registration Sequence Number:
+: The sequence number of this registration in the sequence number space of
+client CID registrations ({{cid-registration}}).
 
 Connection ID:
 : A connection ID being registered, which is between 0 and 255 bytes in
@@ -622,193 +582,72 @@ to 20 bytes, but QUIC invariants allow up to 255 bytes.
 
 ### REGISTER_TARGET_CID {#capsule-reg-target}
 
-The REGISTER_TARGET_CID capsule is sent by the client and includes the
-target-provided connection ID on the client-to-target QUIC connection, and
-the corresponding Stateless Reset Token.
+The REGISTER_TARGET_CID capsule is sent by the client and includes a sequence
+number, the target-provided connection ID on the client-to-target QUIC
+connection, and the corresponding Stateless Reset Token.
 
 ~~~
 Register Target CID Capsule {
   Type (i) = see {{iana}} for the value of the capsule type
   Length (i),
-  Reason (i),
-  Connection ID Length (i)
+  Registration Sequence Number (i),
+  Connection ID Length (i),
   Connection ID (0..2040),
-  Stateless Reset Token Length (i),
   Stateless Reset Token (..),
 }
 ~~~
 {: #fig-capsule-register-target-cid title="Register Target CID Capsule Format"}
 
-Reason:
-: The reason for this registration. This MUST be DEFAULT (0x00), although a
-different value can be used for future extensions.
-See {{iana-cid-reasons}}.
+Registration Sequence Number:
+: The sequence number of this registration in the sequence number space of
+target CID registrations ({{cid-registration}}).
 
-Connection ID Length
+Connection ID Length:
 : The length of the connection ID being registered, which is between 0 and
 255. Note that in QUICv1, the length of the Connection ID is limited to 20
 bytes, but QUIC invariants allow up to 255 bytes.
 
-Connection ID
+Connection ID:
 : A connection ID being registered whose length is equal to Connection ID
 Length. This is the real target CID.
 
-Stateless Reset Token Length
-: The length of the target-provided Stateless Reset Token.
-
-Stateless Reset Token
+Stateless Reset Token:
 : The target-provided Stateless Reset token allowing the proxy to correctly
-recognize Stateless Reset packets to be tunnelled to the client.
+recognize Stateless Reset packets to be tunnelled to the client. The length of
+the Stateless Reset Token is implied by the length of the capsule.
 
-### ACK_CLIENT_CID {#capsule-ack-client}
+### ACK_CLIENT_CID and ACK_TARGET_CID {#capsule-ack-cid}
 
-The ACK_CLIENT_CID capsule is sent by the proxy in
-response to a REGISTER_CLIENT_CID capsule. It optionally assigns a Virtual
-Connection ID when forwarded mode is supported.
+The ACK_CLIENT_CID and ACK_TARGET_CID capsules are sent by the proxy in
+response to REGISTER_CLIENT_CID and REGISTER_TARGET_CID capsules, respectively,
+to acknowledge the registration of a connection ID.
 
 ~~~
-Acknowledge Client CID Capsule {
-  Type (i) = see {{iana}} for the value of the capsule type
-  Length (i)
-  Connection ID Length (i)
-  Connection ID (0..2040),
-  Virtual Connection ID Length (i)
-  Virtual Connection ID (0..2040),
+Acknowledge CID Capsule {
+  Type (i) = see {{iana}} for the values of the capsule types
+  Length (i),
+  Registration Sequence Number (i),
 }
 ~~~
-{: #fig-capsule-ack-client-cid title="Acknowledge Client CID Capsule Format"}
+{: #fig-capsule-ack-cid title="Acknowledge CID Capsule Format"}
 
-Connection ID Length
-: The length of the connection ID being acknowledged, which
-is between 0 and 255. Note that in QUICv1, the length of the Connection ID
-is limited to 20 bytes, but QUIC invariants allow up to 255 bytes.
-
-Connection ID
-: A connection ID being acknowledged whose length is equal to
-Connection ID Length. This is the real Client Connection ID.
-
-Virtual Connection ID Length
-: The length of the client VCID being provided. This MUST be a
-valid connection ID length for the QUIC version used in the client-to-proxy QUIC
-connection. When forwarded mode is not negotiated, the length MUST be zero.
-The Virtual Connection ID Length and Connection ID Length SHOULD be equal
-when possible to avoid the need to resize packets during replacement. The
-client VCID Length MUST be at least as large as the
-Connection ID to reduce the likelihood of connection ID conflicts.
-
-Virtual Connection ID
-: The proxy-chosen connection ID that the proxy MUST use when sending in
-forwarded mode. The proxy rewrites forwarded mode packets to contain the
-correct client VCID prior to sending them to the client.
-
-### ACK_TARGET_CID {#capsule-ack-target}
-
-The ACK_TARGET_CID capsule is sent by the proxy in
-response to a REGISTER_TARGET_CID capsule. It optionally assigns a Virtual
-Connection ID and Stateless Reset Token if forwarded mode is enabled.
-
-~~~
-Acknowledge Target CID Capsule {
-  Type (i) = see {{iana}} for the value of the capsule type
-  Length (i)
-  Connection ID Length (i)
-  Connection ID (0..2040),
-  Virtual Connection ID Length (i)
-  Virtual Connection ID (0..2040),
-  Stateless Reset Token Length (i),
-  Stateless Reset Token (..),
-}
-~~~
-{: #fig-capsule-ack-target-cid title="Acknowledge Target CID Capsule Format"}
-
-Connection ID Length
-: The length of the connection ID being acknowledged, which
-is between 0 and 255. Note that in QUICv1, the length of the Connection ID
-is limited to 20 bytes, but QUIC invariants allow up to 255 bytes.
-
-Connection ID
-: A connection ID being acknowledged whose length is equal to
-Connection ID Length. This is the real target CID.
-
-Virtual Connection ID Length
-: The length of the target VCID being provided. This MUST be a
-valid connection ID length for the QUIC version used in the client-to-proxy QUIC
-connection. When forwarded mode is not negotiated, the length MUST be zero.
-The Virtual Connection ID Length and Connection ID Length SHOULD be equal
-when possible to avoid the need to resize packets during replacement.
-
-Virtual Connection ID
-: The proxy-chosen connection ID that the client MUST use when sending in
-forwarded mode. The proxy rewrites forwarded mode packets to contain the
-correct target CID prior to sending them.
-
-Stateless Reset Token Length
-: The length of the Stateless Reset Token sent by the proxy in response to
-forwarded mode packets in order to reset the client-to-target QUIC connection.
-When forwarded mode is not negotiated, the length MUST be zero. Proxies choosing
-not to support stateless resets MAY set the length to zero. Clients receiving a
-zero-length stateless reset token MUST ignore it.
-
-Stateless Reset Token
-: A Stateless Reset Token allowing reset of the client-to-target connection in
-response to client-to-target forwarded mode packets.
-
-### ACK_CLIENT_VCID {#capsule-ack-virtual}
-
-The ACK_CLIENT_VCID capsule type is sent by the client in
-response to an ACK_CLIENT_CID capsule that contains a virtual connection ID.
-
-~~~
-Acknowledge Client VCID Capsule {
-  Type (i) = see {{iana}} for the value of the capsule type
-  Length (i)
-  Connection ID Length (i)
-  Connection ID (0..2040),
-  Virtual Connection ID Length (i)
-  Virtual Connection ID (0..2040),
-  Stateless Reset Token Length (i),
-  Stateless Reset Token (..),
-}
-~~~
-{: #fig-capsule-ack-virtual-client-cid title="Acknowledge Client VCID Capsule Format"}
-
-Connection ID Length
-: The length of the connection ID being acknowledged, which
-is between 0 and 255. Note that in QUICv1, the length of the Connection ID
-is limited to 20 bytes, but QUIC invariants allow up to 255 bytes.
-
-Connection ID
-: A connection ID being acknowledged whose length is equal to
-Connection ID Length. This is the real Client Connection ID.
-
-Virtual Connection ID Length
-: The length of the client VCID being acknowledged.
-
-Virtual Connection ID
-: The proxy-chosen virtual connection ID being acknowledged whose length is
-equal to Virtual Connection ID Length.
-
-Stateless Reset Token Length
-: The length of the Stateless Reset Token that may be sent by the client in
-response to forwarded mode packets to reset the client-to-target connection.
-Clients choosing not to support stateless resets MAY set the length to zero.
-Proxies receiving a zero-length stateless reset token MUST ignore it.
-
-Stateless Reset Token
-: A Stateless Reset Token allowing reset of the target-to-client forwarding rule
-in response to target-to-client forwarded mode packets.
+Registration Sequence Number:
+: The sequence number of the registration being acknowledged, in the sequence
+number space of client CID registrations for ACK_CLIENT_CID and of target CID
+registrations for ACK_TARGET_CID ({{cid-registration}}).
 
 ### REJECT_CLIENT_CID and REJECT_TARGET_CID {#capsule-reject}
 
 REJECT_CLIENT_CID and REJECT_TARGET_CID capsule types include a reason code
-and a connection ID. Proxies send these capsules to reject connection ID registrations.
+and the sequence number of a registration. Proxies send these capsules to reject
+connection ID registrations.
 
 ~~~
 Reject CID Capsule {
   Type (i) = see {{iana}} for the values of the capsule types
   Length (i),
   Reason (i),
-  Connection ID (0..2040),
+  Registration Sequence Number (i),
 }
 ~~~
 {: #fig-capsule-reject-cid title="Reject CID Capsule Format"}
@@ -817,122 +656,96 @@ Reason:
 : The reason for rejecting the connection ID registration.
 See {{iana-cid-reasons}} for the list of reason codes.
 
-Connection ID:
-: A connection ID being closed, which is between 0 and 255 bytes in
-length. The length of the connection ID is implied by the length of the
-capsule. Note that in QUICv1, the length of the Connection ID is limited
-to 20 bytes, but QUIC invariants allow up to 255 bytes.
+Registration Sequence Number:
+: The sequence number of the registration being rejected, in the sequence
+number space of client CID registrations for REJECT_CLIENT_CID and of target
+CID registrations for REJECT_TARGET_CID ({{cid-registration}}).
 
-### CLOSE_CLIENT_CID and CLOSE_TARGET_CID {#capsule-close}
+### RETIRE_CLIENT_CID and RETIRE_TARGET_CID {#capsule-retire-cid}
 
-CLOSE_CLIENT_CID and CLOSE_TARGET_CID capsule types include a connection ID.
-Clients send these capsules to retire connection IDs they
-no longer need.
+RETIRE_CLIENT_CID and RETIRE_TARGET_CID capsule types include the sequence
+number of a registration. Clients send these capsules to remove the registration
+of a connection ID that they no longer need.
 
 ~~~
-Close CID Capsule {
+Retire CID Capsule {
   Type (i) = see {{iana}} for the values of the capsule types
   Length (i),
-  Reason (i),
-  Connection ID (0..2040),
+  Registration Sequence Number (i),
 }
 ~~~
-{: #fig-capsule-close-cid title="Close CID Capsule Format"}
+{: #fig-capsule-retire-cid title="Retire CID Capsule Format"}
 
-Reason:
-: The reason for closing or rejecting the connection ID registration.
-See {{iana-cid-reasons}} for the list of reason codes.
+Registration Sequence Number:
+: The sequence number of the registration being retired, in the sequence number
+space of client CID registrations for RETIRE_CLIENT_CID and of target CID
+registrations for RETIRE_TARGET_CID ({{cid-registration}}).
 
-Connection ID:
-: A connection ID being closed, which is between 0 and 255 bytes in
-length. The length of the connection ID is implied by the length of the
-capsule. Note that in QUICv1, the length of the Connection ID is limited
-to 20 bytes, but QUIC invariants allow up to 255 bytes.
+### MAX_CLIENT_CIDS and MAX_TARGET_CIDS {#capsule-max-cids}
 
-### MAX_CONNECTION_IDS {#capsule-max-cids}
-
-The MAX_CONNECTION_IDS capsule is sent by the proxy to the client
-to define the cumulative number of connection ID registrations
-the client is allowed to request.
+The MAX_CLIENT_CIDS and MAX_TARGET_CIDS capsules are sent by the proxy to the
+client to define the cumulative number of client CID and target CID
+registrations, respectively, that the client is allowed to request.
 
 ~~~
 Maximum Connection IDs Capsule {
-  Type (i) = see {{iana}} for the value of the capsule type
-  Length (i)
-  Maximum Connection IDs (i)
+  Type (i) = see {{iana}} for the values of the capsule types
+  Length (i),
+  Maximum Connection IDs (i),
 }
 ~~~
 {: #fig-capsule-max-connection-ids title="Maximum Connection IDs Capsule Format"}
 
-Maximum Connection IDs
-: A count of the cumulative number of connection ID registrations the client
-is allowed to request. For example, if the value is 4, the maximum allowed sequence
-number for a connection ID registration would be 3.
+Maximum Connection IDs:
+: A count of the cumulative number of registrations of the corresponding type
+that the client is allowed to request. For example, if the value of a
+MAX_CLIENT_CIDS capsule is 4, the maximum allowed sequence number for a client
+CID registration would be 3.
 
 The value advertised in the capsule MUST be greater than any value previously
-sent in a MAX_CONNECTION_IDS capsule, and MUST be greater than the initial
+sent in a capsule of the same type, and MUST be greater than the initial
 allowed limit of 2. Thus, any value sent in the capsule MUST be at least 3.
 
-Clients receiving a MAX_CONNECTION_IDS capsule with an invalid value
-MUST reset the stream with H3_DATAGRAM_ERROR error code.
+Clients receiving a MAX_CLIENT_CIDS or MAX_TARGET_CIDS capsule with an invalid
+value MUST reset the stream with H3_DATAGRAM_ERROR error code.
 
 ## Client Considerations
 
 The client sends a REGISTER_CLIENT_CID capsule before it advertises a new
 client CID to the target, and a REGISTER_TARGET_CID capsule when
-it has received a new target CID for the target. In order to change
-the connection ID bytes on the wire, a client can solicit new virtual connection
-IDs by re-registering the same connection IDs. Note that re-registrations
-consume sequence numbers like any other registration. The client may solicit a new
-target VCID by sending a REGISTER_TARGET_CID capsule with a
-previously registered target CID. Similarly, the client may solicit a
-new client VCID by sending a REGISTER_CLIENT_CID with a
-previously registered client CID. The client MUST acknowledge the new
-client VCID with an ACK_CLIENT_VCID capsule or close the
-registration. The proxy MUST NOT send in forwarded mode until ACK_CLIENT_VCID
-has been received. Clients are responsible for changing Virtual Connection IDs
-when the HTTP stream's network path changes to avoid linkability across network
-paths. Note that initial REGISTER_CLIENT_CID capsules MAY be sent prior to
-receiving an HTTP response from the proxy.
+it has received a new target CID for the target. When a connection ID is
+retired on the client-to-target connection, the client sends the corresponding
+RETIRE_CLIENT_CID or RETIRE_TARGET_CID capsule. Note that initial
+REGISTER_CLIENT_CID capsules MAY be sent prior to receiving an HTTP response
+from the proxy.
 
-If the client receives a VCID it cannot use, it may re-register the same
-client CID with a reason code indicating why the previous VCID was unusable.
-The proxy SHOULD use this information to select a more suitable VCID. If the
-reason is TOO_SHORT, the proxy MUST either select a longer VCID or close the registration. If the reason is
-CONFLICT, the proxy MUST select a different VCID.
+A client MUST NOT register a connection ID that is already registered on the
+same request.
 
-Connection ID registrations are subject to a proxy-advertised limit. Each registration
-has a corresponding sequence number. The client MUST NOT send a registration
-capsule with a sequence number greater than or equal to the value the proxy
-advertises via the MAX_CONNECTION_IDS capsule. The initial limit is 2, allowing
-sequence numbers 0 and 1 for a total of two registrations without receiving a
-MAX_CONNECTION_IDS capsule from the proxy.
+Connection ID registrations are subject to proxy-advertised limits. Each
+registration has a corresponding sequence number ({{cid-registration}}). The
+client MUST NOT send a registration capsule with a sequence number greater than
+or equal to the value the proxy advertises for that type of registration via the
+MAX_CLIENT_CIDS or MAX_TARGET_CIDS capsule. The initial limit for each type is
+2, allowing sequence numbers 0 and 1 for a total of two registrations of each
+type without receiving a MAX_CLIENT_CIDS or MAX_TARGET_CIDS capsule from the
+proxy.
 
-Clients that cannot register new connection IDs within a reasonable time due to
-the MAX_CONNECTION_IDS limit SHOULD abort the proxied connection by resetting the HTTP
-stream with error code NO_ERROR. This may happen, for example, if the target server
-sends a NEW_CONNECTION_ID frame with Sequence Number and Retire Prior To equal to the
-same value.
+A client that cannot register a new target CID due to the MAX_TARGET_CIDS limit
+uses tunnelled mode for packets that use that target CID. A client that cannot
+register a new client CID within a reasonable time due to the MAX_CLIENT_CIDS
+limit, and cannot continue without it, SHOULD abort the proxied connection by
+resetting the HTTP stream with the H3_NO_ERROR error code.
 
-Clients can cease receiving with forwarded mode over an existing tunnel while
-retaining the same client-to-target connection by creating a new tunnel with
-"Proxy-QUIC-Forwarding" set to "?0" and migrating the client-to-target connection.
-
-### New Proxied Connection Setup
+### New Proxied Connection Setup {#connection-setup}
 
 To initiate QUIC-aware proxying, the client sends a REGISTER_CLIENT_CID
 capsule containing the initial client CID that the client has
 advertised to the target.
 
 If the mapping is created successfully, the client will receive an
-ACK_CLIENT_CID capsule that contains the same client CID that was
-requested as well as a client VCID that the client MUST use
-when sending forwarded mode packets, assuming forwarded mode is supported.
-
-If forwarded mode is supported, the client MUST respond with an
-ACK_CLIENT_VCID to signal to the proxy that it may start sending forwarded mode
-packets. If forwarded mode is not supported, an ACK_CLIENT_VCID capsule MUST
-NOT be sent.
+ACK_CLIENT_CID capsule that contains the sequence number of that
+registration.
 
 Since clients are always aware whether or not they are using a QUIC proxy,
 clients are expected to cooperate with proxies in selecting client CIDs.
@@ -962,28 +775,29 @@ Prior to informing the target of a new chosen client CID, the client
 MUST send a REGISTER_CLIENT_CID capsule to the proxy containing the new client
 CID.
 
-The client should only inform the target of the new client CID once an
-ACK_CLIENT_CID capsule is received that contains the echoed connection ID.
-
-If forwarded mode is enabled, the client MUST reply to the ACK_CLIENT_CID with
-an ACK_CLIENT_VCID capsule with the real and virtual connection IDs along with
-an optional Stateless Reset Token.
+The client should only inform the target of the new client CID once it has
+received an ACK_CLIENT_CID capsule for the registration.
 
 ## Proxy Considerations
 
 The proxy MUST reply to each REGISTER_CLIENT_CID capsule with either
 an ACK_CLIENT_CID or REJECT_CLIENT_CID capsule containing the
-Connection ID that was in the registration capsule. Capsules MUST be responded
-to in the order in which they are received.
+sequence number of the registration.
 
 Similarly, the proxy MUST reply to each REGISTER_TARGET_CID capsule with
 either an ACK_TARGET_CID or REJECT_TARGET_CID capsule containing the
-Connection ID that was in the registration capsule.
+sequence number of the registration.
 
-When a proxy receives a REGISTER_CLIENT_CID with a non-zero reason code,
-it indicates the client is requesting a new VCID because the previous one
-was unusable. The proxy SHOULD attempt to address the issue indicated by
-the reason code when selecting the new VCID.
+A proxy that receives a REGISTER_CLIENT_CID or REGISTER_TARGET_CID capsule for a
+connection ID that is already registered on the same request MUST reset the
+stream with H3_DATAGRAM_ERROR error code.
+
+A proxy that receives a RETIRE_CLIENT_CID or RETIRE_TARGET_CID capsule with a
+sequence number that the client has not yet used for that type of registration
+MUST reset the stream with H3_DATAGRAM_ERROR error code. A proxy ignores these
+capsules for registrations that the client has already retired, or that the
+proxy has rejected, which can happen when the rejection and retirement capsules
+are sent simultaneously.
 
 The proxy then determines the proxy-to-target 4-tuple to associate with the
 client's request. This will generally involve performing a DNS lookup for
@@ -1011,45 +825,18 @@ When the proxy receives a REGISTER_CLIENT_CID capsule, it is receiving a
 request to be able to route traffic matching the client CID back to
 the client. If the pair of this client CID and the selected
 proxy-to-target 4-tuple does not create a conflict, the proxy creates the mapping
-and responds with an ACK_CLIENT_CID capsule. If forwarded mode is enabled, the
-capsule contains a proxy-chosen client VCID. If forwarded mode
-is enabled, and after receiving an ACK_CLIENT_VCID capsule from the client, any
-packets received by the proxy from the proxy-to-target 4-tuple that match the
-client CID can be sent to the client after the proxy has replaced
-the CID with the client VCID and executed the negotiated transform ({{transforms}}). If forwarded mode is
-not supported, the proxy MUST NOT send a client VCID by setting
-the length to zero. The proxy MUST use tunnelled mode (HTTP Datagram frames) for
-any long header packets. The proxy SHOULD forward directly to the client for any
-matching short header packets if forwarding is supported by the client, but the
-proxy MAY tunnel these packets in HTTP Datagram frames instead. If the mapping
+and responds with an ACK_CLIENT_CID capsule. If the mapping
 would create a conflict, the proxy responds with a REJECT_CLIENT_CID capsule
 with the CONFLICT reason code.
 
-When the proxy receives a REGISTER_TARGET_CID capsule, it is receiving a
-request to allow the client to forward packets to the target. The proxy
-generates a target VCID for the client to use when sending
-packets in forwarded mode. If forwarded mode is not supported, the proxy MUST
-NOT send a target VCID by setting the length to zero. If
-forwarded mode is supported, the proxy MUST use a target VCID
-that does not introduce a conflict with any other Connection ID on the
-client-to-proxy 4-tuple. The proxy creates the mapping and responds with an
-ACK_TARGET_CID capsule. Once the successful response is sent, the proxy will
-forward any short header packets received on the client-to-proxy 4-tuple that use
-the target VCID using the correct proxy-to-target 4-tuple after
-first rewriting the target VCID to be the correct target CID and executing the
-negotiated transform.
-
-Proxies MUST choose unpredictable client and target VCIDs to
-avoid forwarding loop attacks.
-
-The proxy MUST only forward non-tunnelled packets from the client that are QUIC
-short header packets (based on the Header Form bit) and have mapped target VCIDs.
-Packets sent by the client that are forwarded SHOULD be
-considered as activity for restarting QUIC's Idle Timeout {{QUIC}}.
+When the proxy receives a REGISTER_TARGET_CID capsule, it creates the mapping
+and responds with an ACK_TARGET_CID capsule, or responds with a
+REJECT_TARGET_CID capsule if it cannot create the mapping, such as due to a
+conflict ({{conflicts}}).
 
 In order to permit the client to change client-to-target connection IDs, the proxy
-SHOULD send MAX_CONNECTION_IDS capsules allowing the client additional connection ID
-registrations.
+SHOULD send MAX_CLIENT_CIDS and MAX_TARGET_CIDS capsules allowing the client
+additional connection ID registrations.
 
 ### Detecting Conflicts {#conflicts}
 
@@ -1077,15 +864,23 @@ particularly zero-length Connection IDs, a proxy MAY choose to reject
 registrations for very short Connection IDs using the TOO_SHORT reason code.
 
 
+### Stateless Resets from the Target {#target-resets}
+
+Reuse of proxy-to-target 4-tuples is only possible because QUIC connection IDs
+allow distinguishing packets for multiple QUIC connections received with the
+same 5-tuple. One exception to this is Stateless Reset packets, in which the
+connection ID is not used, but rather populated with unpredictable bits followed
+by a Stateless Reset token, to make it indistinguishable from a regular packet
+with a short header. In order for the proxy to correctly recognize Stateless
+Reset packets, the client SHOULD share the Stateless Reset token for each
+registered target CID. When the proxy receives a Stateless Reset packet, it
+sends the packet to the client as a tunnelled datagram.
+
 ### Closing Proxy State
 
 For any registration capsule for which the proxy has sent an acknowledgement, the
-mapping lasts until the client sends a close capsule or either side of the
+mapping lasts until the client retires it or either side of the
 HTTP stream closes.
-
-A client that no longer wants a given Connection ID to be forwarded by the
-proxy sends a CLOSE_CLIENT_CID or CLOSE_TARGET_CID capsule with the DEFAULT
-reason code.
 
 If a client's connection to the proxy is terminated for any reason, all
 mappings associated with all requests are removed.
@@ -1093,7 +888,11 @@ mappings associated with all requests are removed.
 A proxy can close its proxy-to-target 4-tuple once all UDP proxying requests mapped to
 that 4-tuple have been removed.
 
-# Using Forwarded Mode
+# Using Forwarded Mode {#forwarded-mode}
+
+Forwarded mode builds on Connection ID registration ({{cid-registration}}): for
+each registered connection ID, the proxy issues Virtual Connection IDs that are
+used on the client-to-proxy 4-tuple in its place.
 
 All packets sent in forwarded mode use a transform in which CIDs are switched
 into VCIDs, and the contents of packets are either left the same, or modified
@@ -1107,6 +906,432 @@ and stateless resets ({{resets}}).
 Forwarded mode packets are not part of the QUIC connection the tunnel is
 managed by, but instead an independent flow of QUIC packets.
 
+When forwarded mode is enabled, the proxy issues Virtual Connection IDs using
+the NEW_TARGET_VCID ({{capsule-new-target-vcid}}) and NEW_CLIENT_VCID
+({{capsule-new-client-vcid}}) capsule types, and the client accepts or refuses
+each client VCID using the ACK_CLIENT_VCID ({{capsule-ack-client-vcid}}) and
+REJECT_CLIENT_VCID ({{capsule-reject-client-vcid}}) capsule types. The client
+retires target VCIDs using the RETIRE_TARGET_VCID capsule type
+({{capsule-retire-target-vcid}}), and the proxy retires client VCIDs using the
+RETIRE_CLIENT_VCID capsule type ({{capsule-retire-client-vcid}}). These
+capsule types MUST only be sent when forwarded mode is enabled.
+{{vcid-lifecycle}} describes how they are used.
+
+For QUIC-aware proxying with forwarded mode, the steps are as follows:
+
+1. The client sends the `REGISTER_CLIENT_CID` capsule once it selects a
+CID that it will use for receiving packets from a target.
+
+1. The proxy sends the `ACK_CLIENT_CID` capsule to acknowledge that CID;
+alternatively, the proxy can send the
+`REJECT_CLIENT_CID` if it detects a conflict with another CID.
+
+1. The proxy sends one or more `NEW_CLIENT_VCID` capsules, each proposing a
+client VCID for that client CID.
+
+1. The client sends an `ACK_CLIENT_VCID` capsule for each client VCID that it
+can use, which allows the proxy to send forwarded packets using that client
+VCID, or a `REJECT_CLIENT_VCID` capsule otherwise.
+
+1. The client sends the `REGISTER_TARGET_CID` capsule as soon as it learns
+the target CID on the client-to-target connection.
+
+1. The proxy sends the `ACK_TARGET_CID` capsule to acknowledge that CID;
+alternatively, the proxy can send the
+`REJECT_TARGET_CID` if it detects a conflict with another CID.
+
+1. The proxy sends one or more `NEW_TARGET_VCID` capsules for that target CID. Once
+the client receives a target VCID, it can start sending forwarded
+packets using the target VCID.
+
+1. The proxy sends `MAX_CLIENT_CIDS` and `MAX_TARGET_CIDS` capsules to allow
+additional registrations via future `REGISTER_CLIENT_CID` and
+`REGISTER_TARGET_CID` capsules.
+
+1. When the client migrates to a new network path, the client and proxy switch
+to Virtual Connection IDs they have not used before, and retire the ones they no
+longer use ({{migration}}). When the proxy needs to stop accepting
+particular target VCIDs, such as when rotating the keys it uses to generate
+VCIDs, it sends a `NEW_TARGET_VCID` capsule that asks the client to retire them.
+
+1. Whenever a client or target stops using a particular CID, the client
+sends a `RETIRE_CLIENT_CID` or `RETIRE_TARGET_CID` capsule. The client
+can also initiate new `REGISTER_CLIENT_CID` or `REGISTER_TARGET_CID`
+exchanges at any time.
+
+## Virtual Connection ID Capsule Types and Formats {#vcid-capsule-types-formats}
+
+### NEW_TARGET_VCID {#capsule-new-target-vcid}
+
+The NEW_TARGET_VCID capsule is sent by the proxy to issue a target VCID for a
+registered target CID, along with a Stateless Reset Token for it. It can also
+ask the client to retire target VCIDs that the proxy issued earlier for the same
+target CID ({{vcid-request-retirement}}). This capsule MUST only be sent by the
+proxy.
+
+~~~
+New Target VCID Capsule {
+  Type (i) = see {{iana}} for the value of the capsule type
+  Length (i),
+  Registration Sequence Number (i),
+  Virtual Connection ID Sequence Number (i),
+  Retire Prior To (i),
+  Virtual Connection ID Length (i),
+  Virtual Connection ID (8..2040),
+  Stateless Reset Token (..),
+}
+~~~
+{: #fig-capsule-new-target-vcid title="New Target VCID Capsule Format"}
+
+Registration Sequence Number:
+: The sequence number of the target CID registration that the target VCID maps
+to ({{cid-registration}}).
+
+Virtual Connection ID Sequence Number:
+: The sequence number of the target VCID that the capsule issues
+({{vcid-issuance}}).
+
+Retire Prior To:
+: The Virtual Connection ID sequence number below which the client is asked to
+retire target VCIDs for the same registration ({{vcid-request-retirement}}).
+This MUST NOT be greater than the Virtual Connection ID Sequence Number.
+
+Virtual Connection ID Length:
+: The length of the target VCID. This MUST be a non-zero, valid connection ID
+length for the QUIC version used in the client-to-proxy QUIC connection. The
+lengths of the target VCID and target CID SHOULD be equal when possible to
+avoid the need to resize packets during replacement.
+
+Virtual Connection ID:
+: The proxy-chosen target VCID, whose length is equal to Virtual Connection ID
+Length. The client uses it when sending forwarded mode packets, and the proxy
+rewrites these packets to contain the correct target CID prior to forwarding
+them.
+
+Stateless Reset Token:
+: A Stateless Reset Token allowing reset of the client-to-target connection in
+response to client-to-target forwarded mode packets. The length of the
+Stateless Reset Token is implied by the length of the capsule. Proxies choosing
+not to support stateless resets MAY send a zero-length Stateless Reset Token.
+Clients receiving a zero-length stateless reset token MUST ignore it.
+
+### NEW_CLIENT_VCID {#capsule-new-client-vcid}
+
+The NEW_CLIENT_VCID capsule is sent by the proxy to propose a client VCID for a
+registered client CID. This capsule MUST only be sent by the proxy.
+
+~~~
+New Client VCID Capsule {
+  Type (i) = see {{iana}} for the value of the capsule type
+  Length (i),
+  Registration Sequence Number (i),
+  Virtual Connection ID Sequence Number (i),
+  Virtual Connection ID (8..2040),
+}
+~~~
+{: #fig-capsule-new-client-vcid title="New Client VCID Capsule Format"}
+
+Registration Sequence Number:
+: The sequence number of the client CID registration that the client VCID maps
+to ({{cid-registration}}).
+
+Virtual Connection ID Sequence Number:
+: The sequence number of the client VCID that the capsule proposes
+({{vcid-issuance}}).
+
+Virtual Connection ID:
+: The proxy-chosen client VCID that the proxy would use when sending forwarded
+mode packets, after rewriting them to contain the client VCID instead of the
+client CID. The length of the client VCID is implied by the length of the
+capsule. Its length MUST be non-zero and valid for the QUIC version used in
+the client-to-proxy QUIC connection, and it is chosen as described in
+{{vcids}}. The lengths of the client VCID and client CID SHOULD be equal when
+possible to avoid the need to resize packets during replacement.
+
+### ACK_CLIENT_VCID {#capsule-ack-client-vcid}
+
+The ACK_CLIENT_VCID capsule is sent by the client to accept a client VCID
+proposed in a NEW_CLIENT_VCID capsule, indicating that the client is ready to
+receive forwarded mode packets using it. This capsule MUST only be sent by the
+client.
+
+~~~
+Acknowledge Client VCID Capsule {
+  Type (i) = see {{iana}} for the value of the capsule type
+  Length (i),
+  Registration Sequence Number (i),
+  Virtual Connection ID Sequence Number (i),
+  Stateless Reset Token (..),
+}
+~~~
+{: #fig-capsule-ack-client-vcid title="Acknowledge Client VCID Capsule Format"}
+
+Registration Sequence Number:
+: The sequence number of the client CID registration that the client VCID maps
+to ({{cid-registration}}).
+
+Virtual Connection ID Sequence Number:
+: The sequence number of the client VCID being acknowledged
+({{vcid-issuance}}).
+
+Stateless Reset Token:
+: A Stateless Reset Token that the client can send in response to
+target-to-client forwarded mode packets using the client VCID when it has no
+state for that client VCID. The length of the Stateless Reset Token is implied
+by the length of the capsule. Clients choosing not to support stateless resets
+MAY send a zero-length Stateless Reset Token. Proxies receiving a zero-length
+stateless reset token MUST ignore it. Since a client does not send a Stateless
+Reset for a client VCID before the proxy retires it ({{vcid-retirement}}), a
+proxy that receives a Stateless Reset with this token MUST reset the stream with
+H3_DATAGRAM_ERROR error code.
+
+### REJECT_CLIENT_VCID {#capsule-reject-client-vcid}
+
+The REJECT_CLIENT_VCID capsule is sent by the client to refuse a client VCID
+proposed in a NEW_CLIENT_VCID capsule. This capsule MUST only be sent by the
+client.
+
+~~~
+Reject Client VCID Capsule {
+  Type (i) = see {{iana}} for the value of the capsule type
+  Length (i),
+  Reason (i),
+  Registration Sequence Number (i),
+  Virtual Connection ID Sequence Number (i),
+}
+~~~
+{: #fig-capsule-reject-client-vcid title="Reject Client VCID Capsule Format"}
+
+Reason:
+: The reason for refusing the client VCID, such as TOO_SHORT or CONFLICT.
+See {{iana-cid-reasons}} for the list of reason codes.
+
+Registration Sequence Number:
+: The sequence number of the client CID registration that the client VCID maps
+to ({{cid-registration}}).
+
+Virtual Connection ID Sequence Number:
+: The sequence number of the client VCID being refused ({{vcid-issuance}}).
+
+### RETIRE_TARGET_VCID {#capsule-retire-target-vcid}
+
+The RETIRE_TARGET_VCID capsule is sent by the client to indicate that it will
+no longer send forwarded mode packets using a target VCID. This capsule MUST
+only be sent by the client.
+
+~~~
+Retire Target VCID Capsule {
+  Type (i) = see {{iana}} for the value of the capsule type
+  Length (i),
+  Registration Sequence Number (i),
+  Virtual Connection ID Sequence Number (i),
+}
+~~~
+{: #fig-capsule-retire-target-vcid title="Retire Target VCID Capsule Format"}
+
+Registration Sequence Number:
+: The sequence number of the target CID registration that the target VCID maps
+to ({{cid-registration}}).
+
+Virtual Connection ID Sequence Number:
+: The sequence number of the target VCID being retired ({{vcid-issuance}}).
+
+### RETIRE_CLIENT_VCID {#capsule-retire-client-vcid}
+
+The RETIRE_CLIENT_VCID capsule is sent by the proxy to indicate that it will no
+longer send forwarded mode packets using a client VCID, or to withdraw a
+proposed client VCID. This capsule MUST only be sent by the proxy.
+
+~~~
+Retire Client VCID Capsule {
+  Type (i) = see {{iana}} for the value of the capsule type
+  Length (i),
+  Registration Sequence Number (i),
+  Virtual Connection ID Sequence Number (i),
+}
+~~~
+{: #fig-capsule-retire-client-vcid title="Retire Client VCID Capsule Format"}
+
+Registration Sequence Number:
+: The sequence number of the client CID registration that the client VCID maps
+to ({{cid-registration}}).
+
+Virtual Connection ID Sequence Number:
+: The sequence number of the client VCID being retired ({{vcid-issuance}}).
+
+## Virtual Connection ID Lifecycle {#vcid-lifecycle}
+
+### Issuing Virtual Connection IDs {#vcid-issuance}
+
+After acknowledging a target CID registration, a proxy that is willing to
+forward packets for that target CID issues one or more target VCIDs for it using
+NEW_TARGET_VCID capsules. The client can use any target VCID that it has
+received for sending forwarded mode packets, as long as the target VCID has not
+been retired and the proxy has not requested its retirement.
+
+After acknowledging a client CID registration, a proxy proposes one or more
+client VCIDs for it using NEW_CLIENT_VCID capsules. Unless it has retired the
+registration (see below), the client MUST respond to each
+with an ACK_CLIENT_VCID capsule if it is prepared to receive forwarded mode
+packets using that client VCID, or with a REJECT_CLIENT_VCID capsule otherwise.
+A client rejects a client VCID that conflicts with another Connection ID on the
+client-to-proxy 4-tuple using the CONFLICT reason code, and a client VCID that
+is too short using the TOO_SHORT reason code. The proxy MUST NOT send forwarded
+mode packets using a client VCID until it has received an ACK_CLIENT_VCID
+capsule for it. After receiving a REJECT_CLIENT_VCID capsule, the proxy can
+propose another client VCID, and SHOULD take the reason code into account when
+choosing it. If the reason was TOO_SHORT, any client VCID that the proxy
+proposes next for the same client CID MUST be longer.
+
+Each NEW_TARGET_VCID and NEW_CLIENT_VCID capsule carries the sequence number of
+the Virtual Connection ID that it issues. The first Virtual Connection ID that
+the proxy issues for a registration has sequence number 0, and each subsequent
+Virtual Connection ID that it issues for the same registration has a sequence
+number one greater than the previous one. Capsules refer to a Virtual
+Connection ID by the sequence number of its registration and its own sequence
+number. A client that receives one of these capsules for a registration that it
+has not retired, with a sequence number that is not the next one for that
+registration, MUST reset the stream with H3_DATAGRAM_ERROR error code.
+
+Proxies MUST choose unpredictable target VCIDs to avoid forwarding loop attacks,
+and MUST use target VCIDs that do not introduce a conflict with any other
+Connection ID on the client-to-proxy 4-tuple. Requirements for choosing client
+VCIDs are described in {{vcids}}.
+
+A proxy SHOULD keep at least one unused Virtual Connection ID available for each
+registered connection ID that it forwards packets for, issuing new ones as
+others are retired, within the limit set by the client ({{vcid-limit}}). This
+allows the endpoint that sends packets to switch to an unused Virtual Connection
+ID without first exchanging capsules, for example when the network path changes
+({{migration}}).
+
+A client ignores NEW_TARGET_VCID and NEW_CLIENT_VCID capsules for a
+registration that it has already retired, which can happen when the
+retirement and issuance capsules are sent simultaneously. These Virtual
+Connection IDs are retired along with the others for that registration when the
+proxy processes the corresponding RETIRE_CLIENT_CID or RETIRE_TARGET_CID capsule
+({{vcid-retirement}}). A client that receives one of these capsules for a
+registration that the proxy has not acknowledged MUST reset the stream with
+H3_DATAGRAM_ERROR error code.
+
+### Retiring Virtual Connection IDs {#vcid-retirement}
+
+The client retires target VCIDs using RETIRE_TARGET_VCID capsules, and the proxy
+retires client VCIDs using RETIRE_CLIENT_VCID capsules. An endpoint retires a
+Virtual Connection ID when it will no longer send packets using it, for example
+after the network path changes ({{migration}}). An endpoint checks for the
+Stateless Reset Token associated with a Virtual Connection ID only after it has
+sent packets using that Virtual Connection ID ({{Section 10.3.1 of QUIC}}).
+Before sending the capsule that retires a Virtual Connection ID, the endpoint
+MUST stop sending forwarded mode packets using it and MUST stop checking for the
+associated Stateless Reset Token.
+
+Until a Virtual Connection ID is retired, the endpoint that receives packets
+using it MUST continue to accept them, and MUST NOT send a Stateless Reset in
+response to them, since its peer might still act on the corresponding Stateless
+Reset Token. Once it has received the capsule that retires the Virtual
+Connection ID, it can remove all state for it. Packets that use a retired
+Virtual Connection ID and arrive later, for example due to reordering, can be
+dropped or answered with a Stateless Reset, which the peer will ignore.
+
+When a registration is retired, the Virtual Connection IDs associated with it
+are retired as well:
+
+- Before sending a RETIRE_TARGET_CID capsule, the client MUST stop using all
+  target VCIDs for that target CID and stop checking for their Stateless Reset
+  Tokens. These target VCIDs are retired once the proxy receives the capsule.
+
+- After sending a RETIRE_CLIENT_CID capsule, the client continues to accept
+  packets using the client VCIDs for that client CID, and MUST NOT send
+  Stateless Resets in response to them, until they are retired. Upon receiving
+  the RETIRE_CLIENT_CID capsule, the proxy MUST stop using and stop checking for
+  the Stateless Reset Tokens of all client VCIDs for that client CID, and retire
+  each of them with a RETIRE_CLIENT_VCID capsule.
+
+A proxy can also withdraw a client VCID that it has proposed, before the client
+accepts it, by retiring it. A proxy ignores ACK_CLIENT_VCID and
+REJECT_CLIENT_VCID capsules for client VCIDs that it has already retired, such
+as those that it has withdrawn, and a client ignores RETIRE_CLIENT_VCID capsules
+for client VCIDs that are not active, such as those that it has rejected or
+ignored. A proxy that receives an ACK_CLIENT_VCID or REJECT_CLIENT_VCID capsule
+with a Virtual Connection ID sequence number that it has not yet used for that
+registration MUST reset the stream with H3_DATAGRAM_ERROR error code. Likewise,
+a client that receives a RETIRE_CLIENT_VCID capsule for a registration that it
+has not retired, with a Virtual Connection ID sequence number that the proxy
+has not yet used for that registration, MUST reset the stream with
+H3_DATAGRAM_ERROR error code.
+
+A proxy that receives a RETIRE_TARGET_VCID capsule for a target VCID that it did
+not issue, or that is already retired, MUST reset the stream with
+H3_DATAGRAM_ERROR error code.
+
+#### Requesting Retirement of Target VCIDs {#vcid-request-retirement}
+
+A proxy might need to stop accepting target VCIDs that it has issued. For
+example, a proxy that encodes routing information into target VCIDs using keys
+that are periodically rotated, such as described in {{QUIC-LB}}, needs to
+replace target VCIDs that were generated with an old key. Much like a QUIC
+endpoint does using the Retire Prior To field of the NEW_CONNECTION_ID frame
+({{Section 5.1.2 of QUIC}}), the proxy does so by issuing a replacement in a
+NEW_TARGET_VCID capsule whose Retire Prior To field asks the client to retire
+the target VCIDs that it replaces.
+
+Retire Prior To uses the sequence numbers of target VCIDs ({{vcid-issuance}}). A
+client that receives a NEW_TARGET_VCID capsule with a Retire Prior To value
+greater than the sequence number of the target VCID in the capsule MUST reset
+the stream with H3_DATAGRAM_ERROR error code.
+
+Upon receiving a NEW_TARGET_VCID capsule, the client stops using the target
+VCIDs for that target CID that have a sequence number less than the Retire Prior
+To value, and MUST retire each of them that it has not already retired, using
+RETIRE_TARGET_VCID capsules ({{vcid-retirement}}), before adding the target VCID
+that the capsule issues to its set of active target VCIDs. Since the capsule
+always issues a target VCID that it does not ask the client to retire, the
+client can switch to it without falling back to tunnelled mode.
+
+Retire Prior To replaces target VCIDs, and cannot remove the last target VCID
+for a target CID. This document does not define a way for a proxy to stop
+accepting forwarded mode packets for a target CID while continuing to proxy the
+client-to-target connection. A proxy that is no longer willing to accept
+forwarded mode packets from the client, for example due to resource constraints
+or a change in policy, closes the request stream.
+
+A proxy does not need to request retirement of client VCIDs, since it is the
+endpoint that sends packets using them.
+
+### Limiting Active Virtual Connection IDs {#vcid-limit}
+
+The client limits the number of active Virtual Connection IDs that the proxy
+issues for each registered connection ID using the "active-vcid-limit"
+parameter of the "Proxy-QUIC-Forwarding" header ({{forwarding-header}}), much
+like the active_connection_id_limit transport parameter of QUIC
+({{Section 18.2 of QUIC}}). Unlike that transport parameter, the limit applies
+to each registered connection ID separately, and only the client sets one, since
+the proxy chooses all Virtual Connection IDs.
+
+A Virtual Connection ID counts toward the limit while it is active, whether or
+not any packets have been sent using it. A target VCID is active from when the
+client receives it until the client retires it. A client VCID is active from
+when the client receives it until the client rejects it or receives a
+RETIRE_CLIENT_VCID capsule for it. The proxy MUST NOT send a NEW_TARGET_VCID or
+NEW_CLIENT_VCID capsule that would cause the number of active Virtual
+Connection IDs for a connection ID to exceed the limit.
+
+Since capsules are processed in order, a proxy that has reached the limit can
+replace a Virtual Connection ID without waiting for a round trip. For client
+VCIDs, it retires one before proposing its replacement. For target VCIDs, it
+issues the replacement in a NEW_TARGET_VCID capsule whose Retire Prior To field
+asks the client to retire at least one target VCID, which the client does before
+adding the new one ({{vcid-request-retirement}}). As in QUIC
+({{Section 5.1.1 of QUIC}}), the proxy can therefore issue a target VCID that
+temporarily exceeds the limit from its own point of view, until it receives the
+corresponding RETIRE_TARGET_VCID capsules.
+
+After processing a NEW_TARGET_VCID or NEW_CLIENT_VCID capsule, including
+retiring any target VCIDs that it asks the client to retire, a client that has
+more active Virtual Connection IDs for the connection ID than the limit allows
+MUST reset the stream with H3_DATAGRAM_ERROR error code.
+
 ## Sending With Forwarded Mode
 
 Support for forwarded mode is determined by the "Proxy-QUIC-Forwarding" header,
@@ -1116,17 +1341,19 @@ Once the client has learned the target server's Connection ID, such as in the
 response to a QUIC Initial packet, it can send a REGISTER_TARGET_CID capsule
 containing the target CID to request the ability to forward packets.
 
-The client MUST wait for an ACK_TARGET_CID capsule that contains the echoed
-connection ID and target VCID before using forwarded mode.
+Forwarded mode requires connection IDs to be registered and Virtual Connection
+IDs to be issued, and, as a consequence, cannot be leveraged without a round
+trip. This is particularly pronounced when chaining proxies because
+registration happens sequentially. While waiting for forwarded mode to become
+enabled, clients SHOULD communicate over tunnelled mode to avoid end-to-end
+delays.
 
-Prior to receiving the proxy server response, the client MUST send short header
+Prior to receiving the proxy's response, the client MUST send short header
 packets tunnelled in HTTP Datagram frames. The client MAY also choose to tunnel
 some short header packets even after receiving the successful response.
 
-If the target CID registration is rejected, for example with a
-REJECT_TARGET_CID capsule, it MUST NOT forward packets to the requested target CID,
-but only use tunnelled mode. The registration might also be rejected
-if the proxy does not support forwarded mode or has it disabled by policy.
+If the proxy rejects the target CID registration or does not issue any target
+VCIDs for it, the client continues to use tunnelled mode for that target CID.
 
 QUIC long header packets MUST NOT be forwarded. These packets can only be
 tunnelled within HTTP Datagram frames to avoid exposing unnecessary connection
@@ -1135,6 +1362,18 @@ metadata.
 When forwarding, the client sends a QUIC packet with the target VCID
 in the QUIC short header, using the same 4-tuple between client and
 proxy that was used for the main QUIC connection between client and proxy.
+
+The proxy will forward to the target any short header packets received from
+the client that use one of its target VCIDs, after first rewriting the target
+VCID to be the correct target CID and executing the negotiated transform.
+
+The proxy MUST only forward non-tunnelled packets from the client that are QUIC
+short header packets (based on the Header Form bit), that use target VCIDs that
+the proxy has issued and that have not been retired, and that arrive from a
+client address from which the proxy accepts forwarded mode packets
+({{migration}}).
+Packets sent by the client that are forwarded SHOULD be
+considered as activity for restarting QUIC's Idle Timeout {{QUIC}}.
 
 When forwarding, the proxy sends a QUIC packet with the client VCID
 in the QUIC short header, using the same 4-tuple between client
@@ -1152,18 +1391,24 @@ Connection IDs of different lengths than the corresponding Connection IDs.
 
 ## Receiving With Forwarded Mode
 
-If the client has indicated support for forwarded mode with the "Proxy-QUIC-Forwarding"
-header, the proxy MAY use forwarded mode for any client CID for which
-it has a valid mapping.
+Once the client has acknowledged a client VCID, the proxy SHOULD forward to the
+client any short header packets from the target that use the corresponding
+client CID, after replacing that client CID with the client VCID and executing
+the negotiated transform ({{transforms}}).
 
 Once a client has sent an ACK_CLIENT_VCID capsule to the proxy, it MUST be
 prepared to receive forwarded short header packets on the 4-tuple between itself
-and the proxy for the specified client VCID.
+and the proxy for the specified client VCID, until that client VCID is retired
+({{vcid-retirement}}).
 
 The client uses the Destination Connection ID field of the received packet to
 determine if the packet was originated by the proxy, or merely forwarded from
 the target. The client replaces the client VCID with the real
 client CID before processing the packet further.
+
+Clients can cease receiving with forwarded mode over an existing tunnel while
+retaining the same client-to-target connection by creating a new tunnel with
+"Proxy-QUIC-Forwarding" set to "?0" and migrating the client-to-target connection.
 
 ## Packet Transforms {#transforms}
 
@@ -1226,11 +1471,11 @@ document MUST use the value "scramble-dt". The finalized version is expected
 to use the reserved value "scramble" {{iana-transforms}}.
 
 The `scramble` transform is initialized using a 32-byte random symmetric key.
-When offering or selecting this transform, the client and server each
+When offering or selecting this transform, the client and proxy each
 generate the key that they will use to encrypt scrambled packets and MUST add it to the
 "Proxy-QUIC-Forwarding" header in an `sf-binary` parameter named "scramble-key".
 If either side receives a `scramble` transform without the "scramble-key" parameter,
-forwarded mode MUST be disabled. Note that each side (client and server) generates
+forwarded mode MUST be disabled. Note that each side (client and proxy) generates
 its own "scramble-key" that it uses when sending scrambled packets; the value
 received in the "scramble-key" parameter is thus used to unscramble packets
 received from the peer.
@@ -1303,51 +1548,130 @@ Specifically, the proxy MUST NOT forward packets to an unvalidated client addres
 Proxies additionally SHOULD pace the rate at which packets are sent over a new
 path to avoid creating unintentional congestion on the new path.
 
-When operating in forwarded mode, the proxy reconfigures or removes forwarding
+When operating in forwarded mode, the proxy reconfigures forwarding
 rules (i.e., the mappings for VCIDs) as the network path between the client and proxy changes.
+As with connection IDs in QUIC ({{Section 9.5 of QUIC}}), a Virtual
+Connection ID MUST NOT be used for sending packets on more than one network
+path, other than when the peer's address changes without its knowledge, such as
+due to NAT rebinding. Since the proxy issues more than one Virtual Connection ID
+for each connection ID ({{vcid-issuance}}), the client and proxy can switch to a
+Virtual Connection ID that they have not used before when the network path
+changes, without first exchanging capsules.
 
-In the event of passive migration, the proxy automatically reconfigures forwarding rules
-according to the HTTP stream's active network path and its validation status. Specifically,
-the proxy MUST NOT forward packets to the client until the new network path
-is validated. The proxy SHOULD continue forwarding packets to the target to avoid disruption
-of the client-to-target forwarding packet flow.
+Since forwarded mode packets are not authenticated, a proxy only accepts them
+from a client address once it has successfully processed a client-to-proxy QUIC
+packet from that address, that is, a packet that it decrypted and did not
+discard as a duplicate ({{Section 12.3 of QUIC}}), including a probing packet
+({{Section 9.1 of QUIC}}). Otherwise, an attacker that has observed a target
+VCID could use it to inject packets toward the target from any address
+({{active-attacks}}).
 
-In the event of active migration, the proxy MUST remove forwarding rules in order to not send
-packets with the same connection ID bytes over multiple network paths, and MUST NOT apply the new forwarding rule in the target-to-client direction until the new network path is validated. After
-initiating active migration, clients are no longer able to send forwarded mode
-packets since the proxy will have removed forwarding rules. Clients can proceed with
-tunnelled mode or can request new forwarding rules via REGISTER_CLIENT_CID and
-REGISTER_TARGET_CID capsules. Requesting new forwarding rules in this way (registering the same
-client-to-target CIDs again) is a re-registration and does increment the sequence
-number and is dependent on sufficient MAX_CONNECTION_IDs. Each of the acknowledging capsules
-will contain new virtual connection IDs to prevent packets with the same connection
-ID bytes being used over multiple network paths. Note that the client CID and target
-CID can stay the same while the target VCID and client VCID change. Importantly,
-the client does not send a CLOSE_CLIENT_CID capsule because that would also
-remove the registration of the CID for the purpose of port sharing, potentially breaking the
-tunnelled path.
+The proxy continues to accept forwarded mode packets from an address for as long
+as it maintains state for the network path to that address, such as a network
+path that the client is probing or the previous network path after a migration
+({{Section 9.3.2 of QUIC}}), unless path validation to that address fails. The
+proxy drops forwarded mode packets that arrive from any other address.
+Regardless of the address that they arrive from, the proxy does not send a
+Stateless Reset in response to forwarded mode packets that use a target VCID
+that has not been retired ({{vcid-retirement}}).
+
+The proxy sends forwarded mode packets to the client only at the address that
+the client-to-proxy QUIC connection uses, and only once that address is
+validated. That address only changes when the client-to-proxy QUIC connection
+migrates ({{Section 9.3 of QUIC}}), and never in response to forwarded mode
+packets. While the client-to-proxy QUIC connection uses an address that it has
+not yet validated, the proxy tunnels packets for the client in HTTP Datagram
+frames instead, subject to the anti-amplification limit for that address
+({{Section 8 of QUIC}}).
+
+In the event of passive migration, such as NAT rebinding, the client is not
+aware that its address has changed, and continues to send packets using the same
+Virtual Connection IDs. Until the client sends a client-to-proxy QUIC packet
+from its new address, such as a keepalive ({{maintenance}}), forwarded mode
+packets are lost in both directions: the proxy drops those that the client sends
+from the new address, and continues to send those for the client to its previous
+address. Once the proxy receives a client-to-proxy QUIC packet from the new
+address, it accepts forwarded mode packets from that address. If that packet
+causes the client-to-proxy QUIC connection to migrate to the new address, the
+proxy tunnels packets for the client until it has validated the new address,
+and then reconfigures its forwarding rules to send forwarded mode packets to the
+client at the new address. The Virtual Connection IDs in use do not need to
+change, although the proxy MAY switch to an unused client VCID when it
+reconfigures its forwarding rules for the new address, and then retire the
+client VCID it used before.
+
+A client that has not sent any packets to the proxy for longer than NAT bindings
+can be expected to last (see {{Section 3.2 of ?RFC9308}}) might be assigned a
+new address by its NAT when it next sends a packet. A client that resumes
+sending forwarded mode packets after such a period SHOULD first send an
+ack-eliciting packet on the client-to-proxy QUIC connection, such as one
+containing a PING frame. This allows the client-to-proxy QUIC connection to
+migrate to the new address, and the proxy to accept forwarded mode packets from
+it, without waiting for other client-to-proxy QUIC packets.
+
+A proxy that receives a probing packet from a new client address SHOULD initiate
+path validation ({{Section 8.2 of QUIC}}) to that address, even before the
+client migrates to it, so that it can send forwarded mode packets to the client
+on the new network path as soon as the client migrates.
+
+In the event of active migration, the client SHOULD probe the new network path
+({{Section 9.1 of QUIC}}) before sending forwarded mode packets on it, and
+continues to send forwarded mode packets on the previous network path in the
+meantime. Once its path validation succeeds, the client knows that the proxy has
+received its probe from the new address, and therefore accepts forwarded mode
+packets from it. The client then migrates the client-to-proxy QUIC connection to
+the new network path by sending a non-probing packet on it
+({{Section 9.2 of QUIC}}), and sends forwarded mode packets on it using target
+VCIDs that it has not used before. Once the client no longer uses the previous
+network path, it retires the target VCIDs that it used on that path
+({{vcid-retirement}}).
+
+A client that migrates without first probing the new network path, such as when
+the previous network path is no longer usable, sends a client-to-proxy QUIC
+packet on the new network path before sending forwarded mode packets on it,
+since the proxy drops forwarded mode packets that arrive from the new address
+before it has processed such a packet.
+
+In active migration, the client also switches to a new connection ID on the
+client-to-proxy QUIC connection ({{Section 9.5 of QUIC}}). Once the
+client-to-proxy QUIC connection has migrated to the new network path with a new
+connection ID and the proxy has validated the path, the proxy MUST use a client
+VCID that it has not used on another network path to send forwarded mode
+packets on it. After switching to the new network path, the proxy can retire the
+client VCIDs that it used on the previous path at any time. Keeping them, for
+example until the client retires the target VCIDs that it used on that path,
+allows the proxy to use them again if the client returns to that path, instead
+of proposing new client VCIDs. However, client VCIDs that have not been retired
+count toward the client's limit ({{vcid-limit}}).
+
+If the client has no unused target VCID when it migrates, it sends packets in
+tunnelled mode until the proxy issues a new one. Similarly, if the proxy has no
+unused client VCID that the client has acknowledged, it sends packets to the
+client in tunnelled mode until the client acknowledges a new one. A client that
+returns to a previous network path MAY use a target VCID that it used on that
+path before, if it has not retired it. In that case, the proxy MAY likewise use
+the client VCID that it used on that path, if it has not retired it; otherwise,
+the proxy uses an unused client VCID.
 
 ### Passive Migration Steps {#passive-migration-steps}
 
-1. Client and proxy exchange connection IDs via REGISTER_CLIENT_CID/REGISTER_TARGET_CID/ACK_CLIENT_CID/ACK_TARGET_CID and start using the forwarded mode.
-1. The network path experiences NAT rebinding.
-1. Proxy immediately and automatically reconfigures client-to-target forwarding rules to prevent dropping of forwarded mode packets.
-1. Proxy waits for the client-to-proxy network path to become validated and then automatically reconfigures target-to-client forwarding rules.
+1. Client and proxy exchange connection IDs via REGISTER_CLIENT_CID/REGISTER_TARGET_CID/ACK_CLIENT_CID/ACK_TARGET_CID, the proxy issues Virtual Connection IDs, and they start using the forwarded mode.
+1. The network path experiences NAT rebinding, and packets that the client sends to the proxy arrive from a new address.
+1. The proxy drops forwarded mode packets from the new address until it receives a client-to-proxy QUIC packet from that address, and then forwards them to the target.
+1. The client-to-proxy QUIC connection migrates to the new address, and the proxy starts validating it ({{Section 9.3 of QUIC}}). Until path validation succeeds, the proxy tunnels packets for the client in HTTP Datagram frames.
+1. Once path validation succeeds, the proxy reconfigures target-to-client forwarding rules to send forwarded mode packets to the client at the new address.
 
-No capsules are exchanged in response to passive migration.
+No capsules are exchanged in response to passive migration, unless the proxy
+chooses to switch to an unused client VCID.
 
 ### Active Migration Steps {#active-migration-steps}
 
-1. Client and proxy exchange connection IDs via REGISTER_CLIENT_CID/REGISTER_TARGET_CID/ACK_CLIENT_CID/ACK_TARGET_CID and start using the forwarded mode.
-1. Client probes a new network path and migrates.
-1. Proxy, by receiving a non-probing packet on a non-active path that uses a Connection ID different from the active path, detects that the client intentionally migrated, and removes the forwarding rules.
-1. Client re-registers the original client-to-target Connection IDs. This solicits new virtual CIDs from the proxy.
-1. When the proxy receives a REGISTER_TARGET_CID capsule, the proxy responds with an ACK_TARGET_CID capsule carrying a fresh VCID, and enables the forwarding rule in the client-to-target direction.
-1. When the proxy receives a REGISTER_CLIENT_CID capsule, the proxy responds with an ACK_CLIENT_CID capsule carrying a fresh VCID; once the client acknowledges it with an ACK_CLIENT_VCID capsule and the network path is validated, the proxy enables the forwarding rule in the target-to-client direction.
-
-Migrating "back" requires the same steps - there are no special affordances for previously
-configured paths. Forwarding rules are removed and re-registration is required to enable
-forwarding on the network path.
+1. Client and proxy exchange connection IDs via REGISTER_CLIENT_CID/REGISTER_TARGET_CID/ACK_CLIENT_CID/ACK_TARGET_CID, the proxy issues Virtual Connection IDs, and they start using the forwarded mode.
+1. Client probes a new network path. Once the proxy has received the client's probe, it accepts forwarded mode packets from the new address, and starts validating that address.
+1. Once the client's path validation succeeds, the client migrates the client-to-proxy QUIC connection to the new path and sends forwarded mode packets on it using an unused target VCID.
+1. Client retires the target VCIDs that it used on the previous path with RETIRE_TARGET_VCID capsules.
+1. Once the client-to-proxy QUIC connection has migrated to the new path and the proxy has validated it, the proxy sends forwarded mode packets to the client using an unused client VCID that the client has acknowledged, and, at a time of its choosing, retires the client VCIDs that it used on the previous path with RETIRE_CLIENT_VCID capsules.
+1. Proxy issues new target VCIDs and proposes new client VCIDs to replace those that were retired.
 
 ## Handling Server Preferred Addresses {#preferred-address}
 
@@ -1391,14 +1715,20 @@ Forwarding ECN markings introduces certain active attacks. See
 
 ## Stateless Resets for Forwarded Mode QUIC Packets {#resets}
 
-While the lifecycle of forwarding rules are bound to the lifecycle of the
+While the lifecycle of forwarding rules is bound to the lifecycle of the
 client-to-proxy HTTP stream, a peer may not be aware that the stream has
-terminated. If the above mappings are lost or removed without the peer's
-knowledge, they may send forwarded mode packets even though the client
+terminated. If the forwarding rules are lost or removed without the peer's
+knowledge, the peer may send forwarded mode packets even though the client
 or proxy no longer has state for that connection. To allow the client or
-proxy to reset the client-to-target connection in the absence of the mappings
-above, a stateless reset token corresponding to the Virtual Connection ID
-can be provided.
+proxy to signal this, a Stateless Reset Token can be provided for each Virtual
+Connection ID. A Stateless Reset for a target VCID resets the client-to-target
+connection, and a Stateless Reset for a client VCID causes the proxy to reset
+the request stream ({{capsule-ack-client-vcid}}).
+
+When a Virtual Connection ID is retired intentionally, the procedures in
+{{vcid-retirement}} ensure that the peer has stopped checking for the
+corresponding Stateless Reset Token before a Stateless Reset can be sent for it,
+so that retiring a Virtual Connection ID never has either effect.
 
 Consider a proxy that initiates closure of a client-to-proxy QUIC connection.
 If the client is temporarily unresponsive or unreachable, the proxy might have
@@ -1412,19 +1742,9 @@ reset token for the target VCID, it can send a stateless reset
 packet to quickly notify the client that the client-to-target connection is
 broken.
 
-### Stateless Resets from the Target
-
-Reuse of proxy-to-target 4-tuples is only possible because QUIC connection IDs
-allow distinguishing packets for multiple QUIC connections received with the
-same 5-tuple. One exception to this is Stateless Reset packets, in which the
-connection ID is not used, but rather populated with unpredictable bits followed
-by a Stateless Reset token, to make it indistinguishable from a regular packet
-with a short header. In order for the proxy to correctly recognize Stateless
-Reset packets, the client SHOULD share the Stateless Reset token for each
-registered target CID. When the proxy receives a Stateless Reset packet,
-it can send the packet to the client as a tunnelled datagram. Although Stateless Reset packets
-look like short header packets, they are not technically short header packets and do not contain
-negotiated connection IDs, and thus are not eligible for forwarded mode.
+Stateless Resets sent by the target do not contain a negotiated connection ID,
+so the proxy sends them to the client as tunnelled datagrams
+({{target-resets}}), even when forwarded mode is enabled.
 
 # Example Exchange
 
@@ -1438,7 +1758,7 @@ The client will also send the initial QUIC packet with the Long Header form in
 an HTTP datagram.
 
 ~~~
-Client                                             Server
+Client                                              Proxy
 
 STREAM(44): HEADERS             -------->
   :method = CONNECT
@@ -1453,11 +1773,8 @@ STREAM(44): HEADERS             -------->
 
 STREAM(44): DATA                -------->
   Capsule Type = REGISTER_CLIENT_CID
+  Registration Sequence Number = 0
   Connection ID = 0x31323334
-
-           <--------  STREAM(44): DATA
-                        Capsule Type = MAX_CONNECTION_IDS
-                        Maximum Connection IDs = 4
 
 DATAGRAM                        -------->
   Quarter Stream ID = 11
@@ -1466,37 +1783,56 @@ DATAGRAM                        -------->
 
            <--------  STREAM(44): HEADERS
                         :status = 200
+                        proxy-quic-port-sharing = ?1
                         proxy-quic-forwarding = ?1; \
                             transform="scramble"; \
                             scramble-key=:ABC...321=:
                         capsule-protocol = ?1
 
            <--------  STREAM(44): DATA
+                        Capsule Type = MAX_CLIENT_CIDS
+                        Maximum Connection IDs = 4
+
                         Capsule Type = ACK_CLIENT_CID
-                        Connection ID = 0x31323334
-                        Virtual CID = 0x62646668
+                        Registration Sequence Number = 0
+
+                        Capsule Type = NEW_CLIENT_VCID
+                        Registration Sequence Number = 0
+                        Virtual Connection ID Sequence Number = 0
+                        Virtual Connection ID = 0x62646668
+
+                        Capsule Type = NEW_CLIENT_VCID
+                        Registration Sequence Number = 0
+                        Virtual Connection ID Sequence Number = 1
+                        Virtual Connection ID = 0x7a797877
 ~~~
 
-The proxy has acknowledged the client CID and provided a client VCID.
+The proxy has acknowledged the client CID and proposed two client VCIDs.
 Even if there were Short Header packets to send, the proxy
 cannot send forwarded mode packets because the client hasn't acknowledged the
-client VCID.
+client VCIDs.
 
-The proxy indicates to the client that it will allow connection ID registrations
+The proxy indicates to the client that it will allow client CID registrations
 with sequence numbers 0-3, allowing for registrations beyond the initial limit
 of 2.
 
 ~~~
 STREAM(44): DATA                -------->
   Capsule Type = ACK_CLIENT_VCID
-  Connection ID = 0x31323334
-  Virtual CID = 0x62646668
+  Registration Sequence Number = 0
+  Virtual Connection ID Sequence Number = 0
+  Stateless Reset Token = Token
+
+  Capsule Type = ACK_CLIENT_VCID
+  Registration Sequence Number = 0
+  Virtual Connection ID Sequence Number = 1
   Stateless Reset Token = Token
 ~~~
 
-The client acknowledges the client VCID. The proxy still
+The client acknowledges both client VCIDs. The proxy still
 doesn't have any Short Header Packets to send, but, if it did, it would be able
-to send with forwarded mode.
+to send with forwarded mode using one of them, keeping the other unused in case
+the network path changes.
 
 ~~~
 /* Wait for target server to respond to UDP packet. */
@@ -1520,8 +1856,8 @@ DATAGRAM                        -------->
 
 ~~~
 
-The client may receive forwarded mode packets from the proxy with a Virtual
-client CID of 0x62646668 which it will replace with the real client CID
+The client may receive forwarded mode packets from the proxy with a client
+VCID of 0x62646668 which it will replace with the real client CID
 of 0x31323334. All forwarded mode packets sent by the proxy
 will have been modified to contain the client VCID instead
 of the client CID, and processed by the negotiated "scramble"
@@ -1531,20 +1867,33 @@ transform the proxy selected. In this case, the client will have to ignore
 the packet or buffer it until the HTTP response is received.
 
 Once the client learns which Connection ID has been selected by the target
-server, it can send a new request to the proxy to establish a mapping for
+server, it can register it with the proxy to establish a mapping for
 forwarding. In this case, that ID is 0x61626364. The client sends the
 following capsule:
 
 ~~~
 STREAM(44): DATA                -------->
   Capsule Type = REGISTER_TARGET_CID
+  Registration Sequence Number = 0
   Connection ID = 0x61626364
   Stateless Reset Token = Token
 
            <--------  STREAM(44): DATA
                         Capsule Type = ACK_TARGET_CID
-                        Connection ID = 0x61626364
+                        Registration Sequence Number = 0
+
+                        Capsule Type = NEW_TARGET_VCID
+                        Registration Sequence Number = 0
+                        Virtual Connection ID Sequence Number = 0
+                        Retire Prior To = 0
                         Virtual Connection ID = 0x123412341234
+                        Stateless Reset Token = Token
+
+                        Capsule Type = NEW_TARGET_VCID
+                        Registration Sequence Number = 0
+                        Virtual Connection ID Sequence Number = 1
+                        Retire Prior To = 0
+                        Virtual Connection ID = 0x567856785678
                         Stateless Reset Token = Token
 
 /* Client -> Target QUIC short header packets may use forwarded mode */
@@ -1554,9 +1903,10 @@ UDP Datagram                     -------->
 
 ~~~
 
-Upon receiving an ACK_TARGET_CID capsule, the client starts sending Short Header
+Upon receiving the NEW_TARGET_VCID capsules, the client starts sending Short Header
 packets with a Destination Connection ID of 0x123412341234 directly to the proxy
-(not tunnelled), and these are rewritten by the proxy to have the Destination
+(not tunnelled), and keeps 0x567856785678 unused in case the network path
+changes. These packets are rewritten by the proxy to have the Destination
 Connection ID 0x61626364 prior to being forwarded directly to the target. In the
 reverse direction, Short Header packets from the target with a Destination
 Connection ID of 0x31323334 are modified to replace the Destination Connection
@@ -1577,8 +1927,34 @@ HTTP Datagram frame. If the client does not begin with a larger packet size than
 discovery to discover a larger path size prior to sending any tunnelled Initial
 QUIC packets.
 
-Once a proxied QUIC connections moves into forwarded mode, the client SHOULD
-initiate Path MTU discovery to increase its end-to-end MTU.
+Once a proxied QUIC connection moves into forwarded mode, the client SHOULD
+initiate Path MTU discovery to increase its end-to-end MTU. Since each network
+path can support a different packet size, the client does so again after it
+migrates to a new network path.
+
+Packets that the client sends in tunnelled mode need to fit within HTTP Datagram
+frames, so a client that increased the maximum datagram size of the
+client-to-target connection while using forwarded mode needs to reduce it when
+falling back to tunnelled mode, such as when it starts using a target CID for
+which the proxy has not issued target VCIDs, or when it migrates without an
+unused target VCID ({{migration}}).
+
+Target-to-client packets can also become too large to tunnel. A target that
+validated a larger path MTU while its packets were forwarded continues to send
+packets of that size when the proxy tunnels them instead, such as while the
+proxy validates a new client address ({{migration}}). Since the target is not
+aware of changes to the network path between the client and proxy, it also does
+not reduce its maximum datagram size when the client migrates, even though the
+new network path might not support packets of the same size. A proxy that cannot
+fit a target-to-client packet in an HTTP Datagram frame handles it as described
+in {{Section 6.1 of CONNECT-UDP}}, which recommends dropping the packet and
+sending an ICMP Packet Too Big message to the target.
+
+Since targets might not act on ICMP messages, a client that wants to avoid
+losing target-to-client packets in these cases can use the max_udp_payload_size
+transport parameter ({{Section 18.2 of QUIC}}) to limit the target to packets
+that fit in an HTTP Datagram frame on the client-to-proxy QUIC connection, at
+the cost of the larger packets that forwarded mode could otherwise allow.
 
 # QUIC Version Invariance {#invariance}
 
@@ -1588,8 +1964,9 @@ are all invariant across future QUIC versions {{!INVARIANTS=RFC8999}}, QUIC prox
 proxy all versions of QUIC.
 
 While QUIC proxies can proxy all versions of QUIC, some optional capabilities
-are limited to certain versions. Specifically, some of the connection ID
-registration capsules in {{capsule-types-formats}} include a Stateless Reset Token field.
+are limited to certain versions. Specifically, some of the
+capsules in {{capsule-types-formats}} and {{vcid-capsule-types-formats}}
+include a Stateless Reset Token field.
 This field is defined in {{!QUIC=RFC9000}} and not part of
 {{!INVARIANTS=RFC8999}}. If a future QUIC version removes or changes the
 behavior of Stateless Reset Tokens, the Stateless Reset Token field in each
@@ -1725,6 +2102,8 @@ Specification Required policy (Section 4.6 of [IANA-POLICY]).
     +-----------------------+-------------------------------------+---------------+--------------------------------+
     | scramble-key          | contains key for scramble transform | This document | Section {{scramble-transform}} |
     +-----------------------+-------------------------------------+---------------+--------------------------------+
+    | active-vcid-limit     | limits active VCIDs per CID         | This document | Section {{vcid-limit}}         |
+    +-----------------------+-------------------------------------+---------------+--------------------------------+
 ~~~
 {: #iana-parameter-names-table title="Initial Proxy QUIC Forwarding Parameter Names"}
 
@@ -1749,8 +2128,8 @@ Specification Required policy (Section 4.6 of [IANA-POLICY]).
 ## CID Capsule Reason Codes {#iana-cid-reasons}
 
 This document establishes a new registry, "CID Capsule Reason Codes",
-for reason codes used in REGISTER_CLIENT_CID, REGISTER_TARGET_CID,
-REJECT_CLIENT_CID, REJECT_TARGET_CID, CLOSE_CLIENT_CID, and CLOSE_TARGET_CID capsules,
+for reason codes used in REJECT_CLIENT_CID, REJECT_TARGET_CID, and
+REJECT_CLIENT_VCID capsules,
 in <[](https://www.iana.org/assignments/masque/masque.xhtml)>.
 This registry governs a 62-bit space and operates under the QUIC
 registration policy documented in {{Section 22.1 of QUIC}}. This new registry
@@ -1766,29 +2145,35 @@ IANA-POLICY}}.
 
 | Value | Name       | Description                                      | Specification |
 |:------|:-----------|:-------------------------------------------------|:--------------|
-| 0x00  | DEFAULT       | Normal operation                                 | This Document |
+| 0x00  | DEFAULT    | No specific reason                               | This Document |
 | 0x01  | TOO_SHORT  | CID/VCID rejected for being too short            | This Document |
 | 0x02  | CONFLICT   | CID/VCID conflicts with existing mapping         | This Document |
 {: #iana-cid-reasons-table title="Initial CID Capsule Reason Codes"}
 
 ## Capsule Types {#iana-capsule-types}
 
-This document registers ten new values in the "HTTP Capsule Types"
+This document registers sixteen new values in the "HTTP Capsule Types"
 registry established by {{HTTP-CAPSULES}}. Note that the codepoints below
 will be replaced with lower values before publication.
 
-|     Capsule Type    |   Value   | Specification |
-|:--------------------|:----------|:--------------|
-| REGISTER_CLIENT_CID | 0xffe800  | This Document |
-| REGISTER_TARGET_CID | 0xffe801  | This Document |
-| ACK_CLIENT_CID      | 0xffe802  | This Document |
-| ACK_CLIENT_VCID     | 0xffe803  | This Document |
-| ACK_TARGET_CID      | 0xffe804  | This Document |
-| REJECT_CLIENT_CID   | 0xffe805  | This Document |
-| REJECT_TARGET_CID   | 0xffe806  | This Document |
-| CLOSE_CLIENT_CID    | 0xffe807  | This Document |
-| CLOSE_TARGET_CID    | 0xffe808  | This Document |
-| MAX_CONNECTION_IDS  | 0xffe809  | This Document |
+| Capsule Type               |   Value   | Specification |
+|:---------------------------|:----------|:--------------|
+| REGISTER_CLIENT_CID        | 0xffe900  | This Document |
+| REGISTER_TARGET_CID        | 0xffe901  | This Document |
+| ACK_CLIENT_CID             | 0xffe902  | This Document |
+| ACK_TARGET_CID             | 0xffe903  | This Document |
+| REJECT_CLIENT_CID          | 0xffe904  | This Document |
+| REJECT_TARGET_CID          | 0xffe905  | This Document |
+| RETIRE_CLIENT_CID          | 0xffe906  | This Document |
+| RETIRE_TARGET_CID          | 0xffe907  | This Document |
+| MAX_CLIENT_CIDS            | 0xffe908  | This Document |
+| MAX_TARGET_CIDS            | 0xffe909  | This Document |
+| NEW_TARGET_VCID            | 0xffe90a  | This Document |
+| NEW_CLIENT_VCID            | 0xffe90b  | This Document |
+| ACK_CLIENT_VCID            | 0xffe90c  | This Document |
+| REJECT_CLIENT_VCID         | 0xffe90d  | This Document |
+| RETIRE_TARGET_VCID         | 0xffe90e  | This Document |
+| RETIRE_CLIENT_VCID         | 0xffe90f  | This Document |
 {: #iana-capsule-type-table title="Registered Capsule Types"}
 
 All of these new entries use the following values for these fields:
