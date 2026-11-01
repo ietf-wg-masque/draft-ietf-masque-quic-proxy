@@ -1227,12 +1227,13 @@ MUST stop sending forwarded mode packets using it and MUST stop checking for the
 associated Stateless Reset Token.
 
 Until a Virtual Connection ID is retired, the endpoint that receives packets
-using it MUST continue to accept them, and MUST NOT send a Stateless Reset in
-response to them, since its peer might still act on the corresponding Stateless
-Reset Token. Once it has received the capsule that retires the Virtual
-Connection ID, it can remove all state for it. Packets that use a retired
-Virtual Connection ID and arrive later, for example due to reordering, can be
-dropped or answered with a Stateless Reset, which the peer will ignore.
+using it MUST keep its state for that Virtual Connection ID, and MUST NOT send a
+Stateless Reset in response to packets that use it, since its peer might still
+act on the corresponding Stateless Reset Token. Once it has received the capsule
+that retires the Virtual Connection ID, it can remove all state for it. Packets
+that use a retired Virtual Connection ID and arrive later, for example due to
+reordering, can be dropped or answered with a Stateless Reset, which the peer
+will ignore.
 
 When a registration is retired, the Virtual Connection IDs associated with it
 are retired as well:
