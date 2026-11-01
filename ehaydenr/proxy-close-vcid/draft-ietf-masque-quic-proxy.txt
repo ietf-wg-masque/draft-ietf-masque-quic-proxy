@@ -5,9 +5,9 @@
 MASQUE                                                          T. Pauly
 Internet-Draft                                              E. Rosenberg
 Intended status: Standards Track                              Apple Inc.
-Expires: 4 May 2027                                          D. Schinazi
+Expires: 5 May 2027                                          D. Schinazi
                                                               Google LLC
-                                                         31 October 2026
+                                                         1 November 2026
 
 
                      QUIC-Aware Proxying Using HTTP
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 4 May 2027.
+   This Internet-Draft will expire on 5 May 2027.
 
 Copyright Notice
 
@@ -1351,13 +1351,14 @@ Table of Contents
    stop checking for the associated Stateless Reset Token.
 
    Until a Virtual Connection ID is retired, the endpoint that receives
-   packets using it MUST continue to accept them, and MUST NOT send a
-   Stateless Reset in response to them, since its peer might still act
-   on the corresponding Stateless Reset Token.  Once it has received the
-   capsule that retires the Virtual Connection ID, it can remove all
-   state for it.  Packets that use a retired Virtual Connection ID and
-   arrive later, for example due to reordering, can be dropped or
-   answered with a Stateless Reset, which the peer will ignore.
+   packets using it MUST keep its state for that Virtual Connection ID,
+   and MUST NOT send a Stateless Reset in response to packets that use
+   it, since its peer might still act on the corresponding Stateless
+   Reset Token.  Once it has received the capsule that retires the
+   Virtual Connection ID, it can remove all state for it.  Packets that
+   use a retired Virtual Connection ID and arrive later, for example due
+   to reordering, can be dropped or answered with a Stateless Reset,
+   which the peer will ignore.
 
    When a registration is retired, the Virtual Connection IDs associated
    with it are retired as well:
