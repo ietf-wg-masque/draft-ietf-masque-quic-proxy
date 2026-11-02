@@ -379,7 +379,8 @@ with any parameters for specific transforms. Clients or proxies that
 don't support forwarded mode omit this header field or set it to "?0".
 
 ~~~
-  proxy-quic-forwarding = ?1; accept-transform="scramble,identity"; \
+  proxy-quic-forwarding = ?1; \
+      accept-transform="scramble-dt,identity"; \
       scramble-key=:abc...789=:
 ~~~
 
@@ -1432,7 +1433,7 @@ Inputs:
 
 Output:
 
-* A UDP payload that conforms to the QUIC invariants {{?RFC8999}} and does not
+* A UDP payload that conforms to the QUIC invariants {{!INVARIANTS=RFC8999}} and does not
   modify the Connection ID.
 
 More complex transform behaviors could have internal state, but no such transforms
@@ -1504,7 +1505,7 @@ vector with AES-ECB. The detailed procedure is as follows:
 1. Let `ctr_input = packet[0] | packet[L+17:]`.
 1. Let `ctr_output = AES-CTR(k1, iv, ctr_input)`.
 1. Let `header = ctr_output[0] & 0x7F`.  This ensures that the Header Form bit
-   is zero, as required by the QUIC invariants ({{?RFC8999}}, Section 5.2).
+   is zero, as required by the QUIC invariants ({{Section 5.2 of INVARIANTS}}).
 1. Encrypt `iv` with the block cipher: `encrypted_iv = AES-ECB(k2, iv)`.
 1. Produce the output packet as:\\
    `header | cid | encrypted_iv | ctr_output[1:]`.
@@ -1774,7 +1775,8 @@ STREAM(44): HEADERS             -------->
   :path = /target.example.com/443/
   :authority = proxy.example.org
   proxy-quic-port-sharing = ?1
-  proxy-quic-forwarding = ?1; accept-transform="scramble,identity"; \
+  proxy-quic-forwarding = ?1; \
+      accept-transform="scramble-dt,identity"; \
       scramble-key=:abc...789=:
   capsule-protocol = ?1
 
@@ -1792,7 +1794,7 @@ DATAGRAM                        -------->
                         :status = 200
                         proxy-quic-port-sharing = ?1
                         proxy-quic-forwarding = ?1; \
-                            transform="scramble"; \
+                            transform="scramble-dt"; \
                             scramble-key=:ABC...321=:
                         capsule-protocol = ?1
 
@@ -1860,7 +1862,7 @@ The client may receive forwarded mode packets from the proxy with a client
 VCID of 0x62646668 which it will replace with the real client CID
 of 0x31323334. All forwarded mode packets sent by the proxy
 will have been modified to contain the client VCID instead
-of the client CID, and processed by the negotiated "scramble"
+of the client CID, and processed by the negotiated `scramble-dt`
 packet transform. However, in the unlikely event that a forwarded packet
 arrives before the proxy's HTTP response, the client will not know which
 transform the proxy selected. In this case, the client will have to ignore
@@ -1960,15 +1962,15 @@ the cost of the larger packets that forwarded mode could otherwise allow.
 
 QUIC proxies only need to understand the Header Form bit, and the connection ID
 fields from packets in client-to-target QUIC connections. Since these fields
-are all invariant across future QUIC versions {{!INVARIANTS=RFC8999}}, QUIC proxies can
+are all invariant across future QUIC versions {{INVARIANTS}}, QUIC proxies can
 proxy all versions of QUIC.
 
 While QUIC proxies can proxy all versions of QUIC, some optional capabilities
 are limited to certain versions. Specifically, some of the
 capsules in {{capsule-types-formats}} and {{vcid-capsule-types-formats}}
 include a Stateless Reset Token field.
-This field is defined in {{!QUIC=RFC9000}} and not part of
-{{!INVARIANTS=RFC8999}}. If a future QUIC version removes or changes the
+This field is defined in {{QUIC}} and not part of
+{{INVARIANTS}}. If a future QUIC version removes or changes the
 behavior of Stateless Reset Tokens, the Stateless Reset Token field in each
 capsule MUST have a length of zero.
 
@@ -1976,14 +1978,14 @@ When forwarding mode is enabled, the client and target MAY negotiate any QUIC
 version, and MAY send packets of that version through the forwarding path.
 The proxy does not know what version they are using, so it can only require that
 these packets conform to the QUIC invariants for short-header packets
-({{?RFC8999}}, Section 5.2).
+({{Section 5.2 of INVARIANTS}}).
 
 QUIC version 1 specifies a Fixed Bit (a.k.a. the "QUIC bit") with a fixed value
 to support sharing a 5-tuple with other protocols such as DTLS, but the QUIC
 invariants do not guarantee the value of this bit.  Accordingly proxies with
 forwarding mode enabled MUST NOT rely on this bit for protocol identification,
 and SHOULD send and accept the `grease_quic_bit` transport parameter
-{{?QUIC-GREASE=RFC9297}} to avoid ossification of the forwarding mode path.
+{{?QUIC-GREASE=RFC9287}} to avoid ossification of the forwarding mode path.
 
 # Security Considerations {#security}
 
@@ -2006,7 +2008,7 @@ transform (see {{identity-transform}}), such correlation is trivial by matching
 a subset of QUIC packet bytes as packets enter the proxy on one side and exit
 on the other. Packet transforms such as `scramble` mitigate this by
 cryptographically preventing such byte comparisons
-(see {{!scramble-transform=scramble-transform}}).
+(see {{scramble-transform}}).
 
 Regardless of which packet transform is used, both tunnelled and forwarded mode
 are still vulnerable to size and timing attacks, without the addition of techniques that go beyond the analysis
@@ -2042,7 +2044,7 @@ transform did provide integrity protection, attackers can inject replayed
 packets. Protection against replayed packets is similarly provided by QUIC in
 tunnelled mode, but not provided by any of the forwarded mode packet transforms
 defined in this document. Similarly, Forwarded mode packets are vulnerable to
-active attacks when {{!ECN=RFC3168}} markings are forwarded. Specifically, an
+active attacks when {{ECN}} markings are forwarded. Specifically, an
 attacker could embed a signal over a series of packets by clearing or setting
 ECN bits. This attack is possible without injecting, dropping, or modifying the
 QUIC packet, but instead modifying the packet's IP header.
@@ -2090,21 +2092,14 @@ This document establishes a new registry, "Proxy QUIC Forwarding Parameter Names
 for parameter names to use with the "Proxy-QUIC-Forwarding" header field,
 in <[](https://www.iana.org/assignments/masque/masque.xhtml)>.
 Registrations in this registry are assigned using the
-Specification Required policy (Section 4.6 of [IANA-POLICY]).
+Specification Required policy ({{Section 4.6 of !IANA-POLICY=RFC8126}}).
 
-~~~
-    +-----------------------+-------------------------------------+---------------+--------------------------------+
-    | Parameter Name        | Description                         | Reference     | Notes                          |
-    +-----------------------+-------------------------------------+---------------+--------------------------------+
-    | accept-transform      | contains supported transforms       | This document | Section {{forwarding-header}}  |
-    +-----------------------+-------------------------------------+---------------+--------------------------------+
-    | transform             | indicates selected transforms       | This document | Section {{forwarding-header}}  |
-    +-----------------------+-------------------------------------+---------------+--------------------------------+
-    | scramble-key          | contains key for scramble transform | This document | Section {{scramble-transform}} |
-    +-----------------------+-------------------------------------+---------------+--------------------------------+
-    | active-vcid-limit     | limits active VCIDs per CID         | This document | Section {{vcid-limit}}         |
-    +-----------------------+-------------------------------------+---------------+--------------------------------+
-~~~
+| Parameter Name    | Description                         | Reference     | Notes                  |
+|:------------------|:------------------------------------|:--------------|------------------------|
+| accept-transform  | contains supported transforms       | This document | {{forwarding-header}}  |
+| transform         | indicates selected transforms       | This document | {{forwarding-header}}  |
+| scramble-key      | contains key for scramble transform | This document | {{scramble-transform}} |
+| active-vcid-limit | limits active VCIDs per CID         | This document | {{vcid-limit}}         |
 {: #iana-parameter-names-table title="Initial Proxy QUIC Forwarding Parameter Names"}
 
 ## Packet Transform Names {#iana-transforms}
@@ -2112,17 +2107,15 @@ Specification Required policy (Section 4.6 of [IANA-POLICY]).
 This document establishes a new registry for packet transform names
 in <[](https://www.iana.org/assignments/masque/masque.xhtml)>
 and defines two initial transforms: "identity" and "scramble".
-Prior to finalization, deployments that implement the version of
-the `scramble` transform defined in this document should use the value
-"scramble-dt". Once the design team proposal is adopted and a new draft is submitted,
-the wire identifier will become "scramble-XX" where XX is the draft number.
+Until the `scramble` transform is finalized, deployments use the value
+"scramble-dt" instead of the reserved value "scramble" (see {{scramble-transform}}).
 Registrations in this registry are assigned using the
-Specification Required policy (Section 4.6 of [IANA-POLICY]).
+Specification Required policy ({{Section 4.6 of IANA-POLICY}}).
 
 | Transform Name | Description       | Specification | Notes                          |
 |:---------------|:------------------|:--------------|--------------------------------|
-| identity       | no transformation | This Document | Section {{identity-transform}}     |
-| scramble       | Reserved (will be used for final version)  | This Document | Section {{scramble-transform}} |
+| identity       | no transformation | This Document | {{identity-transform}}     |
+| scramble       | Reserved (will be used for final version)  | This Document | {{scramble-transform}} |
 {: #iana-packet-transforms-table title="Initial Packet Transform Names"}
 
 ## CID Capsule Reason Codes {#iana-cid-reasons}
@@ -2138,7 +2131,7 @@ addition to those common fields, all registrations in this registry MUST include
 a "Name" field that contains a short name or label for the Reason.
 
 Permanent registrations in this registry are assigned using the Specification
-Required policy ({{Section 4.6 of !IANA-POLICY=RFC8126}}), except for values
+Required policy ({{Section 4.6 of IANA-POLICY}}), except for values
 between 0x00 and 0x3f (in hexadecimal; inclusive), which are assigned using
 Standards Action or IESG Approval as defined in {{Sections 4.9 and 4.10 of
 IANA-POLICY}}.
@@ -2247,7 +2240,7 @@ ef012345678ebe6906e16ec5fc90a02c
 
 Thanks to Lucas Pardue, Ryan Hamilton, and Mirja Kühlewind for their inputs
 on this document. The scramble transform design came out of the encryption
-design team whose members were Antoine Fressancourt, Mirja Kuehlwind, Tiru Reddy,
+design team whose members were Antoine Fressancourt, Mirja Kühlewind, Tiru Reddy,
 Ben Schwartz, and the authors of this document. The authors would also like to
 thank Martin Duke for identifying a proxy looping vulnerability that influenced
 the capsule registration design.
