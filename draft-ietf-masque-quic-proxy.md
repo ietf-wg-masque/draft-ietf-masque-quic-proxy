@@ -1791,9 +1791,6 @@ DATAGRAM                        -------->
                         capsule-protocol = ?1
 
            <--------  STREAM(44): DATA
-                        Capsule Type = MAX_CLIENT_CIDS
-                        Maximum Connection IDs = 4
-
                         Capsule Type = ACK_CLIENT_CID
                         Connection ID Sequence Number = 0
 
@@ -1812,10 +1809,6 @@ The proxy has acknowledged the client CID and proposed two client VCIDs.
 Even if there were Short Header packets to send, the proxy
 cannot send forwarded mode packets because the client hasn't acknowledged the
 client VCIDs.
-
-The proxy indicates to the client that it will allow client CID registrations
-with sequence numbers 0-3, allowing for registrations beyond the initial limit
-of 2.
 
 ~~~
 STREAM(44): DATA                -------->
