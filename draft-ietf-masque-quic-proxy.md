@@ -379,7 +379,8 @@ with any parameters for specific transforms. Clients or proxies that
 don't support forwarded mode omit this header field or set it to "?0".
 
 ~~~
-  proxy-quic-forwarding = ?1; accept-transform="scramble,identity"; \
+  proxy-quic-forwarding = ?1; \
+      accept-transform="scramble-dt,identity"; \
       scramble-key=:abc...789=:
 ~~~
 
@@ -1774,7 +1775,8 @@ STREAM(44): HEADERS             -------->
   :path = /target.example.com/443/
   :authority = proxy.example.org
   proxy-quic-port-sharing = ?1
-  proxy-quic-forwarding = ?1; accept-transform="scramble,identity"; \
+  proxy-quic-forwarding = ?1; \
+      accept-transform="scramble-dt,identity"; \
       scramble-key=:abc...789=:
   capsule-protocol = ?1
 
@@ -1792,7 +1794,7 @@ DATAGRAM                        -------->
                         :status = 200
                         proxy-quic-port-sharing = ?1
                         proxy-quic-forwarding = ?1; \
-                            transform="scramble"; \
+                            transform="scramble-dt"; \
                             scramble-key=:ABC...321=:
                         capsule-protocol = ?1
 
@@ -1860,7 +1862,7 @@ The client may receive forwarded mode packets from the proxy with a client
 VCID of 0x62646668 which it will replace with the real client CID
 of 0x31323334. All forwarded mode packets sent by the proxy
 will have been modified to contain the client VCID instead
-of the client CID, and processed by the negotiated "scramble"
+of the client CID, and processed by the negotiated `scramble`
 packet transform. However, in the unlikely event that a forwarded packet
 arrives before the proxy's HTTP response, the client will not know which
 transform the proxy selected. In this case, the client will have to ignore
@@ -2112,10 +2114,8 @@ Specification Required policy (Section 4.6 of [IANA-POLICY]).
 This document establishes a new registry for packet transform names
 in <[](https://www.iana.org/assignments/masque/masque.xhtml)>
 and defines two initial transforms: "identity" and "scramble".
-Prior to finalization, deployments that implement the version of
-the `scramble` transform defined in this document should use the value
-"scramble-dt". Once the design team proposal is adopted and a new draft is submitted,
-the wire identifier will become "scramble-XX" where XX is the draft number.
+Until the `scramble` transform is finalized, deployments use the value
+"scramble-dt" instead of the reserved value "scramble" (see {{scramble-transform}}).
 Registrations in this registry are assigned using the
 Specification Required policy (Section 4.6 of [IANA-POLICY]).
 
