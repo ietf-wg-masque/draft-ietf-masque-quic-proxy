@@ -239,15 +239,15 @@ For example, consider a proxy using HTTP/3 that has two clients (A and B) connec
 simultaneously, each client coming from a different IP address and port.
 Each client makes a request to proxy a UDP flow to "target.example.net" on
 port 443. If the proxy knows that client A's connection to the target
-has negotiated a client CID `AAAA0000` and a target CID `0000AAAA`, and client B's
-connection to the target has negotiated a client CID `BBBB0000` and a target CID
-`0000BBBB`, then the proxy would be able to use the same proxy-to-target 4-tuple
+has negotiated a client CID `AAAAAAAA` and a target CID `11111111`, and client B's
+connection to the target has negotiated a client CID `BBBBBBBB` and a target CID
+`22222222`, then the proxy would be able to use the same proxy-to-target 4-tuple
 for both connections, because it can route packets from the target to the
-correct client based on CID `AAAA0000` or `BBBB0000`.
+correct client based on CID `AAAAAAAA` or `BBBBBBBB`.
 
 ~~~ aasvg
        <---------- Client A-to-target connection ---------->
-       AAAA0000                                     0000AAAA
+       AAAAAAAA                                     11111111
    +--------+              +-----------+
    | Client +--------------+           +
    |   A    |              |           |
@@ -259,7 +259,7 @@ correct client based on CID `AAAA0000` or `BBBB0000`.
    | Client |              |           |
    |   B    +--------------+           |
    +--------+              +-----------+
-       BBBB0000                                     0000BBBB
+       BBBBBBBB                                     22222222
        <---------- Client B-to-target connection ---------->
 ~~~
 {: #sharing-tuple-diagram title="Example of sharing a proxy-to-target 4-tuple"}
@@ -277,13 +277,13 @@ VCIDs are only used in forwarded mode. They are established using HTTP capsules
 {{!HTTP-CAPSULES=RFC9297}} as described in {{vcid-lifecycle}}.
 
 For example, consider a proxy using HTTP/3 that has a single client connected
-to it. The client-to-proxy QUIC connection has `CCCC0000` as the client CID
-and `0000CCCC` as the proxy CID. The client has connected to a single target
-through the proxy, and the client-to-target QUIC connection has `CCCC1111`
-as the client CID and `1111CCCC` as the target CID. In order to use
+to it. The client-to-proxy QUIC connection has `AAAAAAAA` as the client CID
+and `BBBBBBBB` as the proxy CID. The client has connected to a single target
+through the proxy, and the client-to-target QUIC connection has `CCCCCCCC`
+as the client CID and `DDDDDDDD` as the target CID. In order to use
 forwarded mode, the proxy assigns VCIDs to use on the client-to-proxy link
 to represent the client-to-target connection. In this case, the VCIDs could
-be `CCCC2222` for the client VCID and `2222CCCC` for the target VCID.
+be `EEEEEEEE` for the client VCID and `FFFFFFFF` for the target VCID.
 
 ~~~ aasvg
    +--------+              +-----------+              +--------+
@@ -292,14 +292,14 @@ be `CCCC2222` for the client VCID and `2222CCCC` for the target VCID.
    |        |              |           |              |        |
    +--------+              +-----------+              +--------+
 
-       CCCC0000       0000CCCC
+       AAAAAAAA       BBBBBBBB
        <-- Client-to-proxy -->
               connection
 
-       CCCC1111                                     1111CCCC
+       CCCCCCCC                                     DDDDDDDD
        <----------- Client-to-target connection ----------->
 
-  CCCC2222 (CCCC1111)   2222CCCC (1111CCCC)
+  EEEEEEEE (CCCCCCCC)   FFFFFFFF (DDDDDDDD)
        <-- Client-to-proxy -->
                 VCIDs
 ~~~
