@@ -274,7 +274,7 @@ Virtual Connection IDs (VCIDs) are QUIC Connection IDs used on the link between 
 client and proxy that do not belong to the QUIC connection between the client
 and proxy, but instead are aliases for particular client-to-target connections.
 VCIDs are only used in forwarded mode. They are established using HTTP capsules
-{{!HTTP-CAPSULES=RFC9297}} as described in {{vcid-lifecycle}}.
+{{!HTTP-CAPSULES=RFC9297}} as described in {{vcid-issuance}}.
 
 For example, consider a proxy using HTTP/3 that has a single client connected
 to it. The client-to-proxy QUIC connection has `AAAAAAAA` as the client CID
@@ -915,7 +915,7 @@ retires target VCIDs using the RETIRE_TARGET_VCID capsule type
 ({{capsule-retire-target-vcid}}), and the proxy retires client VCIDs using the
 RETIRE_CLIENT_VCID capsule type ({{capsule-retire-client-vcid}}). These
 capsule types MUST only be sent when forwarded mode is enabled.
-{{vcid-lifecycle}} describes how they are used.
+{{vcid-issuance}} and {{vcid-retirement}} describe how they are used.
 
 For QUIC-aware proxying with forwarded mode, the steps are as follows:
 
@@ -1159,9 +1159,7 @@ to ({{cid-registration}}).
 Virtual Connection ID Sequence Number:
 : The sequence number of the client VCID being retired ({{vcid-issuance}}).
 
-## Virtual Connection ID Lifecycle {#vcid-lifecycle}
-
-### Issuing Virtual Connection IDs {#vcid-issuance}
+## Issuing Virtual Connection IDs {#vcid-issuance}
 
 After acknowledging a target CID registration, a proxy that is willing to
 forward packets for that target CID issues one or more target VCIDs for it using
@@ -1218,7 +1216,7 @@ proxy processes the corresponding RETIRE_CLIENT_CID or RETIRE_TARGET_CID capsule
 registration that the proxy has not acknowledged MUST reset the stream with
 H3_DATAGRAM_ERROR error code.
 
-### Retiring Virtual Connection IDs {#vcid-retirement}
+## Retiring Virtual Connection IDs {#vcid-retirement}
 
 The client retires target VCIDs using RETIRE_TARGET_VCID capsules, and the proxy
 retires client VCIDs using RETIRE_CLIENT_VCID capsules. An endpoint retires a
@@ -1270,7 +1268,7 @@ A proxy that receives a RETIRE_TARGET_VCID capsule for a target VCID that it did
 not issue, or that is already retired, MUST reset the stream with
 H3_DATAGRAM_ERROR error code.
 
-#### Requesting Retirement of Target VCIDs {#vcid-request-retirement}
+### Requesting Retirement of Target VCIDs {#vcid-request-retirement}
 
 A proxy might need to stop accepting target VCIDs that it has issued. For
 example, a proxy that encodes routing information into target VCIDs using keys
@@ -1304,7 +1302,7 @@ or a change in policy, closes the request stream.
 A proxy does not need to request retirement of client VCIDs, since it is the
 endpoint that sends packets using them.
 
-### Limiting Active Virtual Connection IDs {#vcid-limit}
+## Limiting Active Virtual Connection IDs {#vcid-limit}
 
 The client limits the number of active Virtual Connection IDs that the proxy
 issues for each registered connection ID using the "active-vcid-limit"
