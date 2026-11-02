@@ -1875,10 +1875,9 @@ Table of Contents
 
    The steps for active migration are as follows:
 
-   1.  Client and proxy exchange connection IDs via
-       REGISTER_CLIENT_CID/REGISTER_TARGET_CID/ACK_CLIENT_CID/
-       ACK_TARGET_CID, the proxy issues Virtual Connection IDs, and they
-       start using the forwarded mode.
+   1.  Client and proxy exchange connection IDs via capsules, the proxy
+       issues Virtual Connection IDs, and they start using the forwarded
+       mode.
 
    2.  Client probes a new network path.  Once the proxy has received
        the client's probe, it accepts forwarded mode packets from the
