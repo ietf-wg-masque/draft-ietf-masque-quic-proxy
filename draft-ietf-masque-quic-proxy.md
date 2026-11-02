@@ -1433,7 +1433,7 @@ Inputs:
 
 Output:
 
-* A UDP payload that conforms to the QUIC invariants {{?RFC8999}} and does not
+* A UDP payload that conforms to the QUIC invariants {{!INVARIANTS=RFC8999}} and does not
   modify the Connection ID.
 
 More complex transform behaviors could have internal state, but no such transforms
@@ -1505,7 +1505,7 @@ vector with AES-ECB. The detailed procedure is as follows:
 1. Let `ctr_input = packet[0] | packet[L+17:]`.
 1. Let `ctr_output = AES-CTR(k1, iv, ctr_input)`.
 1. Let `header = ctr_output[0] & 0x7F`.  This ensures that the Header Form bit
-   is zero, as required by the QUIC invariants ({{?RFC8999}}, Section 5.2).
+   is zero, as required by the QUIC invariants ({{Section 5.2 of INVARIANTS}}).
 1. Encrypt `iv` with the block cipher: `encrypted_iv = AES-ECB(k2, iv)`.
 1. Produce the output packet as:\\
    `header | cid | encrypted_iv | ctr_output[1:]`.
@@ -1962,7 +1962,7 @@ the cost of the larger packets that forwarded mode could otherwise allow.
 
 QUIC proxies only need to understand the Header Form bit, and the connection ID
 fields from packets in client-to-target QUIC connections. Since these fields
-are all invariant across future QUIC versions {{!INVARIANTS=RFC8999}}, QUIC proxies can
+are all invariant across future QUIC versions {{INVARIANTS}}, QUIC proxies can
 proxy all versions of QUIC.
 
 While QUIC proxies can proxy all versions of QUIC, some optional capabilities
@@ -1970,7 +1970,7 @@ are limited to certain versions. Specifically, some of the
 capsules in {{capsule-types-formats}} and {{vcid-capsule-types-formats}}
 include a Stateless Reset Token field.
 This field is defined in {{!QUIC=RFC9000}} and not part of
-{{!INVARIANTS=RFC8999}}. If a future QUIC version removes or changes the
+{{INVARIANTS}}. If a future QUIC version removes or changes the
 behavior of Stateless Reset Tokens, the Stateless Reset Token field in each
 capsule MUST have a length of zero.
 
@@ -1978,7 +1978,7 @@ When forwarding mode is enabled, the client and target MAY negotiate any QUIC
 version, and MAY send packets of that version through the forwarding path.
 The proxy does not know what version they are using, so it can only require that
 these packets conform to the QUIC invariants for short-header packets
-({{?RFC8999}}, Section 5.2).
+({{Section 5.2 of INVARIANTS}}).
 
 QUIC version 1 specifies a Fixed Bit (a.k.a. the "QUIC bit") with a fixed value
 to support sharing a 5-tuple with other protocols such as DTLS, but the QUIC
