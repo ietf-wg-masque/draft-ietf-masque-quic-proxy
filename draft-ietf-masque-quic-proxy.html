@@ -1862,7 +1862,8 @@ with any parameters for specific transforms. Clients or proxies that
 don't support forwarded mode omit this header field or set it to "?0".<a href="#section-3-5" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3-6">
 <pre>
-  proxy-quic-forwarding = ?1; accept-transform="scramble,identity"; \
+  proxy-quic-forwarding = ?1; \
+      accept-transform="scramble-dt,identity"; \
       scramble-key=:abc...789=:
 </pre><a href="#section-3-6" class="pilcrow">¶</a>
 </div>
@@ -3145,7 +3146,7 @@ replacing a VCID with a CID.<a href="#section-5.7-1" class="pilcrow">¶</a></p>
 <p id="section-5.7-5">Output:<a href="#section-5.7-5" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-5.7-6.1">
-            <p id="section-5.7-6.1.1">A UDP payload that conforms to the QUIC invariants <span>[<a href="#RFC8999" class="cite xref">RFC8999</a>]</span> and does not
+            <p id="section-5.7-6.1.1">A UDP payload that conforms to the QUIC invariants <span>[<a href="#INVARIANTS" class="cite xref">INVARIANTS</a>]</span> and does not
 modify the Connection ID.<a href="#section-5.7-6.1.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
@@ -3230,7 +3231,7 @@ vector with AES-ECB. The detailed procedure is as follows:<a href="#section-5.7.
 </li>
             <li id="section-5.7.2-6.7">
               <p id="section-5.7.2-6.7.1">Let <code>header = ctr_output[0] &amp; 0x7F</code>.  This ensures that the Header Form bit
-is zero, as required by the QUIC invariants (<span>[<a href="#RFC8999" class="cite xref">RFC8999</a>]</span>, Section 5.2).<a href="#section-5.7.2-6.7.1" class="pilcrow">¶</a></p>
+is zero, as required by the QUIC invariants (<span><a href="https://rfc-editor.org/rfc/rfc8999#section-5.2" class="relref">Section 5.2</a> of [<a href="#INVARIANTS" class="cite xref">INVARIANTS</a>]</span>).<a href="#section-5.7.2-6.7.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-5.7.2-6.8">
               <p id="section-5.7.2-6.8.1">Encrypt <code>iv</code> with the block cipher: <code>encrypted_iv = AES-ECB(k2, iv)</code>.<a href="#section-5.7.2-6.8.1" class="pilcrow">¶</a></p>
@@ -3548,7 +3549,8 @@ STREAM(44): HEADERS             --------&gt;
   :path = /target.example.com/443/
   :authority = proxy.example.org
   proxy-quic-port-sharing = ?1
-  proxy-quic-forwarding = ?1; accept-transform="scramble,identity"; \
+  proxy-quic-forwarding = ?1; \
+      accept-transform="scramble-dt,identity"; \
       scramble-key=:abc...789=:
   capsule-protocol = ?1
 
@@ -3566,7 +3568,7 @@ DATAGRAM                        --------&gt;
                         :status = 200
                         proxy-quic-port-sharing = ?1
                         proxy-quic-forwarding = ?1; \
-                            transform="scramble"; \
+                            transform="scramble-dt"; \
                             scramble-key=:ABC...321=:
                         capsule-protocol = ?1
 
@@ -3634,7 +3636,7 @@ DATAGRAM                        --------&gt;
 VCID of 0x62646668 which it will replace with the real client CID
 of 0x31323334. All forwarded mode packets sent by the proxy
 will have been modified to contain the client VCID instead
-of the client CID, and processed by the negotiated "scramble"
+of the client CID, and processed by the negotiated <code>scramble-dt</code>
 packet transform. However, in the unlikely event that a forwarded packet
 arrives before the proxy's HTTP response, the client will not know which
 transform the proxy selected. In this case, the client will have to ignore
@@ -3750,7 +3752,7 @@ capsule MUST have a length of zero.<a href="#section-8-2" class="pilcrow">¶</a>
 version, and MAY send packets of that version through the forwarding path.
 The proxy does not know what version they are using, so it can only require that
 these packets conform to the QUIC invariants for short-header packets
-(<span>[<a href="#RFC8999" class="cite xref">RFC8999</a>]</span>, Section 5.2).<a href="#section-8-3" class="pilcrow">¶</a></p>
+(<span><a href="https://rfc-editor.org/rfc/rfc8999#section-5.2" class="relref">Section 5.2</a> of [<a href="#INVARIANTS" class="cite xref">INVARIANTS</a>]</span>).<a href="#section-8-3" class="pilcrow">¶</a></p>
 <p id="section-8-4">QUIC version 1 specifies a Fixed Bit (a.k.a. the "QUIC bit") with a fixed value
 to support sharing a 5-tuple with other protocols such as DTLS, but the QUIC
 invariants do not guarantee the value of this bit.  Accordingly proxies with
@@ -3886,27 +3888,56 @@ across proxies, using sufficiently long and random values, or by other means.<a 
 for parameter names to use with the "Proxy-QUIC-Forwarding" header field,
 in &lt;<span><a href="https://www.iana.org/assignments/masque/masque.xhtml">https://www.iana.org/assignments/masque/masque.xhtml</a></span>&gt;.
 Registrations in this registry are assigned using the
-Specification Required policy (Section 4.6 of <span>[<a href="#IANA-POLICY" class="cite xref">IANA-POLICY</a>]</span>).<a href="#section-10.2-1" class="pilcrow">¶</a></p>
+Specification Required policy (<span><a href="https://rfc-editor.org/rfc/rfc8126#section-4.6" class="relref">Section 4.6</a> of [<a href="#IANA-POLICY" class="cite xref">IANA-POLICY</a>]</span>).<a href="#section-10.2-1" class="pilcrow">¶</a></p>
 <span id="name-initial-proxy-quic-forwardi"></span><div id="iana-parameter-names-table">
-<figure id="figure-17">
-          <div class="alignLeft art-text artwork" id="section-10.2-2.1">
-<pre>
-    +-----------------------+-------------------------------------+---------------+--------------------------------+
-    | Parameter Name        | Description                         | Reference     | Notes                          |
-    +-----------------------+-------------------------------------+---------------+--------------------------------+
-    | accept-transform      | contains supported transforms       | This document | Section {{forwarding-header}}  |
-    +-----------------------+-------------------------------------+---------------+--------------------------------+
-    | transform             | indicates selected transforms       | This document | Section {{forwarding-header}}  |
-    +-----------------------+-------------------------------------+---------------+--------------------------------+
-    | scramble-key          | contains key for scramble transform | This document | Section {{scramble-transform}} |
-    +-----------------------+-------------------------------------+---------------+--------------------------------+
-    | active-vcid-limit     | limits active VCIDs per CID         | This document | Section {{vcid-limit}}         |
-    +-----------------------+-------------------------------------+---------------+--------------------------------+
-</pre>
-</div>
-<figcaption><a href="#figure-17" class="selfRef">Figure 17</a>:
+<table class="center" id="table-1">
+          <caption>
+<a href="#table-1" class="selfRef">Table 1</a>:
 <a href="#name-initial-proxy-quic-forwardi" class="selfRef">Initial Proxy QUIC Forwarding Parameter Names</a>
-          </figcaption></figure>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Parameter Name</th>
+              <th class="text-left" rowspan="1" colspan="1">Description</th>
+              <th class="text-left" rowspan="1" colspan="1">Reference</th>
+              <th class="text-left" rowspan="1" colspan="1">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">accept-transform</td>
+              <td class="text-left" rowspan="1" colspan="1">contains supported transforms</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+              <td class="text-left" rowspan="1" colspan="1">
+                <a href="#forwarding-header" class="auto internal xref">Section 3.1</a>
+</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">transform</td>
+              <td class="text-left" rowspan="1" colspan="1">indicates selected transforms</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+              <td class="text-left" rowspan="1" colspan="1">
+                <a href="#forwarding-header" class="auto internal xref">Section 3.1</a>
+</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">scramble-key</td>
+              <td class="text-left" rowspan="1" colspan="1">contains key for scramble transform</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+              <td class="text-left" rowspan="1" colspan="1">
+                <a href="#scramble-transform" class="auto internal xref">Section 5.7.2</a>
+</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">active-vcid-limit</td>
+              <td class="text-left" rowspan="1" colspan="1">limits active VCIDs per CID</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+              <td class="text-left" rowspan="1" colspan="1">
+                <a href="#vcid-limit" class="auto internal xref">Section 5.4</a>
+</td>
+            </tr>
+          </tbody>
+        </table>
 </div>
 </section>
 </div>
@@ -3918,16 +3949,14 @@ Specification Required policy (Section 4.6 of <span>[<a href="#IANA-POLICY" clas
 <p id="section-10.3-1">This document establishes a new registry for packet transform names
 in &lt;<span><a href="https://www.iana.org/assignments/masque/masque.xhtml">https://www.iana.org/assignments/masque/masque.xhtml</a></span>&gt;
 and defines two initial transforms: "identity" and "scramble".
-Prior to finalization, deployments that implement the version of
-the <code>scramble</code> transform defined in this document should use the value
-"scramble-dt". Once the design team proposal is adopted and a new draft is submitted,
-the wire identifier will become "scramble-XX" where XX is the draft number.
+Until the <code>scramble</code> transform is finalized, deployments use the value
+"scramble-dt" instead of the reserved value "scramble" (see <a href="#scramble-transform" class="auto internal xref">Section 5.7.2</a>).
 Registrations in this registry are assigned using the
-Specification Required policy (Section 4.6 of <span>[<a href="#IANA-POLICY" class="cite xref">IANA-POLICY</a>]</span>).<a href="#section-10.3-1" class="pilcrow">¶</a></p>
+Specification Required policy (<span><a href="https://rfc-editor.org/rfc/rfc8126#section-4.6" class="relref">Section 4.6</a> of [<a href="#IANA-POLICY" class="cite xref">IANA-POLICY</a>]</span>).<a href="#section-10.3-1" class="pilcrow">¶</a></p>
 <span id="name-initial-packet-transform-na"></span><div id="iana-packet-transforms-table">
-<table class="center" id="table-1">
+<table class="center" id="table-2">
           <caption>
-<a href="#table-1" class="selfRef">Table 1</a>:
+<a href="#table-2" class="selfRef">Table 2</a>:
 <a href="#name-initial-packet-transform-na" class="selfRef">Initial Packet Transform Names</a>
           </caption>
 <thead>
@@ -3943,14 +3972,16 @@ Specification Required policy (Section 4.6 of <span>[<a href="#IANA-POLICY" clas
               <td class="text-left" rowspan="1" colspan="1">identity</td>
               <td class="text-left" rowspan="1" colspan="1">no transformation</td>
               <td class="text-left" rowspan="1" colspan="1">This Document</td>
-              <td class="text-left" rowspan="1" colspan="1">Section <a href="#identity-transform" class="auto internal xref">Section 5.7.1</a>
+              <td class="text-left" rowspan="1" colspan="1">
+                <a href="#identity-transform" class="auto internal xref">Section 5.7.1</a>
 </td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">scramble</td>
               <td class="text-left" rowspan="1" colspan="1">Reserved (will be used for final version)</td>
               <td class="text-left" rowspan="1" colspan="1">This Document</td>
-              <td class="text-left" rowspan="1" colspan="1">Section <a href="#scramble-transform" class="auto internal xref">Section 5.7.2</a>
+              <td class="text-left" rowspan="1" colspan="1">
+                <a href="#scramble-transform" class="auto internal xref">Section 5.7.2</a>
 </td>
             </tr>
           </tbody>
@@ -3977,9 +4008,9 @@ Required policy (<span><a href="https://rfc-editor.org/rfc/rfc8126#section-4.6" 
 between 0x00 and 0x3f (in hexadecimal; inclusive), which are assigned using
 Standards Action or IESG Approval as defined in Sections <a href="https://rfc-editor.org/rfc/rfc8126#section-4.9" class="relref">4.9</a> and <a href="https://rfc-editor.org/rfc/rfc8126#section-4.10" class="relref">4.10</a> of <span>[<a href="#IANA-POLICY" class="cite xref">IANA-POLICY</a>]</span>.<a href="#section-10.4-2" class="pilcrow">¶</a></p>
 <span id="name-initial-cid-capsule-reason-"></span><div id="iana-cid-reasons-table">
-<table class="center" id="table-2">
+<table class="center" id="table-3">
           <caption>
-<a href="#table-2" class="selfRef">Table 2</a>:
+<a href="#table-3" class="selfRef">Table 3</a>:
 <a href="#name-initial-cid-capsule-reason-" class="selfRef">Initial CID Capsule Reason Codes</a>
           </caption>
 <thead>
@@ -4023,9 +4054,9 @@ Standards Action or IESG Approval as defined in Sections <a href="https://rfc-ed
 registry established by <span>[<a href="#HTTP-CAPSULES" class="cite xref">HTTP-CAPSULES</a>]</span>. Note that the codepoints below
 will be replaced with lower values before publication.<a href="#section-10.5-1" class="pilcrow">¶</a></p>
 <span id="name-registered-capsule-types"></span><div id="iana-capsule-type-table">
-<table class="center" id="table-3">
+<table class="center" id="table-4">
           <caption>
-<a href="#table-3" class="selfRef">Table 3</a>:
+<a href="#table-4" class="selfRef">Table 4</a>:
 <a href="#name-registered-capsule-types" class="selfRef">Registered Capsule Types</a>
           </caption>
 <thead>
@@ -4225,15 +4256,11 @@ will be replaced with lower values before publication.<a href="#section-10.5-1" 
 <dd class="break"></dd>
 <dt id="QUIC-GREASE">[QUIC-GREASE]</dt>
         <dd>
-<span class="refAuthor">Schinazi, D.</span> and <span class="refAuthor">L. Pardue</span>, <span class="refTitle">"HTTP Datagrams and the Capsule Protocol"</span>, <span class="seriesInfo">RFC 9297</span>, <span class="seriesInfo">DOI 10.17487/RFC9297</span>, <time datetime="2022-08" class="refDate">August 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9297">https://www.rfc-editor.org/rfc/rfc9297</a>&gt;</span>. </dd>
+<span class="refAuthor">Thomson, M.</span>, <span class="refTitle">"Greasing the QUIC Bit"</span>, <span class="seriesInfo">RFC 9287</span>, <span class="seriesInfo">DOI 10.17487/RFC9287</span>, <time datetime="2022-08" class="refDate">August 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9287">https://www.rfc-editor.org/rfc/rfc9287</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="QUIC-LB">[QUIC-LB]</dt>
         <dd>
 <span class="refAuthor">Duke, M.</span>, <span class="refAuthor">Banks, N.</span>, and <span class="refAuthor">C. Huitema</span>, <span class="refTitle">"QUIC-LB: Generating Routable QUIC Connection IDs"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-load-balancers-22</span>, <time datetime="2026-10-23" class="refDate">23 October 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-load-balancers-22">https://datatracker.ietf.org/doc/html/draft-ietf-quic-load-balancers-22</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="RFC8999">[RFC8999]</dt>
-        <dd>
-<span class="refAuthor">Thomson, M.</span>, <span class="refTitle">"Version-Independent Properties of QUIC"</span>, <span class="seriesInfo">RFC 8999</span>, <span class="seriesInfo">DOI 10.17487/RFC8999</span>, <time datetime="2021-05" class="refDate">May 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8999">https://www.rfc-editor.org/rfc/rfc8999</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9001">[RFC9001]</dt>
         <dd>
@@ -4304,7 +4331,7 @@ ef012345678ebe6906e16ec5fc90a02c
       </h2>
 <p id="appendix-B-1">Thanks to Lucas Pardue, Ryan Hamilton, and Mirja Kühlewind for their inputs
 on this document. The scramble transform design came out of the encryption
-design team whose members were Antoine Fressancourt, Mirja Kuehlwind, Tiru Reddy,
+design team whose members were Antoine Fressancourt, Mirja Kühlewind, Tiru Reddy,
 Ben Schwartz, and the authors of this document. The authors would also like to
 thank Martin Duke for identifying a proxy looping vulnerability that influenced
 the capsule registration design.<a href="#appendix-B-1" class="pilcrow">¶</a></p>

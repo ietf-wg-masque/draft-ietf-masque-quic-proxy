@@ -473,7 +473,8 @@ Table of Contents
    don't support forwarded mode omit this header field or set it to
    "?0".
 
-     proxy-quic-forwarding = ?1; accept-transform="scramble,identity"; \
+     proxy-quic-forwarding = ?1; \
+         accept-transform="scramble-dt,identity"; \
          scramble-key=:abc...789=:
 
    If neither header is supplied with a value of "?1", none of the
@@ -1584,8 +1585,8 @@ Table of Contents
 
    Output:
 
-   *  A UDP payload that conforms to the QUIC invariants [RFC8999] and
-      does not modify the Connection ID.
+   *  A UDP payload that conforms to the QUIC invariants [INVARIANTS]
+      and does not modify the Connection ID.
 
    More complex transform behaviors could have internal state, but no
    such transforms are presented here.
@@ -1671,8 +1672,8 @@ Table of Contents
    6.  Let ctr_output = AES-CTR(k1, iv, ctr_input).
 
    7.  Let header = ctr_output[0] & 0x7F.  This ensures that the Header
-       Form bit is zero, as required by the QUIC invariants ([RFC8999],
-       Section 5.2).
+       Form bit is zero, as required by the QUIC invariants (Section 5.2
+       of [INVARIANTS]).
 
    8.  Encrypt iv with the block cipher: encrypted_iv = AES-ECB(k2, iv).
 
@@ -2001,7 +2002,8 @@ Table of Contents
      :path = /target.example.com/443/
      :authority = proxy.example.org
      proxy-quic-port-sharing = ?1
-     proxy-quic-forwarding = ?1; accept-transform="scramble,identity"; \
+     proxy-quic-forwarding = ?1; \
+         accept-transform="scramble-dt,identity"; \
          scramble-key=:abc...789=:
      capsule-protocol = ?1
 
@@ -2019,7 +2021,7 @@ Table of Contents
                            :status = 200
                            proxy-quic-port-sharing = ?1
                            proxy-quic-forwarding = ?1; \
-                               transform="scramble"; \
+                               transform="scramble-dt"; \
                                scramble-key=:ABC...321=:
                            capsule-protocol = ?1
 
@@ -2081,7 +2083,7 @@ Table of Contents
    client VCID of 0x62646668 which it will replace with the real client
    CID of 0x31323334.  All forwarded mode packets sent by the proxy will
    have been modified to contain the client VCID instead of the client
-   CID, and processed by the negotiated "scramble" packet transform.
+   CID, and processed by the negotiated scramble-dt packet transform.
    However, in the unlikely event that a forwarded packet arrives before
    the proxy's HTTP response, the client will not know which transform
    the proxy selected.  In this case, the client will have to ignore the
@@ -2198,7 +2200,7 @@ Table of Contents
    any QUIC version, and MAY send packets of that version through the
    forwarding path.  The proxy does not know what version they are
    using, so it can only require that these packets conform to the QUIC
-   invariants for short-header packets ([RFC8999], Section 5.2).
+   invariants for short-header packets (Section 5.2 of [INVARIANTS]).
 
    QUIC version 1 specifies a Fixed Bit (a.k.a. the "QUIC bit") with a
    fixed value to support sharing a 5-tuple with other protocols such as
@@ -2323,45 +2325,46 @@ Table of Contents
    Registrations in this registry are assigned using the Specification
    Required policy (Section 4.6 of [IANA-POLICY]).
 
-    +-----------------------+-------------------------------------+---------------+--------------------------------+
-    | Parameter Name        | Description                         | Reference     | Notes                          |
-    +-----------------------+-------------------------------------+---------------+--------------------------------+
-    | accept-transform      | contains supported transforms       | This document | Section {{forwarding-header}}  |
-    +-----------------------+-------------------------------------+---------------+--------------------------------+
-    | transform             | indicates selected transforms       | This document | Section {{forwarding-header}}  |
-    +-----------------------+-------------------------------------+---------------+--------------------------------+
-    | scramble-key          | contains key for scramble transform | This document | Section {{scramble-transform}} |
-    +-----------------------+-------------------------------------+---------------+--------------------------------+
-    | active-vcid-limit     | limits active VCIDs per CID         | This document | Section {{vcid-limit}}         |
-    +-----------------------+-------------------------------------+---------------+--------------------------------+
+     +===================+====================+===========+=========+
+     | Parameter Name    | Description        | Reference | Notes   |
+     +===================+====================+===========+=========+
+     | accept-transform  | contains supported | This      | Section |
+     |                   | transforms         | document  | 3.1     |
+     +-------------------+--------------------+-----------+---------+
+     | transform         | indicates selected | This      | Section |
+     |                   | transforms         | document  | 3.1     |
+     +-------------------+--------------------+-----------+---------+
+     | scramble-key      | contains key for   | This      | Section |
+     |                   | scramble transform | document  | 5.7.2   |
+     +-------------------+--------------------+-----------+---------+
+     | active-vcid-limit | limits active      | This      | Section |
+     |                   | VCIDs per CID      | document  | 5.4     |
+     +-------------------+--------------------+-----------+---------+
 
-       Figure 17: Initial Proxy QUIC Forwarding Parameter Names
+          Table 1: Initial Proxy QUIC Forwarding Parameter Names
 
 10.3.  Packet Transform Names
 
    This document establishes a new registry for packet transform names
    in <https://www.iana.org/assignments/masque/masque.xhtml> and defines
-   two initial transforms: "identity" and "scramble".  Prior to
-   finalization, deployments that implement the version of the scramble
-   transform defined in this document should use the value "scramble-
-   dt".  Once the design team proposal is adopted and a new draft is
-   submitted, the wire identifier will become "scramble-XX" where XX is
-   the draft number.  Registrations in this registry are assigned using
-   the Specification Required policy (Section 4.6 of [IANA-POLICY]).
+   two initial transforms: "identity" and "scramble".  Until the
+   scramble transform is finalized, deployments use the value "scramble-
+   dt" instead of the reserved value "scramble" (see Section 5.7.2).
+   Registrations in this registry are assigned using the Specification
+   Required policy (Section 4.6 of [IANA-POLICY]).
 
-      +===========+================+===============+===============+
-      | Transform | Description    | Specification | Notes         |
-      | Name      |                |               |               |
-      +===========+================+===============+===============+
-      | identity  | no             | This Document | Section       |
-      |           | transformation |               | Section 5.7.1 |
-      +-----------+----------------+---------------+---------------+
-      | scramble  | Reserved (will | This Document | Section       |
-      |           | be used for    |               | Section 5.7.2 |
-      |           | final version) |               |               |
-      +-----------+----------------+---------------+---------------+
+   +================+========================+===============+=========+
+   | Transform      | Description            | Specification | Notes   |
+   | Name           |                        |               |         |
+   +================+========================+===============+=========+
+   | identity       | no transformation      | This Document | Section |
+   |                |                        |               | 5.7.1   |
+   +----------------+------------------------+---------------+---------+
+   | scramble       | Reserved (will be used | This Document | Section |
+   |                | for final version)     |               | 5.7.2   |
+   +----------------+------------------------+---------------+---------+
 
-                 Table 1: Initial Packet Transform Names
+                  Table 2: Initial Packet Transform Names
 
 10.4.  CID Capsule Reason Codes
 
@@ -2394,7 +2397,7 @@ Table of Contents
        |       |           | with existing mapping |               |
        +-------+-----------+-----------------------+---------------+
 
-                 Table 2: Initial CID Capsule Reason Codes
+                 Table 3: Initial CID Capsule Reason Codes
 
 10.5.  Capsule Types
 
@@ -2439,7 +2442,7 @@ Table of Contents
             | RETIRE_CLIENT_VCID  | 0xffe90f | This Document |
             +---------------------+----------+---------------+
 
-                    Table 3: Registered Capsule Types
+                    Table 4: Registered Capsule Types
 
    All of these new entries use the following values for these fields:
 
@@ -2519,19 +2522,15 @@ Table of Contents
               2010, <https://www.rfc-editor.org/rfc/rfc6040>.
 
    [QUIC-GREASE]
-              Schinazi, D. and L. Pardue, "HTTP Datagrams and the
-              Capsule Protocol", RFC 9297, DOI 10.17487/RFC9297, August
-              2022, <https://www.rfc-editor.org/rfc/rfc9297>.
+              Thomson, M., "Greasing the QUIC Bit", RFC 9287,
+              DOI 10.17487/RFC9287, August 2022,
+              <https://www.rfc-editor.org/rfc/rfc9287>.
 
    [QUIC-LB]  Duke, M., Banks, N., and C. Huitema, "QUIC-LB: Generating
               Routable QUIC Connection IDs", Work in Progress, Internet-
               Draft, draft-ietf-quic-load-balancers-22, 23 October 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
               load-balancers-22>.
-
-   [RFC8999]  Thomson, M., "Version-Independent Properties of QUIC",
-              RFC 8999, DOI 10.17487/RFC8999, May 2021,
-              <https://www.rfc-editor.org/rfc/rfc8999>.
 
    [RFC9001]  Thomson, M., Ed. and S. Turner, Ed., "Using TLS to Secure
               QUIC", RFC 9001, DOI 10.17487/RFC9001, May 2021,
@@ -2582,7 +2581,7 @@ Acknowledgments
    Thanks to Lucas Pardue, Ryan Hamilton, and Mirja Kühlewind for their
    inputs on this document.  The scramble transform design came out of
    the encryption design team whose members were Antoine Fressancourt,
-   Mirja Kuehlwind, Tiru Reddy, Ben Schwartz, and the authors of this
+   Mirja Kühlewind, Tiru Reddy, Ben Schwartz, and the authors of this
    document.  The authors would also like to thank Martin Duke for
    identifying a proxy looping vulnerability that influenced the capsule
    registration design.
