@@ -1167,7 +1167,11 @@ After acknowledging a target CID registration, a proxy that is willing to
 forward packets for that target CID issues one or more target VCIDs for it using
 NEW_TARGET_VCID capsules. The client can use any target VCID that it has
 received for sending forwarded mode packets, as long as the target VCID has not
-been retired and the proxy has not requested its retirement.
+been retired and the proxy has not requested its retirement. Since the proxy is
+the endpoint that receives packets using target VCIDs, it MUST be prepared to
+receive forwarded mode packets using a target VCID before sending the
+NEW_TARGET_VCID capsule that issues it, and the client does not acknowledge
+target VCIDs.
 
 After acknowledging a client CID registration, a proxy proposes one or more
 client VCIDs for it using NEW_CLIENT_VCID capsules. Unless it has retired the
