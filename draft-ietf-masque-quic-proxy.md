@@ -564,13 +564,13 @@ the client-to-target QUIC connection.
 Register Client CID Capsule {
   Type (i) = see {{iana}} for the value of the capsule type
   Length (i),
-  Registration Sequence Number (i),
+  Connection ID Sequence Number (i),
   Connection ID (0..2040),
 }
 ~~~
 {: #fig-capsule-register-client-cid title="Register Client CID Capsule Format"}
 
-Registration Sequence Number:
+Connection ID Sequence Number:
 : The sequence number of this registration in the sequence number space of
 client CID registrations ({{cid-registration}}).
 
@@ -590,7 +590,7 @@ connection, and the corresponding Stateless Reset Token.
 Register Target CID Capsule {
   Type (i) = see {{iana}} for the value of the capsule type
   Length (i),
-  Registration Sequence Number (i),
+  Connection ID Sequence Number (i),
   Connection ID Length (i),
   Connection ID (0..2040),
   Stateless Reset Token (..),
@@ -598,7 +598,7 @@ Register Target CID Capsule {
 ~~~
 {: #fig-capsule-register-target-cid title="Register Target CID Capsule Format"}
 
-Registration Sequence Number:
+Connection ID Sequence Number:
 : The sequence number of this registration in the sequence number space of
 target CID registrations ({{cid-registration}}).
 
@@ -626,12 +626,12 @@ to acknowledge the registration of a connection ID.
 Acknowledge CID Capsule {
   Type (i) = see {{iana}} for the values of the capsule types
   Length (i),
-  Registration Sequence Number (i),
+  Connection ID Sequence Number (i),
 }
 ~~~
 {: #fig-capsule-ack-cid title="Acknowledge CID Capsule Format"}
 
-Registration Sequence Number:
+Connection ID Sequence Number:
 : The sequence number of the registration being acknowledged, in the sequence
 number space of client CID registrations for ACK_CLIENT_CID and of target CID
 registrations for ACK_TARGET_CID ({{cid-registration}}).
@@ -647,7 +647,7 @@ Reject CID Capsule {
   Type (i) = see {{iana}} for the values of the capsule types
   Length (i),
   Reason (i),
-  Registration Sequence Number (i),
+  Connection ID Sequence Number (i),
 }
 ~~~
 {: #fig-capsule-reject-cid title="Reject CID Capsule Format"}
@@ -656,7 +656,7 @@ Reason:
 : The reason for rejecting the connection ID registration.
 See {{iana-cid-reasons}} for the list of reason codes.
 
-Registration Sequence Number:
+Connection ID Sequence Number:
 : The sequence number of the registration being rejected, in the sequence
 number space of client CID registrations for REJECT_CLIENT_CID and of target
 CID registrations for REJECT_TARGET_CID ({{cid-registration}}).
@@ -671,12 +671,12 @@ of a connection ID that they no longer need.
 Retire CID Capsule {
   Type (i) = see {{iana}} for the values of the capsule types
   Length (i),
-  Registration Sequence Number (i),
+  Connection ID Sequence Number (i),
 }
 ~~~
 {: #fig-capsule-retire-cid title="Retire CID Capsule Format"}
 
-Registration Sequence Number:
+Connection ID Sequence Number:
 : The sequence number of the registration being retired, in the sequence number
 space of client CID registrations for RETIRE_CLIENT_CID and of target CID
 registrations for RETIRE_TARGET_CID ({{cid-registration}}).
@@ -973,7 +973,7 @@ proxy.
 New Target VCID Capsule {
   Type (i) = see {{iana}} for the value of the capsule type
   Length (i),
-  Registration Sequence Number (i),
+  Connection ID Sequence Number (i),
   Virtual Connection ID Sequence Number (i),
   Retire Prior To (i),
   Virtual Connection ID Length (i),
@@ -983,7 +983,7 @@ New Target VCID Capsule {
 ~~~
 {: #fig-capsule-new-target-vcid title="New Target VCID Capsule Format"}
 
-Registration Sequence Number:
+Connection ID Sequence Number:
 : The sequence number of the target CID registration that the target VCID maps
 to ({{cid-registration}}).
 
@@ -1024,14 +1024,14 @@ registered client CID. This capsule MUST only be sent by the proxy.
 New Client VCID Capsule {
   Type (i) = see {{iana}} for the value of the capsule type
   Length (i),
-  Registration Sequence Number (i),
+  Connection ID Sequence Number (i),
   Virtual Connection ID Sequence Number (i),
   Virtual Connection ID (8..2040),
 }
 ~~~
 {: #fig-capsule-new-client-vcid title="New Client VCID Capsule Format"}
 
-Registration Sequence Number:
+Connection ID Sequence Number:
 : The sequence number of the client CID registration that the client VCID maps
 to ({{cid-registration}}).
 
@@ -1059,14 +1059,14 @@ client.
 Acknowledge Client VCID Capsule {
   Type (i) = see {{iana}} for the value of the capsule type
   Length (i),
-  Registration Sequence Number (i),
+  Connection ID Sequence Number (i),
   Virtual Connection ID Sequence Number (i),
   Stateless Reset Token (..),
 }
 ~~~
 {: #fig-capsule-ack-client-vcid title="Acknowledge Client VCID Capsule Format"}
 
-Registration Sequence Number:
+Connection ID Sequence Number:
 : The sequence number of the client CID registration that the client VCID maps
 to ({{cid-registration}}).
 
@@ -1096,7 +1096,7 @@ Reject Client VCID Capsule {
   Type (i) = see {{iana}} for the value of the capsule type
   Length (i),
   Reason (i),
-  Registration Sequence Number (i),
+  Connection ID Sequence Number (i),
   Virtual Connection ID Sequence Number (i),
 }
 ~~~
@@ -1106,7 +1106,7 @@ Reason:
 : The reason for refusing the client VCID, such as TOO_SHORT or CONFLICT.
 See {{iana-cid-reasons}} for the list of reason codes.
 
-Registration Sequence Number:
+Connection ID Sequence Number:
 : The sequence number of the client CID registration that the client VCID maps
 to ({{cid-registration}}).
 
@@ -1123,13 +1123,13 @@ only be sent by the client.
 Retire Target VCID Capsule {
   Type (i) = see {{iana}} for the value of the capsule type
   Length (i),
-  Registration Sequence Number (i),
+  Connection ID Sequence Number (i),
   Virtual Connection ID Sequence Number (i),
 }
 ~~~
 {: #fig-capsule-retire-target-vcid title="Retire Target VCID Capsule Format"}
 
-Registration Sequence Number:
+Connection ID Sequence Number:
 : The sequence number of the target CID registration that the target VCID maps
 to ({{cid-registration}}).
 
@@ -1146,13 +1146,13 @@ proposed client VCID. This capsule MUST only be sent by the proxy.
 Retire Client VCID Capsule {
   Type (i) = see {{iana}} for the value of the capsule type
   Length (i),
-  Registration Sequence Number (i),
+  Connection ID Sequence Number (i),
   Virtual Connection ID Sequence Number (i),
 }
 ~~~
 {: #fig-capsule-retire-client-vcid title="Retire Client VCID Capsule Format"}
 
-Registration Sequence Number:
+Connection ID Sequence Number:
 : The sequence number of the client CID registration that the client VCID maps
 to ({{cid-registration}}).
 
@@ -1774,7 +1774,7 @@ STREAM(44): HEADERS             -------->
 
 STREAM(44): DATA                -------->
   Capsule Type = REGISTER_CLIENT_CID
-  Registration Sequence Number = 0
+  Connection ID Sequence Number = 0
   Connection ID = 0x31323334
 
 DATAGRAM                        -------->
@@ -1795,15 +1795,15 @@ DATAGRAM                        -------->
                         Maximum Connection IDs = 4
 
                         Capsule Type = ACK_CLIENT_CID
-                        Registration Sequence Number = 0
+                        Connection ID Sequence Number = 0
 
                         Capsule Type = NEW_CLIENT_VCID
-                        Registration Sequence Number = 0
+                        Connection ID Sequence Number = 0
                         Virtual Connection ID Sequence Number = 0
                         Virtual Connection ID = 0x62646668
 
                         Capsule Type = NEW_CLIENT_VCID
-                        Registration Sequence Number = 0
+                        Connection ID Sequence Number = 0
                         Virtual Connection ID Sequence Number = 1
                         Virtual Connection ID = 0x7a797877
 ~~~
@@ -1820,12 +1820,12 @@ of 2.
 ~~~
 STREAM(44): DATA                -------->
   Capsule Type = ACK_CLIENT_VCID
-  Registration Sequence Number = 0
+  Connection ID Sequence Number = 0
   Virtual Connection ID Sequence Number = 0
   Stateless Reset Token = Token
 
   Capsule Type = ACK_CLIENT_VCID
-  Registration Sequence Number = 0
+  Connection ID Sequence Number = 0
   Virtual Connection ID Sequence Number = 1
   Stateless Reset Token = Token
 ~~~
@@ -1875,23 +1875,23 @@ following capsule:
 ~~~
 STREAM(44): DATA                -------->
   Capsule Type = REGISTER_TARGET_CID
-  Registration Sequence Number = 0
+  Connection ID Sequence Number = 0
   Connection ID = 0x61626364
   Stateless Reset Token = Token
 
            <--------  STREAM(44): DATA
                         Capsule Type = ACK_TARGET_CID
-                        Registration Sequence Number = 0
+                        Connection ID Sequence Number = 0
 
                         Capsule Type = NEW_TARGET_VCID
-                        Registration Sequence Number = 0
+                        Connection ID Sequence Number = 0
                         Virtual Connection ID Sequence Number = 0
                         Retire Prior To = 0
                         Virtual Connection ID = 0x123412341234
                         Stateless Reset Token = Token
 
                         Capsule Type = NEW_TARGET_VCID
-                        Registration Sequence Number = 0
+                        Connection ID Sequence Number = 0
                         Virtual Connection ID Sequence Number = 1
                         Retire Prior To = 0
                         Virtual Connection ID = 0x567856785678
