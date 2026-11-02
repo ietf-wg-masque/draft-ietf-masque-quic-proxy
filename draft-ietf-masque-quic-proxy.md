@@ -2121,8 +2121,8 @@ Specification Required policy ({{Section 4.6 of IANA-POLICY}}).
 
 | Transform Name | Description       | Specification | Notes                          |
 |:---------------|:------------------|:--------------|--------------------------------|
-| identity       | no transformation | This Document | Section {{identity-transform}}     |
-| scramble       | Reserved (will be used for final version)  | This Document | Section {{scramble-transform}} |
+| identity       | no transformation | This Document | {{identity-transform}}     |
+| scramble       | Reserved (will be used for final version)  | This Document | {{scramble-transform}} |
 {: #iana-packet-transforms-table title="Initial Packet Transform Names"}
 
 ## CID Capsule Reason Codes {#iana-cid-reasons}
