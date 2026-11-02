@@ -1673,7 +1673,7 @@ the proxy uses an unused client VCID.
 
 The steps for active migration are as follows:
 
-1. Client and proxy exchange connection IDs via REGISTER_CLIENT_CID/REGISTER_TARGET_CID/ACK_CLIENT_CID/ACK_TARGET_CID, the proxy issues Virtual Connection IDs, and they start using the forwarded mode.
+1. Client and proxy exchange connection IDs via capsules, the proxy issues Virtual Connection IDs, and they start using the forwarded mode.
 1. Client probes a new network path. Once the proxy has received the client's probe, it accepts forwarded mode packets from the new address, and starts validating that address.
 1. Once the client's path validation succeeds, the client migrates the client-to-proxy QUIC connection to the new path and sends forwarded mode packets on it using an unused target VCID.
 1. Client retires the target VCIDs that it used on the previous path with RETIRE_TARGET_VCID capsules.
