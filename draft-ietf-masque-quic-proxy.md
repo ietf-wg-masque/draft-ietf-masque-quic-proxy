@@ -2006,7 +2006,7 @@ transform (see {{identity-transform}}), such correlation is trivial by matching
 a subset of QUIC packet bytes as packets enter the proxy on one side and exit
 on the other. Packet transforms such as `scramble` mitigate this by
 cryptographically preventing such byte comparisons
-(see {{!scramble-transform=scramble-transform}}).
+(see {{scramble-transform}}).
 
 Regardless of which packet transform is used, both tunnelled and forwarded mode
 are still vulnerable to size and timing attacks, without the addition of techniques that go beyond the analysis
