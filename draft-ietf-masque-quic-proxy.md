@@ -894,6 +894,17 @@ Forwarded mode builds on Connection ID registration ({{cid-registration}}): for
 each registered connection ID, the proxy issues Virtual Connection IDs that are
 used on the client-to-proxy 4-tuple in its place.
 
+When forwarded mode is enabled, the proxy issues Virtual Connection IDs using
+the NEW_TARGET_VCID ({{capsule-new-target-vcid}}) and NEW_CLIENT_VCID
+({{capsule-new-client-vcid}}) capsule types, and the client accepts or refuses
+each client VCID using the ACK_CLIENT_VCID ({{capsule-ack-client-vcid}}) and
+REJECT_CLIENT_VCID ({{capsule-reject-client-vcid}}) capsule types. The client
+retires target VCIDs using the RETIRE_TARGET_VCID capsule type
+({{capsule-retire-target-vcid}}), and the proxy retires client VCIDs using the
+RETIRE_CLIENT_VCID capsule type ({{capsule-retire-client-vcid}}). These
+capsule types MUST only be sent when forwarded mode is enabled.
+{{vcid-issuance}} and {{vcid-retirement}} describe how they are used.
+
 All packets sent in forwarded mode use a transform in which CIDs are switched
 into VCIDs, and the contents of packets are either left the same, or modified
 ({{transforms}}).
@@ -905,17 +916,6 @@ and stateless resets ({{resets}}).
 
 Forwarded mode packets are not part of the QUIC connection the tunnel is
 managed by, but instead an independent flow of QUIC packets.
-
-When forwarded mode is enabled, the proxy issues Virtual Connection IDs using
-the NEW_TARGET_VCID ({{capsule-new-target-vcid}}) and NEW_CLIENT_VCID
-({{capsule-new-client-vcid}}) capsule types, and the client accepts or refuses
-each client VCID using the ACK_CLIENT_VCID ({{capsule-ack-client-vcid}}) and
-REJECT_CLIENT_VCID ({{capsule-reject-client-vcid}}) capsule types. The client
-retires target VCIDs using the RETIRE_TARGET_VCID capsule type
-({{capsule-retire-target-vcid}}), and the proxy retires client VCIDs using the
-RETIRE_CLIENT_VCID capsule type ({{capsule-retire-client-vcid}}). These
-capsule types MUST only be sent when forwarded mode is enabled.
-{{vcid-issuance}} and {{vcid-retirement}} describe how they are used.
 
 For QUIC-aware proxying with forwarded mode, the steps are as follows:
 
