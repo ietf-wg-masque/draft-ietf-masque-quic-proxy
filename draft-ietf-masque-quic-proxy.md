@@ -1589,6 +1589,8 @@ not yet validated, the proxy tunnels packets for the client in HTTP Datagram
 frames instead, subject to the anti-amplification limit for that address
 ({{Section 8 of QUIC}}).
 
+### Passive Migration {#passive-migration}
+
 In the event of passive migration, such as NAT rebinding, the client is not
 aware that its address has changed, and continues to send packets using the same
 Virtual Connection IDs. Until the client sends a client-to-proxy QUIC packet
@@ -1614,10 +1616,18 @@ containing a PING frame. This allows the client-to-proxy QUIC connection to
 migrate to the new address, and the proxy to accept forwarded mode packets from
 it, without waiting for other client-to-proxy QUIC packets.
 
-A proxy that receives a probing packet from a new client address SHOULD initiate
-path validation ({{Section 8.2 of QUIC}}) to that address, even before the
-client migrates to it, so that it can send forwarded mode packets to the client
-on the new network path as soon as the client migrates.
+The steps for passive migration are as follows:
+
+1. Client and proxy exchange connection IDs via REGISTER_CLIENT_CID/REGISTER_TARGET_CID/ACK_CLIENT_CID/ACK_TARGET_CID, the proxy issues Virtual Connection IDs, and they start using the forwarded mode.
+1. The network path experiences NAT rebinding, and packets that the client sends to the proxy arrive from a new address.
+1. The proxy drops forwarded mode packets from the new address until it receives a client-to-proxy QUIC packet from that address, and then forwards them to the target.
+1. The client-to-proxy QUIC connection migrates to the new address, and the proxy starts validating it ({{Section 9.3 of QUIC}}). Until path validation succeeds, the proxy tunnels packets for the client in HTTP Datagram frames.
+1. Once path validation succeeds, the proxy reconfigures target-to-client forwarding rules to send forwarded mode packets to the client at the new address.
+
+No capsules are exchanged in response to passive migration, unless the proxy
+chooses to switch to an unused client VCID.
+
+### Active Migration {#active-migration}
 
 In the event of active migration, the client SHOULD probe the new network path
 ({{Section 9.1 of QUIC}}) before sending forwarded mode packets on it, and
@@ -1630,6 +1640,11 @@ the new network path by sending a non-probing packet on it
 VCIDs that it has not used before. Once the client no longer uses the previous
 network path, it retires the target VCIDs that it used on that path
 ({{vcid-retirement}}).
+
+A proxy that receives a probing packet from a new client address SHOULD initiate
+path validation ({{Section 8.2 of QUIC}}) to that address, even before the
+client migrates to it, so that it can send forwarded mode packets to the client
+on the new network path as soon as the client migrates.
 
 A client that migrates without first probing the new network path, such as when
 the previous network path is no longer usable, sends a client-to-proxy QUIC
@@ -1658,18 +1673,7 @@ path before, if it has not retired it. In that case, the proxy MAY likewise use
 the client VCID that it used on that path, if it has not retired it; otherwise,
 the proxy uses an unused client VCID.
 
-### Passive Migration Steps {#passive-migration-steps}
-
-1. Client and proxy exchange connection IDs via REGISTER_CLIENT_CID/REGISTER_TARGET_CID/ACK_CLIENT_CID/ACK_TARGET_CID, the proxy issues Virtual Connection IDs, and they start using the forwarded mode.
-1. The network path experiences NAT rebinding, and packets that the client sends to the proxy arrive from a new address.
-1. The proxy drops forwarded mode packets from the new address until it receives a client-to-proxy QUIC packet from that address, and then forwards them to the target.
-1. The client-to-proxy QUIC connection migrates to the new address, and the proxy starts validating it ({{Section 9.3 of QUIC}}). Until path validation succeeds, the proxy tunnels packets for the client in HTTP Datagram frames.
-1. Once path validation succeeds, the proxy reconfigures target-to-client forwarding rules to send forwarded mode packets to the client at the new address.
-
-No capsules are exchanged in response to passive migration, unless the proxy
-chooses to switch to an unused client VCID.
-
-### Active Migration Steps {#active-migration-steps}
+The steps for active migration are as follows:
 
 1. Client and proxy exchange connection IDs via REGISTER_CLIENT_CID/REGISTER_TARGET_CID/ACK_CLIENT_CID/ACK_TARGET_CID, the proxy issues Virtual Connection IDs, and they start using the forwarded mode.
 1. Client probes a new network path. Once the proxy has received the client's probe, it accepts forwarded mode packets from the new address, and starts validating that address.
