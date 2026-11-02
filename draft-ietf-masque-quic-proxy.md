@@ -1983,7 +1983,7 @@ to support sharing a 5-tuple with other protocols such as DTLS, but the QUIC
 invariants do not guarantee the value of this bit.  Accordingly proxies with
 forwarding mode enabled MUST NOT rely on this bit for protocol identification,
 and SHOULD send and accept the `grease_quic_bit` transport parameter
-{{?QUIC-GREASE=RFC9297}} to avoid ossification of the forwarding mode path.
+{{?QUIC-GREASE=RFC9287}} to avoid ossification of the forwarding mode path.
 
 # Security Considerations {#security}
 
