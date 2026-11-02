@@ -350,7 +350,7 @@ Clients and Proxies not implementing forwarded mode do not need to consider
 VCIDs since all client-to-target datagrams will be encapsulated
 within the client-to-proxy connection.
 
-## Negotiating Modes {#negotiation}
+# Negotiating Modes {#negotiation}
 
 In order to support QUIC-aware proxying, both clients and proxies need
 to support capsules {{HTTP-CAPSULES}}, which is indicated by including
@@ -390,7 +390,7 @@ After negotiating support with header fields, clients and proxies use
 the capsules defined in {{cid-registration}} and {{forwarded-mode}} to
 communicate information about CIDs and VCIDs.
 
-### Proxy-QUIC-Forwarding Header {#forwarding-header}
+## Proxy-QUIC-Forwarding Header {#forwarding-header}
 
 A client initiates UDP proxying via a CONNECT request as defined
 in {{CONNECT-UDP}}. Within its request, it includes the "Proxy-QUIC-Forwarding"
@@ -434,7 +434,7 @@ Clients MUST NOT send the "transform" parameter and proxies MUST NOT send the
 receipt of an "accept-transform" or "active-vcid-limit" parameter and proxies
 MUST ignore receipt of a "transform" parameter.
 
-### Proxy-QUIC-Port-Sharing Header {#port-sharing-header}
+## Proxy-QUIC-Port-Sharing Header {#port-sharing-header}
 
 A client may include the "Proxy-QUIC-Port-Sharing" header to indicate whether
 or not the proxy is permitted to share ports between this QUIC connection and other
