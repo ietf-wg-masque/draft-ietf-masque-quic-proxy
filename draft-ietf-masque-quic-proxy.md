@@ -1618,7 +1618,7 @@ it, without waiting for other client-to-proxy QUIC packets.
 
 The steps for passive migration are as follows:
 
-1. Client and proxy exchange connection IDs via REGISTER_CLIENT_CID/REGISTER_TARGET_CID/ACK_CLIENT_CID/ACK_TARGET_CID, the proxy issues Virtual Connection IDs, and they start using the forwarded mode.
+1. Client and proxy exchange connection IDs via capsules, the proxy issues Virtual Connection IDs, and they start using the forwarded mode.
 1. The network path experiences NAT rebinding, and packets that the client sends to the proxy arrive from a new address.
 1. The proxy drops forwarded mode packets from the new address until it receives a client-to-proxy QUIC packet from that address, and then forwards them to the target.
 1. The client-to-proxy QUIC connection migrates to the new address, and the proxy starts validating it ({{Section 9.3 of QUIC}}). Until path validation succeeds, the proxy tunnels packets for the client in HTTP Datagram frames.
