@@ -2094,19 +2094,12 @@ in <[](https://www.iana.org/assignments/masque/masque.xhtml)>.
 Registrations in this registry are assigned using the
 Specification Required policy ({{Section 4.6 of !IANA-POLICY=RFC8126}}).
 
-~~~
-    +-----------------------+-------------------------------------+---------------+--------------------------------+
-    | Parameter Name        | Description                         | Reference     | Notes                          |
-    +-----------------------+-------------------------------------+---------------+--------------------------------+
-    | accept-transform      | contains supported transforms       | This document | Section {{forwarding-header}}  |
-    +-----------------------+-------------------------------------+---------------+--------------------------------+
-    | transform             | indicates selected transforms       | This document | Section {{forwarding-header}}  |
-    +-----------------------+-------------------------------------+---------------+--------------------------------+
-    | scramble-key          | contains key for scramble transform | This document | Section {{scramble-transform}} |
-    +-----------------------+-------------------------------------+---------------+--------------------------------+
-    | active-vcid-limit     | limits active VCIDs per CID         | This document | Section {{vcid-limit}}         |
-    +-----------------------+-------------------------------------+---------------+--------------------------------+
-~~~
+| Parameter Name    | Description                         | Reference     | Notes                  |
+|:------------------|:------------------------------------|:--------------|------------------------|
+| accept-transform  | contains supported transforms       | This document | {{forwarding-header}}  |
+| transform         | indicates selected transforms       | This document | {{forwarding-header}}  |
+| scramble-key      | contains key for scramble transform | This document | {{scramble-transform}} |
+| active-vcid-limit | limits active VCIDs per CID         | This document | {{vcid-limit}}         |
 {: #iana-parameter-names-table title="Initial Proxy QUIC Forwarding Parameter Names"}
 
 ## Packet Transform Names {#iana-transforms}
