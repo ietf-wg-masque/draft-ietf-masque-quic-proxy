@@ -1969,7 +1969,7 @@ While QUIC proxies can proxy all versions of QUIC, some optional capabilities
 are limited to certain versions. Specifically, some of the
 capsules in {{capsule-types-formats}} and {{vcid-capsule-types-formats}}
 include a Stateless Reset Token field.
-This field is defined in {{!QUIC=RFC9000}} and not part of
+This field is defined in {{QUIC}} and not part of
 {{INVARIANTS}}. If a future QUIC version removes or changes the
 behavior of Stateless Reset Tokens, the Stateless Reset Token field in each
 capsule MUST have a length of zero.
@@ -2044,7 +2044,7 @@ transform did provide integrity protection, attackers can inject replayed
 packets. Protection against replayed packets is similarly provided by QUIC in
 tunnelled mode, but not provided by any of the forwarded mode packet transforms
 defined in this document. Similarly, Forwarded mode packets are vulnerable to
-active attacks when {{!ECN=RFC3168}} markings are forwarded. Specifically, an
+active attacks when {{ECN}} markings are forwarded. Specifically, an
 attacker could embed a signal over a series of packets by clearing or setting
 ECN bits. This attack is possible without injecting, dropping, or modifying the
 QUIC packet, but instead modifying the packet's IP header.
