@@ -2092,7 +2092,7 @@ This document establishes a new registry, "Proxy QUIC Forwarding Parameter Names
 for parameter names to use with the "Proxy-QUIC-Forwarding" header field,
 in <[](https://www.iana.org/assignments/masque/masque.xhtml)>.
 Registrations in this registry are assigned using the
-Specification Required policy (Section 4.6 of [IANA-POLICY]).
+Specification Required policy ({{Section 4.6 of !IANA-POLICY=RFC8126}}).
 
 ~~~
     +-----------------------+-------------------------------------+---------------+--------------------------------+
@@ -2117,7 +2117,7 @@ and defines two initial transforms: "identity" and "scramble".
 Until the `scramble` transform is finalized, deployments use the value
 "scramble-dt" instead of the reserved value "scramble" (see {{scramble-transform}}).
 Registrations in this registry are assigned using the
-Specification Required policy (Section 4.6 of [IANA-POLICY]).
+Specification Required policy ({{Section 4.6 of IANA-POLICY}}).
 
 | Transform Name | Description       | Specification | Notes                          |
 |:---------------|:------------------|:--------------|--------------------------------|
@@ -2138,7 +2138,7 @@ addition to those common fields, all registrations in this registry MUST include
 a "Name" field that contains a short name or label for the Reason.
 
 Permanent registrations in this registry are assigned using the Specification
-Required policy ({{Section 4.6 of !IANA-POLICY=RFC8126}}), except for values
+Required policy ({{Section 4.6 of IANA-POLICY}}), except for values
 between 0x00 and 0x3f (in hexadecimal; inclusive), which are assigned using
 Standards Action or IESG Approval as defined in {{Sections 4.9 and 4.10 of
 IANA-POLICY}}.
